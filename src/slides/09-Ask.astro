@@ -1,0 +1,139 @@
+---
+import Slide from '../components/Slide.astro';
+import { cs, numbers } from '../data/numbers';
+
+// Timeline on a 1680 × 300 grid (1 unit = 0.1rem): four stops, then three possible decisions.
+const lineY = 170;
+const stops = [
+  { x: 40, when: 'Jaro', what: 'výchozí měření' },
+  { x: 440, when: 'Září', what: 'start v\u00a0Porubě' },
+  { x: 840, when: 'Každý měsíc', what: 'srovnání s\u00a0Jihem' },
+  { x: 1240, when: 'Únor', what: 'vyhodnocení' },
+];
+const decisions = [
+  { y: 30, label: 'Rozšířit' },
+  { y: 100, label: 'Upravit' },
+  { y: lineY, label: 'Ukončit' },
+];
+const needs = ['Data ODIS', 'Poruba a\u00a0Jih', '3\u00a0partneři z\u00a0kultury', '2\u00a0školy', '2\u00a0firmy', `${cs(numbers.pilotCostMillion)}\u00a0mil.\u00a0Kč`];
+
+const rem = (units: number) => `${units / 10}rem`;
+---
+
+<Slide
+  theme="navy"
+  class="ask"
+  notes="Žádáme o data a jeden obvod. Pilot v Porubě na šest měsíců za tři celé čtyři milionu korun, kontrolní obvod Jih, data o jízdenkách od KODIS, tři partnery z kultury, dvě školy a dvě firmy. Za půl roku budeme vědět, jestli Fajnovku rozšířit, upravit, nebo ukončit. Děkujeme."
+>
+  <h2 class="t-title" data-in><span class="mark">Dejte nám data a&nbsp;jeden obvod.</span></h2>
+  <p class="ask__promise t-body" data-in style="--i:2">Za šest měsíců ukážeme, zda Fajnovka přivádí a&nbsp;udržuje cestující.</p>
+
+  <div class="ask__timeline">
+    <svg viewBox="0 0 1680 300" aria-hidden="true">
+      <path class="ask__line" d={`M40 ${lineY}H1240`} pathLength="1"></path>
+      {decisions.map(({ y }) => <path class="ask__branch" d={`M1240 ${lineY}C1350 ${lineY} 1340 ${y} 1450 ${y}H1490`} pathLength="1" />)}
+      {stops.map(({ x }, index) => <circle class="ask__stop" cx={x} cy={lineY} r="17" style={`--n:${index}`} />)}
+      {decisions.map(({ y }) => <circle class="ask__stop ask__stop--end" cx="1490" cy={y} r="13" style="--n:5" />)}
+    </svg>
+    {
+      stops.map(({ x, when, what }, index) => (
+        <p class="ask__label t-body" data-in style={`left:${rem(x)};--i:${index * 2 + 5}`}>
+          <strong>{when}</strong>
+          <br />
+          {what}
+        </p>
+      ))
+    }
+    {
+      decisions.map(({ y, label }, index) => (
+        <p class="ask__decision t-body" data-in style={`top:${rem(y)};--i:${index + 15}`}>
+          <strong>{label}</strong>
+        </p>
+      ))
+    }
+  </div>
+
+  <ul class="ask__needs t-body">
+    {needs.map((need, index) => <li data-in style={`--i:${index + 19}`}>{need}</li>)}
+  </ul>
+</Slide>
+
+<style>
+  .ask__promise {
+    margin-top: 3.6rem;
+  }
+
+  .ask__timeline {
+    position: relative;
+    width: 168rem;
+    height: 30rem;
+    margin-top: auto;
+  }
+
+  .ask__line,
+  .ask__branch {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 12;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .ask.is-active .ask__line {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.6s var(--ease) 0.6s;
+  }
+
+  .ask.is-active .ask__branch {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.8s var(--ease) 2s;
+  }
+
+  .ask__stop {
+    fill: var(--bg);
+    stroke: var(--fg);
+    stroke-width: 7;
+    transform: scale(0);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .ask__stop--end {
+    fill: var(--fg);
+  }
+
+  .ask.is-active .ask__stop {
+    transform: none;
+    transition: transform 0.6s var(--spring);
+    transition-delay: calc(var(--n) * 320ms + 0.7s);
+  }
+
+  .ask__label,
+  .ask__decision {
+    position: absolute;
+  }
+
+  .ask__label {
+    top: 20.6rem;
+    white-space: nowrap;
+  }
+
+  .ask__decision {
+    left: 153rem;
+    translate: 0 -50%;
+  }
+
+  .ask__needs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    margin-top: 5rem;
+  }
+
+  .ask__needs li {
+    padding: 1.1rem 2.6rem;
+    border: 0.4rem solid var(--soft);
+    border-radius: 10rem;
+  }
+</style>

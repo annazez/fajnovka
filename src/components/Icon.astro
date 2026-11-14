@@ -1,0 +1,61 @@
+---
+/**
+ * Pictograms on a 100 × 100 grid, drawn in the style of the team's graphic pack.
+ * Three roles: line (text colour), fill (background), accent.
+ */
+const star =
+  '50,27 55.88,41.91 71.87,42.89 59.51,53.09 63.52,68.61 50,60 36.48,68.61 40.49,53.09 28.13,42.89 44.12,41.91';
+
+const icons = {
+  car: `<path class="line" d="M17 54 28 31h43l12 23M14 55h72v25H14ZM24 81v9M76 81v9"/><path class="accent" d="M30 40h37l6 13H24Z"/><circle class="dot" cx="28" cy="68" r="4"/><circle class="dot" cx="72" cy="68" r="4"/>`,
+  tram: `<path class="line" d="M37 15 50 5l13 10-13 10ZM50 25v4"/><rect class="line fill" x="23" y="30" width="54" height="51" rx="9"/><rect class="accent" x="29" y="37" width="42" height="23" rx="3"/><circle class="dot" cx="35" cy="70" r="4"/><circle class="dot" cx="65" cy="70" r="4"/><path class="line" d="m32 82-7 12M68 82l7 12M28 91h44"/>`,
+  medal: `<path class="line" d="m34 8 9 22M66 8l-9 22"/><circle class="line fill" cx="50" cy="60" r="30"/><polygon class="accent" transform="translate(50 60) scale(0.72) translate(-50 -48)" points="${star}"/>`,
+  back: `<path class="line" d="M80 72H42q-20 0-20-20t20-20h30"/><path class="line accent-line" d="m60 16 16 16-16 16"/>`,
+  star: `<circle class="line fill" cx="50" cy="50" r="38"/><polygon class="accent" points="${star}"/>`,
+  gift: `<rect class="line fill" x="18" y="44" width="64" height="41" rx="3"/><rect class="accent" x="13" y="31" width="74" height="17" rx="3"/><path class="line" d="M50 32v53M50 31C14 32 22 3 38 13l12 18c33 1 28-28 13-18Z"/>`,
+  ticket: `<path class="line fill" d="M12 29h76v15c-15 0-15 16 0 16v15H12V60c15 0 15-16 0-16Z"/><path class="line accent-line" d="m33 51 9 9 12-17"/>`,
+  home: `<path class="line" d="M12 48 50 15l38 33M22 44v43h56V44"/><rect class="accent" x="43" y="59" width="16" height="28" rx="2"/>`,
+  drop: `<path class="line fill" d="M50 10C40 28 22 48 22 63a28 28 0 0 0 56 0c0-15-18-35-28-53Z"/><path class="line accent-line" d="M37 63a13 13 0 0 0 13 13"/>`,
+  card: `<rect class="line fill" x="10" y="22" width="80" height="56" rx="9"/><rect class="accent" x="10" y="36" width="80" height="11"/><path class="line" d="M24 63h22"/>`,
+  family: `<circle class="line fill" cx="27" cy="24" r="10"/><circle class="line fill" cx="73" cy="24" r="10"/><path class="line" d="M10 86V62q0-16 17-16t17 16M90 86V62q0-16-17-16T56 62"/><circle class="accent" cx="50" cy="58" r="8"/><path class="line accent-line" d="M38 90V82q0-10 12-10t12 10v8"/>`,
+} as const;
+
+interface Props {
+  name: keyof typeof icons;
+}
+
+const { name } = Astro.props;
+---
+
+<svg class="icon" viewBox="0 0 100 100" aria-hidden="true" set:html={icons[name]} />
+
+<style is:global>
+  .icon {
+    width: 100%;
+    height: 100%;
+  }
+
+  .icon .line {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .icon .fill {
+    fill: var(--bg);
+  }
+
+  .icon .accent {
+    fill: var(--accent);
+  }
+
+  .icon .accent-line {
+    stroke: var(--accent);
+  }
+
+  .icon .dot {
+    fill: var(--fg);
+  }
+</style>

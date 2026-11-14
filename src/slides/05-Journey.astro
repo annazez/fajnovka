@@ -1,0 +1,186 @@
+---
+import Slide from '../components/Slide.astro';
+
+/*
+ * Two riders, two lines, one terminus. Grid: 1680 × 560 (1 unit = 0.1rem).
+ * Tomáš is new and rides the "steps" (Schody); Lenka is a regular and rides the "plaques" (Plakety).
+ */
+const stopX = [330, 590, 850, 1110];
+const merge = { x: 1400, y: 285 };
+
+const riders = [
+  {
+    id: 'new',
+    name: 'Tomáš',
+    y: 170,
+    stops: ['Stěhuje se do Ostravy', 'Zkušební měsíc', 'ZOO za polovinu', 'Roční jízdenka'],
+  },
+  {
+    id: 'loyal',
+    name: 'Lenka',
+    y: 400,
+    stops: ['15\u00a0let s\u00a0jízdenkou', 'Diamantová plaketa', 'Mění práci', 'Pauza místo odchodu'],
+  },
+].map((rider) => ({
+  ...rider,
+  path: `M250 ${rider.y}H1130C1280 ${rider.y} 1270 ${merge.y} ${merge.x} ${merge.y}`,
+}));
+
+const rem = (units: number) => `${units / 10}rem`;
+---
+
+<Slide
+  theme="cyan"
+  class="journey"
+  notes="Tomáš se přistěhoval a zvažuje auto. Dostane uvítací body, zkusí měsíc, do dvou týdnů jde do ZOO za polovinu a po třech měsících kupuje roční jízdenku. Lenka jezdí patnáct let: hned má diamantovou plaketu, a když změní práci, dá si pauzu místo odchodu. Výhoda přivede, postup udrží, hrdost posílí vztah k městu."
+>
+  <h2 class="t-title" data-in>Výhoda přivede. Postup udrží.<br />Hrdost posílí vztah k&nbsp;městu.</h2>
+
+  <div class="journey__map">
+    <svg viewBox="0 0 1680 560" aria-hidden="true">
+      {
+        riders.map(({ id, path, y }) => (
+          <g class={`journey__line journey__line--${id}`} data-rider={id}>
+            <path d={path} pathLength="1" />
+            {stopX.map((x, index) => (
+              <circle cx={x} cy={y} r="17" style={`--n:${index}`} />
+            ))}
+          </g>
+        ))
+      }
+      <circle class="journey__terminus" cx={merge.x} cy={merge.y} r="30"></circle>
+    </svg>
+
+    {
+      riders.map(({ id, name, y, stops }, line) => (
+        <div class={`journey__rider journey__rider--${id}`} data-rider={id}>
+          <p class="journey__name t-body" data-in style={`top:${rem(y)};--i:${line * 5 + 2}`}>
+            {name}
+          </p>
+          {stops.map((stop, index) => (
+            <p class="journey__stop t-body" data-in style={`left:${rem(stopX[index] ?? 0)};top:${rem(y)};--i:${line * 5 + index * 2 + 4}`}>
+              {stop}
+            </p>
+          ))}
+        </div>
+      ))
+    }
+    <p class="journey__end t-body" data-in style={`left:${rem(merge.x + 56)};top:${rem(merge.y)};--i:18`}>Jezdí dál</p>
+  </div>
+</Slide>
+
+<style>
+  .journey__map {
+    position: relative;
+    width: 168rem;
+    height: 56rem;
+    margin-top: auto;
+  }
+
+  .journey__line path {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .journey__line--new path {
+    stroke: var(--accent);
+  }
+
+  .journey__line--loyal path {
+    stroke: var(--fg);
+  }
+
+  .journey.is-active .journey__line path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.8s var(--ease) 0.5s;
+  }
+
+  .journey.is-active .journey__line--loyal path {
+    transition-delay: 1.05s;
+  }
+
+  .journey__line circle,
+  .journey__terminus {
+    fill: var(--accent);
+    stroke: var(--fg);
+    stroke-width: 7;
+    transform: scale(0);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .journey.is-active .journey__line circle {
+    transform: none;
+    transition: transform 0.6s var(--spring);
+    transition-delay: calc(var(--n) * 220ms + 0.8s);
+  }
+
+  .journey.is-active .journey__line--loyal circle {
+    transition-delay: calc(var(--n) * 220ms + 1.35s);
+  }
+
+  .journey__terminus {
+    stroke-width: 10;
+  }
+
+  .journey.is-active .journey__terminus {
+    transform: none;
+    transition: transform 0.8s var(--spring) 2.5s;
+  }
+
+  .journey__name,
+  .journey__stop,
+  .journey__end {
+    position: absolute;
+  }
+
+  .journey__name {
+    left: 0;
+    padding: 1.2rem 3rem;
+    border-radius: 10rem;
+    font-weight: 900;
+    translate: 0 -50%;
+  }
+
+  .journey__rider--new .journey__name {
+    background: var(--accent);
+  }
+
+  .journey__rider--loyal .journey__name {
+    background: var(--fg);
+    color: var(--accent);
+  }
+
+  .journey__stop {
+    width: 24rem;
+    text-align: center;
+  }
+
+  /* Tomáš's stops are labelled above his line, Lenka's below hers. */
+  .journey__rider--new .journey__stop {
+    translate: -50% calc(-100% - 3.6rem);
+  }
+
+  .journey__rider--loyal .journey__stop {
+    translate: -50% 3.6rem;
+  }
+
+  .journey__end {
+    font-weight: 900;
+    white-space: nowrap;
+    translate: 0 -50%;
+  }
+
+  /* Pointing at one rider dims the other. */
+  .journey__map [data-rider] {
+    transition: opacity 0.4s ease;
+  }
+
+  .journey__map:has([data-rider='new']:hover) [data-rider='loyal'],
+  .journey__map:has([data-rider='loyal']:hover) [data-rider='new'] {
+    opacity: 0.25;
+  }
+</style>

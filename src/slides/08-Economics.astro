@@ -1,0 +1,187 @@
+---
+import Slide from '../components/Slide.astro';
+import { cs, numbers } from '../data/numbers';
+
+const { costPerPassengerYear: cost, paybackYear } = numbers;
+
+const bars = [
+  { label: 'Vrátit odešlého', value: cost.return, cheap: true },
+  { label: 'Udržet stálého', value: cost.loyalty, cheap: true },
+  { label: 'Získat nového z\u00a0auta', value: cost.acquisition, cheap: false },
+];
+
+const scenarios = [
+  { label: 'horší', year: paybackYear.pessimistic },
+  { label: 'základní', year: paybackYear.base },
+  { label: 'lepší', year: paybackYear.optimistic },
+].map(({ label, year }) => ({
+  label,
+  hero: year === null ? '—' : String(year),
+  caption: year === null ? 'do roku 2036 se nevrátí' : 'rok návratnosti',
+  selected: year === paybackYear.base,
+}));
+
+const base = scenarios.find(({ selected }) => selected);
+if (!base) throw new Error('The base scenario is missing.');
+---
+
+<Slide
+  theme="white"
+  class="econ"
+  notes="Program stojí jedenáct a půl milionu ročně, půl procenta toho, co město platí DPO. Vrácený cestující nás stojí devadesát pět korun na rok, udržený pět set deset, nový z auta přes dva tisíce. Proto stavíme na udržení a návratu. V základním scénáři se program městu vrátí v roce 2034. A měříme proti kontrolnímu obvodu, takže víme, co program skutečně přidal."
+>
+  <h2 class="t-title" data-in>Odměňujeme změnu i&nbsp;věrnost.<br /><span class="mark">Měříme skutečný přínos.</span></h2>
+
+  <div class="econ__grid">
+    <figure data-in style="--i:3">
+      <p class="econ__visual t-hero">{cs(numbers.compensationSharePercent)}&nbsp;%</p>
+      <figcaption class="t-body">kompenzace DPO: {cs(numbers.programmeCostMillion)}&nbsp;mil.&nbsp;Kč ročně</figcaption>
+    </figure>
+
+    <figure data-in style="--i:6">
+      <ul class="econ__visual econ__bars t-body">
+        {
+          bars.map(({ label, value, cheap }, index) => (
+            <li class:list={{ cheap }} style={`--share:${value / cost.acquisition};--n:${index}`}>
+              {label}
+              <span class="econ__bar">
+                <strong>{cs(value)}&nbsp;Kč</strong>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <figcaption class="t-body">za cestujícího a&nbsp;rok</figcaption>
+    </figure>
+
+    <figure data-in style="--i:9">
+      <div class="econ__visual econ__payback">
+        <div class="econ__switch t-small" role="group" aria-label="Scénář">
+          {
+            scenarios.map(({ label, hero, caption, selected }) => (
+              <button type="button" data-hero={hero} data-caption={caption} aria-pressed={selected ? 'true' : 'false'}>
+                {label}
+              </button>
+            ))
+          }
+        </div>
+        <p class="t-hero" data-payback-hero>{base.hero}</p>
+      </div>
+      <figcaption class="t-body" data-payback-caption>{base.caption}</figcaption>
+    </figure>
+  </div>
+
+  <p class="slide__foot t-small">Hrubý odhad týmu v&nbsp;cenách roku 2025 · Výroční zpráva DPO 2025</p>
+</Slide>
+
+<script>
+  // The scenario switch changes the payback year. It is there for questions from the jury.
+  const slide = document.querySelector<HTMLElement>('.econ');
+  const hero = slide?.querySelector<HTMLElement>('[data-payback-hero]');
+  const caption = slide?.querySelector<HTMLElement>('[data-payback-caption]');
+  const buttons = slide?.querySelectorAll<HTMLButtonElement>('.econ__switch button');
+
+  if (hero && caption && buttons) {
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        buttons.forEach((other) => other.setAttribute('aria-pressed', String(other === button)));
+        hero.textContent = button.dataset.hero ?? '';
+        caption.textContent = button.dataset.caption ?? '';
+        button.blur();
+      });
+    });
+  }
+</script>
+
+<style>
+  .econ__grid {
+    display: grid;
+    grid-template-columns: 46rem 1fr 42rem;
+    gap: 7rem;
+    margin-top: auto;
+  }
+
+  /* Every column: a visual of the same height, then one caption on a shared baseline. */
+  .econ__grid figure {
+    display: grid;
+    grid-template-rows: 30rem auto;
+  }
+
+  .econ__visual {
+    align-self: end;
+  }
+
+  .econ .t-hero {
+    font-size: 14rem;
+  }
+
+  figcaption {
+    margin-top: 2.6rem;
+  }
+
+  .econ__bars {
+    display: grid;
+    gap: 2.2rem;
+  }
+
+  .econ__bars li {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  /* Bar length is the cost relative to the most expensive lever; the value sits at its end. */
+  .econ__bar {
+    position: relative;
+    width: 0.8rem;
+    height: 3rem;
+    border-radius: 0.6rem;
+    background: var(--fg);
+  }
+
+  .econ__bars .cheap .econ__bar {
+    background: var(--accent);
+  }
+
+  .econ.is-active .econ__bar {
+    width: max(0.8rem, calc(var(--share) * (100% - 19rem)));
+    transition: width 1.2s var(--ease);
+    transition-delay: calc(var(--n) * 200ms + 1.2s);
+  }
+
+  .econ__bar strong {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 1.6rem);
+    white-space: nowrap;
+    translate: 0 -50%;
+  }
+
+  .econ__payback {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .econ__switch {
+    display: inline-flex;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    border-radius: 10rem;
+    background: var(--soft);
+  }
+
+  .econ__switch button {
+    padding: 0.9rem 2rem;
+    border-radius: 10rem;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  .econ__switch button[aria-pressed='true'] {
+    background: var(--fg);
+    color: var(--bg);
+  }
+</style>

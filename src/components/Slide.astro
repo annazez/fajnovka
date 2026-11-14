@@ -1,0 +1,18 @@
+---
+/**
+ * One slide of the deck.
+ * theme: colour roles from global.css. notes: the text the speaker says (key N).
+ */
+interface Props {
+  theme: 'cyan' | 'white' | 'navy';
+  notes: string;
+  class?: string;
+}
+
+// `rest` carries the caller's scoped-style attribute, so a slide can style its own section.
+const { theme, notes, class: className, ...rest } = Astro.props;
+---
+
+<section class:list={['slide', className]} data-slide data-theme={theme} data-notes={notes} {...rest}>
+  <slot />
+</section>

@@ -1,0 +1,140 @@
+---
+import Slide from '../components/Slide.astro';
+import Wordmark from '../components/Wordmark.astro';
+
+// The line with stops is the motif of the brand. Grid: 1920 × 1080 (1 unit = 0.1rem).
+const track = 'M-40 880H560q80 0 136-56t136-56H1960';
+const stops = [
+  { x: 330, y: 880 },
+  { x: 1150, y: 768 },
+  { x: 1650, y: 768 },
+];
+---
+
+<Slide theme="cyan" class="title" notes="Dobrý den, jsme tým Fajnovka. Jezdi fajně. Žij Ostravou.">
+  <svg class="title__line" viewBox="0 0 1920 1080" aria-hidden="true">
+    <path id="title-track" d={track} pathLength="1"></path>
+    {stops.map(({ x, y }, index) => <circle cx={x} cy={y} r="19" style={`--n:${index}`} />)}
+    <rect x="-46" y="-16" width="92" height="32" rx="13">
+      <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
+        <mpath href="#title-track"></mpath>
+      </animateMotion>
+    </rect>
+  </svg>
+
+  <h1 class="title__mark"><Wordmark /></h1>
+  <p class="title__slogan t-title" data-in style="--i:10">Jezdi fajně. Žij Ostravou.</p>
+  <div data-in style="--i:13">
+    <button class="title__start t-body" type="button" data-fullscreen data-when="windowed">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+      Celá obrazovka
+    </button>
+  </div>
+  <p class="slide__foot t-small" data-in style="--i:15">Návrh pro výzvu města Ostravy · MSIC LabZero 2026</p>
+</Slide>
+
+<style>
+  .title {
+    padding-top: 15rem;
+  }
+
+  /* The word wipes in, then the three marks drop one by one. */
+  .title :global(.wordmark__word) {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .title.is-active :global(.wordmark__word) {
+    clip-path: inset(0);
+    transition: clip-path 1.1s var(--ease) 0.25s;
+  }
+
+  .title :global(.wordmark__bang) {
+    opacity: 0;
+    transform: translateY(-70%);
+    transform-box: fill-box;
+  }
+
+  .title.is-active :global(.wordmark__bang) {
+    opacity: 1;
+    transform: none;
+    transition:
+      transform 0.7s var(--spring),
+      opacity 0.2s ease;
+    transition-delay: calc(var(--n) * 150ms + 1.15s);
+  }
+
+  .title__slogan {
+    margin-top: 5.5rem;
+  }
+
+  .title__start {
+    display: inline-flex;
+    gap: 1.4rem;
+    align-items: center;
+    margin-top: 5.5rem;
+    padding: 1.8rem 3.8rem 1.8rem 3rem;
+    border-radius: 10rem;
+    background: var(--fg);
+    color: var(--accent);
+    transition: transform 0.4s var(--spring);
+  }
+
+  .title__start:hover {
+    transform: scale(1.06);
+  }
+
+  .title__start svg {
+    width: 3.4rem;
+    height: 3.4rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The line draws itself, the stops pop in, then a vehicle keeps riding it. */
+  .title__line {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .title__line path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 14;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .title.is-active .title__line path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 2.2s var(--ease) 0.9s;
+  }
+
+  .title__line circle {
+    fill: var(--accent);
+    stroke: var(--fg);
+    stroke-width: 7;
+    transform: scale(0);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .title.is-active .title__line circle {
+    transform: none;
+    transition: transform 0.6s var(--spring);
+    transition-delay: calc(var(--n) * 350ms + 1.5s);
+  }
+
+  .title__line rect {
+    fill: var(--fg);
+    opacity: 0;
+  }
+
+  .title.is-active .title__line rect {
+    opacity: 1;
+    transition: opacity 0.6s ease 3s;
+  }
+</style>

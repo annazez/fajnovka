@@ -1,0 +1,160 @@
+---
+import Icon from '../components/Icon.astro';
+import Slide from '../components/Slide.astro';
+import { cs, numbers } from '../data/numbers';
+
+// Two lanes between car and public transport, on a 1680 × 580 grid (1 unit = 0.1rem).
+const lanes = [
+  { id: 'in', path: 'M233 218C470-40 1210-40 1447 218' },
+  { id: 'out', path: 'M1447 362C1210 620 470 620 233 362' },
+];
+const dotsPerLane = 9;
+const lapSeconds = 8;
+const moments = ['nová práce', 'stěhování', 'dítě', 'škola'];
+---
+
+<Slide
+  theme="navy"
+  class="flow"
+  notes="Skutečný problém je tok. Kolik lidí do MHD přichází, dnes nikdo neměří. Kolik odchází, umíme odhadnout: asi dvanáct tisíc lidí ročně neobnoví dlouhodobou jízdenku. Změní práci, přestěhují se, narodí se jim dítě. Nestačí přivádět nové. Musíme udržet ty současné."
+>
+  <h2 class="t-title" data-in>Nestačí přivést nové.<br />Musíme <span class="mark">udržet ty současné.</span></h2>
+
+  <div class="flow__map">
+    <svg viewBox="0 0 1680 580" aria-hidden="true">
+      <defs>
+        {
+          lanes.map(({ id }) => (
+            <marker id={`flow-head-${id}`} viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3" markerHeight="3" orient="auto">
+              <path class={`flow__head flow__head--${id}`} d="M0 0 10 5 0 10Z" />
+            </marker>
+          ))
+        }
+      </defs>
+      {
+        lanes.map(({ id, path }) => (
+          <g class={`flow__lane flow__lane--${id}`}>
+            <path id={`flow-lane-${id}`} d={path} marker-end={`url(#flow-head-${id})`} />
+            {Array.from({ length: dotsPerLane }, (_, dot) => (
+              <circle r="11">
+                <animateMotion dur={`${lapSeconds}s`} begin={`${(-dot * lapSeconds) / dotsPerLane}s`} repeatCount="indefinite">
+                  <mpath href={`#flow-lane-${id}`} />
+                </animateMotion>
+              </circle>
+            ))}
+          </g>
+        ))
+      }
+    </svg>
+
+    <div class="flow__node flow__node--car" data-in style="--i:2"><Icon name="car" /></div>
+    <div class="flow__node flow__node--tram" data-in style="--i:2"><Icon name="tram" /></div>
+
+    <div class="flow__centre t-body">
+      <p data-in style="--i:5">Přichází <b class="t-hero flow__unknown">?</b></p>
+      <ul class="flow__moments" data-in style="--i:22">
+        {moments.map((moment) => <li>{moment}</li>)}
+      </ul>
+      <p data-in style="--i:14">
+        Odchází <b class="t-hero" data-count={numbers.nonRenewalsPerYear}>{cs(numbers.nonRenewalsPerYear)}</b> ročně
+      </p>
+    </div>
+  </div>
+
+  <p class="slide__foot t-small">Odhad týmu z&nbsp;prodejů jízdenek DPO. Skutečné toky ukážou data ODIS.</p>
+</Slide>
+
+<style>
+  .flow__map {
+    position: relative;
+    width: 168rem;
+    height: 58rem;
+    margin-top: auto;
+  }
+
+  .flow__lane path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 14;
+    stroke-linecap: round;
+    opacity: 0.4;
+  }
+
+  .flow__lane circle,
+  .flow__head {
+    fill: currentColor;
+  }
+
+  .flow__lane--in,
+  .flow__head--in,
+  .flow__unknown {
+    color: var(--accent);
+  }
+
+  .flow__lane--out,
+  .flow__head--out {
+    color: var(--fg);
+  }
+
+  /* The inbound lane shows first, the outbound lane follows. */
+  .flow__lane {
+    opacity: 0;
+  }
+
+  .flow.is-active .flow__lane {
+    opacity: 1;
+    transition: opacity 1s ease 0.7s;
+  }
+
+  .flow.is-active .flow__lane--out {
+    transition-delay: 1.7s;
+  }
+
+  .flow__node {
+    position: absolute;
+    top: 18rem;
+    width: 22rem;
+    height: 22rem;
+    padding: 4rem;
+    border: 0.7rem solid var(--fg);
+    border-radius: 50%;
+  }
+
+  .flow__node--car {
+    left: 2rem;
+  }
+
+  .flow__node--tram {
+    right: 2rem;
+  }
+
+  .flow__centre {
+    position: absolute;
+    inset: 6.6rem 40rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .flow__centre b {
+    margin: 0 1.6rem;
+    font-size: 11rem;
+    line-height: 1;
+    vertical-align: -0.07em;
+  }
+
+  .flow__moments {
+    display: flex;
+  }
+
+  .flow__moments li {
+    opacity: 0.75;
+  }
+
+  .flow__moments li + li::before {
+    margin: 0 1.8rem;
+    content: '·';
+  }
+</style>
