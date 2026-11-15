@@ -17,7 +17,7 @@ export interface Deck {
 }
 
 /** The title that a screen reader hears: the text of the element that labels the slide, with its line breaks as spaces. */
-function titleOf(slide: HTMLElement): string {
+export function titleOf(slide: HTMLElement): string {
   const label = document.getElementById(slide.getAttribute('aria-labelledby') ?? '');
   if (!label) return '';
   // A copy, because the rendered text of a slide that just became visible is not ready yet.

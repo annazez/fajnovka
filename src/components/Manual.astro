@@ -4,12 +4,13 @@
  * A chapter is a Markdown file in `src/content/manual/<language>/`. `src/lib/markdown.ts` holds the rules for its text.
  * The PDF is a print of this page (`npm run manual:pdf`).
  */
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 
 import '../styles/manual.css';
 import SceneLines from './SceneLines.astro';
 import UiIcon from './UiIcon.astro';
 import Wordmark from './Wordmark.astro';
+import { loadChapters } from '../data/chapters.ts';
 import { manual, manualPdf } from '../data/manual.ts';
 import { useDictionary } from '../i18n/index.ts';
 import { languageName, languageTag, localePath, locales, toLocale } from '../i18n/locales.ts';
@@ -19,17 +20,13 @@ import { typeset } from '../lib/typeset.ts';
 const locale = toLocale(Astro.currentLocale);
 const { manual: t, ui } = useDictionary(locale);
 
-const entries = await getCollection('manual', ({ id }) => id.startsWith(`${locale}/`));
 const chapters = await Promise.all(
-  entries
-    .sort((a, b) => a.data.order - b.data.order)
-    .map(async (entry) => ({
-      // `en/02-problem` gives the anchor `problem`, the same in each language.
-      slug: entry.id.replace(/^[a-z]+\/\d+-/, ''),
-      number: String(entry.data.order),
-      title: typeset(entry.data.title, locale),
-      Content: (await render(entry)).Content,
-    })),
+  (await loadChapters(locale)).map(async ({ slug, number, title, entry }) => ({
+    slug,
+    number: String(number),
+    title: typeset(title, locale),
+    Content: (await render(entry)).Content,
+  })),
 );
 
 const pdf = manualPdf(locale);

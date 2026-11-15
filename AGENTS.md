@@ -11,6 +11,8 @@ The site has two parts. Each part has one job.
 
 Do not add other pages, routing, a CMS, analytics or a UI framework.
 
+The site also gives its content to programs: `llms.txt`, the manual as Markdown, a catalogue of resources, structured data, and tools in the browser (WebMCP). `src/lib/agents.ts` and `src/lib/tools.ts` make all of them from the texts and data of the pages. Do not write a second copy of a text for a program.
+
 ## Design rules
 
 1. One idea for each slide. The title is a sentence that gives the point, not a topic name.

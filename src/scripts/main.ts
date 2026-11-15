@@ -5,6 +5,8 @@ import { createFullscreen } from './deck/fullscreen.ts';
 import { bindInput } from './deck/input.ts';
 import { createMotion } from './deck/motion.ts';
 import { createNotes } from './deck/notes.ts';
+import { deckTools } from './deck/tools.ts';
+import { offerTools } from './tools.ts';
 
 const root = required<HTMLElement>('[data-deck]');
 const motion = createMotion(root, required<HTMLElement>('[data-action="motion"]', root));
@@ -25,3 +27,4 @@ bindInput(root, deck, {
 });
 
 deck.start();
+offerTools(deckTools(root, deck));

@@ -2,10 +2,11 @@
 import Deck from '../../components/Deck.astro';
 import { useDictionary } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
+import { deckJsonLd } from '../../lib/agents.ts';
 
 const { meta } = useDictionary('cs');
 ---
 
-<Base locale="cs" title={meta.title} description={meta.description} path="/">
+<Base locale="cs" title={meta.title} description={meta.description} path="/" data={deckJsonLd('cs')}>
   <Deck />
 </Base>

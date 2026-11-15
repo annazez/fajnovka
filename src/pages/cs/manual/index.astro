@@ -1,11 +1,20 @@
 ---
 import Manual from '../../../components/Manual.astro';
+import { manualMd } from '../../../data/manual.ts';
 import { useDictionary } from '../../../i18n/index.ts';
 import Base from '../../../layouts/Base.astro';
+import { manualJsonLd } from '../../../lib/agents.ts';
 
 const { manual } = useDictionary('cs');
 ---
 
-<Base locale="cs" title={`Fajnovka · ${manual.title}`} description={manual.description} path="/manual/">
+<Base
+  locale="cs"
+  title={`Fajnovka · ${manual.title}`}
+  description={manual.description}
+  path="/manual/"
+  data={manualJsonLd('cs')}
+  markdown={manualMd('cs')}
+>
   <Manual />
 </Base>

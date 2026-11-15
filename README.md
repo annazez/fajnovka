@@ -26,6 +26,21 @@ The trams on the first slide are about as full as the real vehicles of DPO at th
 
 The page needs the network only for the first load. Open it before the pitch starts.
 
+## For AI agents
+
+A program gets the same content as a person, in a form that it can read without the layout.
+
+| What                                  | Address                                                                                          |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Guide to the site (llms.txt)          | `/llms.txt`                                                                                      |
+| The manual as one Markdown text       | `/manual.md`, `/cs/manual.md`                                                                    |
+| Live data of DPO, and its description | `/api/occupancy`, `/openapi.json`                                                                |
+| Catalogue of resources (ARD)          | `/.well-known/ard.json`; `/.well-known/ai-catalog.json` is the older form                        |
+| What each page is (JSON-LD)           | a `script` element of the type `application/ld+json` in each page                                |
+| Tools in the browser (WebMCP)         | deck: `list_slides`, `go_to_slide`, `get_live_occupancy`; manual: `list_chapters`, `get_chapter` |
+
+A browser gives the tools to its agent only if it has WebMCP (`document.modelContext`). In November 2026, Chrome has WebMCP as an origin trial: a site needs a token from Google, sent in the `Origin-Trial` header. This site has no token yet. Without WebMCP, the pages work as before.
+
 ## Develop
 
 ```sh
@@ -45,7 +60,7 @@ Node 22.23.4 or later is necessary (Astro 7).
 
 ```text
 src/
-  pages/                   the deck and the manual, one page for each language
+  pages/                   the deck and the manual, one page for each language; the files for AI agents
   components/Deck.astro    the list of slides sets the order of the pitch
   components/Manual.astro  cover, contents and chapters of the manual
   slides/NN-Name.astro     one file for each slide: layout, and its script if it has one
@@ -55,6 +70,7 @@ src/
   data/model.ts            data behind the charts of the manual
   data/scene.ts            the tram scene of the title slide
   lib/                     pure functions (formats, typography, scene model, charts, Markdown rules)
+  lib/agents.ts, tools.ts  what the site gives to AI agents: llms.txt, Markdown, catalogue, JSON-LD, tools
   scripts/                 deck engine and the scenes of the slides
   styles/                  design tokens, reset, deck styles, manual styles
 api/occupancy.ts           server function: how full the vehicles of DPO are now

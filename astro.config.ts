@@ -1,6 +1,7 @@
 import { satteri } from '@astrojs/markdown-satteri';
 import { defineConfig, fontProviders } from 'astro/config';
 
+import { SITE } from './src/data/site.ts';
 import { defaultLocale, locales } from './src/i18n/locales.ts';
 import { manualMarkdown } from './src/lib/markdown.ts';
 
@@ -20,7 +21,7 @@ function montserrat(subset: 'latin' | 'latin-ext', name: string, cssVariable: st
 }
 
 export default defineConfig({
-  site: 'https://fajnovka.zezulka.me',
+  site: SITE,
   trailingSlash: 'always',
   devToolbar: { enabled: false },
   i18n: { locales: [...locales], defaultLocale },

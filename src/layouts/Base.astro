@@ -2,6 +2,8 @@
 /**
  * Page shell: metadata and fonts. The content of the page brings its own styles.
  * path: the path of the page without the language prefix, for example `/` or `/manual/`.
+ * data: what the page is, in the words of schema.org (JSON-LD), for search engines and AI agents.
+ * markdown: the address of the same content as Markdown, if the page has one.
  */
 import { Font } from 'astro:assets';
 
@@ -12,10 +14,14 @@ interface Props {
   title: string;
   description: string;
   path: string;
+  data: object;
+  markdown?: string;
 }
 
-const { locale, title, description, path } = Astro.props;
+const { locale, title, description, path, data, markdown } = Astro.props;
 const address = (target: Locale): string => new URL(localePath(target, path), Astro.site).href;
+// The data is text in a script element. `<` as an escape keeps a text of the site from ending that element.
+const structuredData = JSON.stringify(data).replaceAll('<', '\\u003c');
 ---
 
 <!doctype html>
@@ -30,7 +36,11 @@ const address = (target: Locale): string => new URL(localePath(target, path), As
     <link rel="canonical" href={address(locale)} />
     {locales.map((code) => <link rel="alternate" hreflang={code} href={address(code)} />)}
     <link rel="alternate" hreflang="x-default" href={address(defaultLocale)} />
+    {markdown && <link rel="alternate" type="text/markdown" href={markdown} />}
+    {/* The catalogue of what the site gives to AI agents (Agentic Resource Discovery). */}
+    <link rel="ard" href="/.well-known/ard.json" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script type="application/ld+json" is:inline set:html={structuredData} />
     <Font cssVariable="--font-montserrat" preload />
     <Font cssVariable="--font-montserrat-ext" preload={locale === 'cs'} />
     <slot name="head" />
