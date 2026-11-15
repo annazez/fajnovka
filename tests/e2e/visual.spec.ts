@@ -4,11 +4,12 @@ import { LOCALES, SLIDES, deck, openDeck } from './support.ts';
 
 /**
  * The picture of each slide, as a projector and a phone show it.
- * Chromium draws the reference pictures: it draws the same picture on each machine.
- * After a change of the design, run the workflow "Update the pictures" or `npx playwright test visual --update-snapshots`.
+ * Chromium on the CI machine draws the reference pictures. Each machine draws letters a little differently,
+ * so the comparison runs only there. After a change of the design, run the workflow "Update the pictures".
  */
 test.describe('pictures of the slides', () => {
   test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium draws the reference pictures.');
+  test.skip(!process.env.CI, 'The reference pictures come from the CI machine.');
 
   for (const locale of LOCALES) {
     for (const [index, id] of SLIDES.entries()) {
