@@ -104,3 +104,12 @@ The rules that keep the deck simple are in [`AGENTS.md`](AGENTS.md).
 ## Deploy
 
 Vercel builds each push to `main` and serves it at the address above. The site is static, with one server function in Frankfurt (`fra1`) that reads the public vehicle feed of DPO. The site has no analytics and no cookies. People and programs can read each page (`robots.txt` permits all), but each answer of the server tells search engines not to list it (`X-Robots-Tag: noindex, nofollow`).
+
+## Licence
+
+Copyright © 2026 Anna Zezulka, Richard Albrecht and Jakub Dedek.
+
+- The program code and its documentation: Licensed under the EUPL (European Union Public Licence 1.2). See [`LICENCE.md`](LICENCE.md).
+- The content (texts, manual, charts, pictures, wordmark): CC BY-NC-ND 4.0, with a wider permission for the City of Ostrava. See [`LICENCE-CONTENT.md`](LICENCE-CONTENT.md).
+
+Report a security problem as [`SECURITY.md`](SECURITY.md) tells you. All persons who take part obey the [code of conduct](CODE_OF_CONDUCT.md).

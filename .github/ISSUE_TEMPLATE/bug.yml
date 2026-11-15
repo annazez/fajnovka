@@ -1,0 +1,39 @@
+name: Problem
+description: Something on the site or in the code is wrong.
+labels: [bug]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where is the problem?
+      options:
+        - Deck
+        - Manual (page or PDF)
+        - Live data
+        - Files for AI agents
+        - Documentation
+        - Tests or automation
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      description: The steps that show the problem. Give the address, and the number of the slide or the chapter.
+      placeholder: |
+        1. Open https://fajnovka.zezulka.me/#4
+        2. Press the right arrow
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What you see, and what you expect
+      description: A screenshot helps.
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Browser and device
+      placeholder: Firefox 150 on Fedora, 1920 × 1080

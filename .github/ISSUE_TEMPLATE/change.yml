@@ -1,0 +1,23 @@
+name: Change
+description: A proposal to change the deck, the manual or the code.
+labels: [change]
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The problem that a viewer, a reader or a contributor has now. Start with the problem, not with the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What to change
+      description: The smallest change that solves the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: rules
+    attributes:
+      label: Rules
+      description: Does the change agree with `AGENTS.md`? If it needs a change of a rule, name the rule.

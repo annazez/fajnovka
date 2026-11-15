@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Pitch deck for Fajnovka, a proposed public transport loyalty programme for Ostrava (MSIC LabZero 2026).",
+  "description": "Pitch deck and manual for Fajnovka, a proposed public transport loyalty programme for Ostrava (MSIC LabZero 2026).",
+  "license": "EUPL-1.2",
+  "repository": "github:annazez/fajnovka",
   "engines": {
     "node": ">=22.23.4"
   },
