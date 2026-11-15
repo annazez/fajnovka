@@ -1,3 +1,7 @@
 # Findings of the ZAP baseline scan that are decisions of the project. Columns: rule, action, reason. The separator is a tab.
-10055	IGNORE	(The header has the rules that a page cannot set. Each page has the rules for scripts and styles, with a hash for each of them.)
-90004	IGNORE	(The site sets COOP and CORP. It does not need COEP, because it loads nothing from another site.)
+10015	IGNORE	(Cache directives: the site is public and the same for each person, so a shared cache can keep it.)
+10049	IGNORE	(Content that a cache can store: see rule 10015.)
+10050	IGNORE	(An answer from a cache: see rule 10015.)
+10096	IGNORE	(A number in a script looks like a time. The site keeps no secret time.)
+10098	IGNORE	(Each site can read the content: it is public, it has no personal data, and programs of AI agents need to read it.)
+90004	IGNORE	(No COEP header: a page loads nothing from another site. The site sets COOP and CORP.)
