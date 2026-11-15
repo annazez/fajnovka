@@ -1,2 +1,4 @@
+# Everyone can read this site, people and programs.
+# The pages ask search engines not to list them (noindex), because the site is a proposal of a student team.
 User-agent: *
-Disallow: /
+Allow: /

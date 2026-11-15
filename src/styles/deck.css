@@ -162,6 +162,13 @@
   right: 6.4rem;
 }
 
+/* The link to the manual sits in the left margin. Like the buttons, it leaves the picture while nobody moves the pointer. */
+.control[data-manual] {
+  position: absolute;
+  bottom: 3.5rem;
+  left: 3.5rem;
+}
+
 .control[data-action='fullscreen'] {
   right: 1rem;
 }
@@ -293,7 +300,8 @@
     height: 5rem;
   }
 
-  .control[data-action='motion'] {
+  .control[data-action='motion'],
+  .control[data-manual] {
     position: static;
   }
 

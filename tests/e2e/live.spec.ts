@@ -1,10 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { LIVE_DATA, USUAL_READING, isPhone, openDeck, watchPage } from './support.ts';
+import { LIVE_DATA, USUAL_READING, openDeck, watchPage } from './support.ts';
 
 const BUSY = { ...USUAL_READING, vehicles: 1150, passengers: 4700 };
 const QUIET = { ...USUAL_READING, vehicles: 31, passengers: 600 };
-const pill = (page: Page) => page.locator('#title [data-live-text] span');
 
 /** The scene of the layout that the screen shows. */
 const scene = (page: Page) => page.locator('#title [data-scene].is-built');
@@ -35,42 +34,24 @@ test.describe('live data of DPO on the first slide', () => {
     expect(problems).toEqual([]);
   });
 
-  test('the key L shows and hides the reading of this minute', async ({ page }, info) => {
-    test.skip(isPhone(info), 'A phone has no keyboard.');
+  test('the slide shows no numbers: only the trams tell the reading', async ({ page }) => {
     await openDeck(page, { reading: BUSY });
-    await expect(pill(page)).toHaveCount(0);
-
+    await expect(scene(page)).toHaveAttribute('data-demand', '1.60');
     await page.keyboard.press('l');
-    await expect(pill(page)).toHaveText('Ostrava now · vehicles on the road: 1,150 · places taken: 19% · DPO');
-    await expect(page.locator('#title [data-live-text]')).toHaveAttribute('role', 'status');
-
-    await page.keyboard.press('L');
-    await expect(pill(page)).toHaveCount(0);
+    await expect(page.locator('#title')).not.toContainText(/\d/);
   });
 
-  test('the reading uses the number format of the language', async ({ page }, info) => {
-    test.skip(isPhone(info), 'A phone has no keyboard.');
-    await openDeck(page, { locale: 'cs', reading: BUSY });
-    await page.keyboard.press('l');
-    await expect(pill(page)).toHaveText('Ostrava teď · vozů na trati: 1 150 · obsazeno míst: 19 % · DPO');
-  });
-
-  test('without an answer the slide shows the stored snapshot', async ({ page }, info) => {
-    test.skip(isPhone(info), 'A phone has no keyboard.');
+  test('without an answer the scene is as busy as the stored snapshot', async ({ page }) => {
     await openDeck(page, { reading: null });
-    await page.keyboard.press('l');
-    // Browsers write the day with or without a comma.
-    await expect(pill(page)).toHaveText(/^Fri,? 13 Nov, 16:38 · vehicles on the road: 224 · places taken: 12% · DPO$/);
+    await expect(scene(page)).toHaveAttribute('data-demand', '1.00');
   });
 
-  test('an answer with a wrong shape is not used', async ({ page }, info) => {
-    test.skip(isPhone(info), 'A phone has no keyboard.');
+  test('an answer with a wrong shape is not used', async ({ page }) => {
     await page.route(LIVE_DATA, (route) => route.fulfill({ json: { ...BUSY, places: '<b>many</b>' } }));
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     await expect(page.locator('.deck.is-live')).toBeVisible();
-    await page.keyboard.press('l');
-    await expect(pill(page)).toHaveText(/^Fri,? 13 Nov, 16:38/);
+    await expect(scene(page)).toHaveAttribute('data-demand', '1.00');
   });
 
   test('a fuller network gives a busier scene', async ({ page }) => {

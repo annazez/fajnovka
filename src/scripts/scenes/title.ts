@@ -27,10 +27,8 @@ import {
   type Waypoint,
 } from '../../lib/scene.ts';
 import { snapshot } from '../../data/occupancy.ts';
-import { toLocale } from '../../i18n/locales.ts';
 import { demandOf } from '../../lib/occupancy.ts';
-import { describeOccupancy } from '../../lib/readout.ts';
-import { isFlowLayout, pageLanguage } from '../deck/dom.ts';
+import { isFlowLayout } from '../deck/dom.ts';
 import { readOccupancy } from '../deck/live.ts';
 import { scene } from '../deck/scene.ts';
 
@@ -44,7 +42,9 @@ const HUB_RADIUS = 28.5;
 const GATE_DISTANCE = 500;
 const GATE_MARGIN = 160;
 const SAMPLES_PER_LEG = 18;
-const FADE_SECONDS = 0.3;
+/** A stop marker changes slowly. A passenger changes fast, so a viewer can count the passengers one by one. */
+const MARKER_FADE_SECONDS = 0.3;
+const PASSENGER_FADE_SECONDS = 0.12;
 /** The still picture for people who pause motion: a tram stands at the hub and passengers wait. */
 const STILL_AT_SECONDS = 10.4;
 
@@ -75,9 +75,9 @@ function element(className: string, parent: Element): HTMLElement {
   return node;
 }
 
-/** Shows an element during the intervals (or hides it during them): it grows in and shrinks out. */
-function presence(node: HTMLElement, intervals: readonly Interval[], hide = false): Animation {
-  const frames = opacityFrames(intervals, CYCLE, FADE_SECONDS).map(({ offset, opacity }) => {
+/** Shows an element during the intervals (or hides it during them): it grows in and shrinks out in `fade` seconds. */
+function presence(node: HTMLElement, intervals: readonly Interval[], fade: number, hide = false): Animation {
+  const frames = opacityFrames(intervals, CYCLE, fade).map(({ offset, opacity }) => {
     const level = hide ? 1 - opacity : opacity;
     return { offset, opacity: level, transform: `scale(${0.4 + 0.6 * level})` };
   });
@@ -179,24 +179,36 @@ function build(root: HTMLElement, layout: SceneLayout, demand: number, origin: C
     const covered = trams
       .filter(({ line }) => line.visits.some((visit) => visit.stop === stop.id))
       .flatMap(({ path, spec, length }) => coverage(spec.journey, spec.offset, CYCLE, distanceTo(path, stop.x, stop.y), length / 2 + radius));
-    animations.push(presence(marker, covered, true));
+    animations.push(presence(marker, covered, MARKER_FADE_SECONDS, true));
 
     const group = element('scene__wait', root);
     group.style.left = em(stop.x + stop.wait[0]);
     group.style.top = em(stop.y + stop.wait[1]);
-    for (const intervals of waiting.get(stop.id) ?? []) animations.push(presence(element('seat', group), intervals));
+    for (const intervals of waiting.get(stop.id) ?? []) animations.push(presence(element('seat', group), intervals, PASSENGER_FADE_SECONDS));
+  }
+
+  // Carriage 0 is the front one. The centre of the tram stops exactly on the stop.
+  const leadOf = (line: SceneLine, index: number): number => ((line.carriages - 1) / 2 - index) * (CAR_LENGTH + CAR_GAP);
+
+  // Each carriage has a ring in the colour of the slide. A link joins the rings of two carriages into one shape.
+  // The links lie below all carriages.
+  for (const { line, path, spec } of trams) {
+    for (let index = 1; index < line.carriages; index += 1) {
+      const link = element('scene__link', root);
+      animations.push(travel(link, path, spec.journey, spec.offset, leadOf(line, index - 0.5)));
+      link.classList.add('is-ready');
+    }
   }
 
   for (const { line, path, spec } of trams) {
     const seats = riding.get(spec.id) ?? [];
     for (let index = 0; index < line.carriages; index += 1) {
       const car = element('scene__car', root);
+      car.dataset.line = line.id;
       car.dataset.tone = line.tone;
-      // Carriage 0 is the front one. The centre of the tram stops exactly on the stop.
-      const lead = ((line.carriages - 1) / 2 - index) * (CAR_LENGTH + CAR_GAP);
-      animations.push(travel(car, path, spec.journey, spec.offset, lead));
+      animations.push(travel(car, path, spec.journey, spec.offset, leadOf(line, index)));
       for (const intervals of seats.slice(index * SEATS_PER_CARRIAGE, (index + 1) * SEATS_PER_CARRIAGE)) {
-        animations.push(presence(element('seat', car), intervals));
+        animations.push(presence(element('seat', car), intervals, PASSENGER_FADE_SECONDS));
       }
       car.classList.add('is-ready');
     }
@@ -212,8 +224,6 @@ function build(root: HTMLElement, layout: SceneLayout, demand: number, origin: C
 
 scene('title', (context) => {
   const deck = context.slide.closest<HTMLElement>('[data-deck]');
-  const readout = context.slide.querySelector<HTMLElement>('[data-live-text]');
-  const locale = toLocale(pageLanguage());
   let animations: Animation[] = [];
   let built: string | null = null;
   let origin: CSSNumberish | null = null;
@@ -244,13 +254,6 @@ scene('title', (context) => {
     apply();
   };
 
-  /** Writes the reading into the pill, if the pill is on the slide. */
-  const write = (): void => {
-    const pill = readout?.firstElementChild;
-    if (!readout || !pill) return;
-    pill.textContent = describeOccupancy(reading, locale, { live: readout.dataset.now ?? '', snapshot: readout.dataset.snapshot ?? '' });
-  };
-
   /** Asks for the live reading one time. The stored snapshot stays if no answer comes. */
   const ask = (): void => {
     if (asked) return;
@@ -259,25 +262,11 @@ scene('title', (context) => {
       if (answer === reading) return;
       reading = answer;
       refresh(true);
-      write();
     });
   };
 
   addEventListener('resize', () => {
     if (context.active) refresh();
-  });
-
-  // The key L shows and hides the reading.
-  context.slide.addEventListener('slide:live', () => {
-    if (!readout) return;
-    if (readout.firstElementChild) {
-      readout.replaceChildren();
-      return;
-    }
-    const pill = document.createElement('span');
-    pill.className = 't-small';
-    readout.append(pill);
-    write();
   });
 
   return {

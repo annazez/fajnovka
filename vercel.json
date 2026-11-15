@@ -10,5 +10,11 @@
     "api/occupancy.ts": {
       "includeFiles": "src/{data,lib}/occupancy.ts"
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    }
+  ]
 }

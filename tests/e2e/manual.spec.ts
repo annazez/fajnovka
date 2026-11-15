@@ -76,11 +76,12 @@ for (const locale of LOCALES) {
       expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
     });
 
-    test('the first slide of the deck opens the PDF', async ({ page }) => {
+    test('the control bar of the deck links to the PDF and the first slide has no button', async ({ page }) => {
       await openDeck(page, { locale });
-      const button = page.locator('#title .title__manual');
-      await expect(button).toBeVisible();
-      await expect(button).toHaveAttribute('href', pdf(locale));
+      const link = page.locator('.controls a[data-manual]');
+      await expect(link).toHaveAttribute('href', pdf(locale));
+      await expect(link).toHaveAccessibleName(/manu[aá]l/i);
+      await expect(page.locator('#title a[href$=".pdf"]')).toHaveCount(0);
     });
 
     test('the PDF is a print of the page of today', async ({ page }, info) => {

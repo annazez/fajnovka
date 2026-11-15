@@ -5,8 +5,10 @@
  */
 import '../styles/global.css';
 import UiIcon from './UiIcon.astro';
+import { manualPdf } from '../data/manual.ts';
 import { useDictionary } from '../i18n/index.ts';
 import { toLocale } from '../i18n/locales.ts';
+import { hasPublicFile } from '../lib/site.ts';
 import Title from '../slides/01-Title.astro';
 import Paradox from '../slides/02-Paradox.astro';
 import Leak from '../slides/03-Leak.astro';
@@ -19,7 +21,11 @@ import Ask from '../slides/09-Ask.astro';
 
 const slides = [Title, Paradox, Leak, Product, Journey, Evidence, Spread, Economics, Ask];
 // PUBLIC_LIVE_DATA is the path of the server function with the live data of DPO. It is set only where the function exists (see vercel.json).
-const { ui } = useDictionary(toLocale(Astro.currentLocale));
+const locale = toLocale(Astro.currentLocale);
+const { ui } = useDictionary(locale);
+// The link shows only when the PDF exists, so the page never has a dead link.
+const manual = manualPdf(locale);
+const hasManual = hasPublicFile(manual);
 ---
 
 <main class="deck" data-deck data-theme="cyan" data-motion="running" data-live={import.meta.env.PUBLIC_LIVE_DATA} aria-label={ui.deck}>
@@ -47,6 +53,13 @@ const { ui } = useDictionary(toLocale(Astro.currentLocale));
         <button class="control control--step" type="button" data-action="next" aria-label={ui.next}>
           <UiIcon name="next" />
         </button>
+        {
+          hasManual && (
+            <a class="control" data-manual href={manual} aria-label={ui.manual}>
+              <UiIcon name="book" />
+            </a>
+          )
+        }
         <button
           class="control"
           type="button"

@@ -131,12 +131,25 @@ export interface Presence {
 }
 
 export const WAITING_PLACES = 6;
-const ALIGHT_AFTER = 0.25;
-const BOARD_AFTER = 0.6;
-const SEATED_AFTER = 0.9;
-const TRANSFER_AFTER = 1.2;
 const MAX_TRANSFERS = 2;
 const WARM_UP_CYCLES = 6;
+
+/**
+ * Timing of passengers at a stop, in seconds. As in Mini Metro, passengers move one at a time:
+ * first each passenger who leaves the tram, then each passenger who boards it.
+ */
+export const EXCHANGE = {
+  /** After the tram stops, before the first passenger moves. */
+  after: 0.3,
+  /** Between two passengers. */
+  step: 0.2,
+  /** The shortest step. A tram with many passengers makes its steps shorter, so that all of them fit in its stay. */
+  minStep: 0.1,
+  /** Between the last passenger who leaves and the first passenger who boards. */
+  pause: 0.25,
+  /** The doors close this long before the tram moves. */
+  beforeDeparture: 0.25,
+} as const;
 
 /** Small seeded generator (mulberry32). The scene must look random and must be the same on each run. */
 export function random(seed: number): () => number {
@@ -149,123 +162,155 @@ export function random(seed: number): () => number {
   };
 }
 
-interface Timed {
+/** One thing that happens at one moment. `order` sorts things that happen at the same moment. */
+interface Moment {
   readonly time: number;
-  /** Order of actions that happen at the same time. */
   readonly order: number;
-}
-
-type Action =
-  | (Timed & { readonly kind: 'spawn'; readonly stop: string })
-  | (Timed & { readonly kind: 'enter'; readonly tram: TramSpec })
-  | (Timed & { readonly kind: 'exit'; readonly tram: TramSpec })
-  | (Timed & { readonly kind: 'alight'; readonly tram: TramSpec; readonly dwell: Dwell })
-  | (Timed & { readonly kind: 'board'; readonly tram: TramSpec; readonly dwell: Dwell })
-  | (Timed & { readonly kind: 'transfer'; readonly tram: TramSpec; readonly dwell: Dwell });
-
-/** All actions of one cycle, in the order in which they happen. */
-function script(cycle: number, stops: readonly StopSpec[], trams: readonly TramSpec[], seed: number): Action[] {
-  const next = random(seed);
-  const actions: Action[] = [];
-  const wrap = (time: number): number => ((time % cycle) + cycle) % cycle;
-
-  for (const stop of stops) {
-    for (let index = 0; index < stop.rate; index += 1) {
-      actions.push({ time: wrap(((index + 0.15 + 0.7 * next()) / stop.rate) * cycle), order: 3, kind: 'spawn', stop: stop.id });
-    }
-  }
-
-  for (const tram of trams) {
-    actions.push({ time: wrap(tram.offset), order: 0, kind: 'enter', tram });
-    actions.push({ time: wrap(tram.offset + tram.journey.duration), order: 4, kind: 'exit', tram });
-    for (const dwell of tram.journey.dwells) {
-      actions.push({ time: wrap(tram.offset + dwell.arrive + ALIGHT_AFTER), order: 1, kind: 'alight', tram, dwell });
-      actions.push({ time: wrap(tram.offset + dwell.arrive + BOARD_AFTER), order: 2, kind: 'board', tram, dwell });
-      actions.push({ time: wrap(tram.offset + dwell.arrive + TRANSFER_AFTER), order: 3, kind: 'transfer', tram, dwell });
-    }
-  }
-
-  return actions.sort((a, b) => a.time - b.time || a.order - b.order);
+  run(now: number): void;
 }
 
 /**
  * Plays the cycle several times until the picture repeats, then reports who stands and sits where and when.
- * A passenger takes the lowest free place and the highest taken place boards first, so a row of passengers has no holes.
+ *
+ * At a stop, the passengers who leave go first, one at a time, from the last seat. Then the passengers who wait board,
+ * one at a time, from the last waiting place. So a row of passengers never has a hole, and a viewer can count each move.
+ * At a hub, up to two of the passengers who leave stay at the stop: they wait for the other line.
+ * The passengers look the same, so the model counts them and does not follow each one.
  */
 export function simulate(cycle: number, stops: readonly StopSpec[], trams: readonly TramSpec[], seed = 7): Presence {
-  const actions = script(cycle, stops, trams, seed);
+  const next = random(seed);
   const hubs = new Set(stops.filter((stop) => stop.hub).map((stop) => stop.id));
+  const rounds = WARM_UP_CYCLES + 2;
+  const recordFrom = WARM_UP_CYCLES * cycle;
 
-  // A place holds the absolute time at which its passenger came, or null when it is free.
+  // A waiting place or a seat holds the time at which its passenger came. It is null when free.
   const places = new Map(stops.map((stop) => [stop.id, new Array<number | null>(WAITING_PLACES).fill(null)]));
   const seats = new Map(trams.map((tram) => [tram.id, new Array<number | null>(tram.capacity).fill(null)]));
+  const taken = (row: readonly (number | null)[] | undefined): number => row?.filter((since) => since !== null).length ?? 0;
   const waiting = new Map(stops.map((stop) => [stop.id, Array.from({ length: WAITING_PLACES }, (): Interval[] => [])]));
   const riding = new Map(trams.map((tram) => [tram.id, Array.from({ length: tram.capacity }, (): Interval[] => [])]));
-  // Passengers who left a tram at a hub and now walk to the waiting place: one count for each stay of a tram.
-  const transfers = new Map<Dwell, number>();
-  const recordFrom = WARM_UP_CYCLES * cycle;
-  const wrap = (time: number): number => time % cycle;
 
-  /** Frees a place or seat and, after the warm-up, records the time the passenger spent there. */
-  const release = (log: Interval[] | undefined, since: number, now: number): void => {
-    if (since >= recordFrom && since < recordFrom + cycle) log?.push({ from: wrap(since), to: wrap(now) });
+  /** After the warm-up, records the time that a passenger spent in a place or on a seat. */
+  const record = (log: Interval[] | undefined, since: number, now: number): void => {
+    if (since >= recordFrom && since < recordFrom + cycle) log?.push({ from: since % cycle, to: now % cycle });
   };
 
-  const arrive = (stopId: string, now: number): void => {
-    const row = places.get(stopId);
+  /** A passenger comes to a stop and takes the lowest free place. A full stop takes no more passengers. */
+  const arrive = (stop: string, now: number): boolean => {
+    const row = places.get(stop);
     const free = row?.indexOf(null) ?? -1;
-    if (row && free >= 0) row[free] = now;
+    if (!row || free < 0) return false;
+    row[free] = now;
+    return true;
   };
 
-  const leaveTram = (tram: TramSpec, count: number, now: number): void => {
+  /** The passenger on the last taken seat leaves the tram. */
+  const leave = (tram: TramSpec, now: number): boolean => {
     const row = seats.get(tram.id) ?? [];
-    for (let seat = row.length - 1, left = count; seat >= 0 && left > 0; seat -= 1) {
-      const since = row[seat];
-      if (since === null || since === undefined) continue;
-      release(riding.get(tram.id)?.[seat], since, now);
-      row[seat] = null;
-      left -= 1;
-    }
+    const seat = row.findLastIndex((since) => since !== null);
+    const since = row[seat];
+    if (since === null || since === undefined) return false;
+    record(riding.get(tram.id)?.[seat], since, now);
+    row[seat] = null;
+    return true;
   };
 
-  for (let round = 0; round < WARM_UP_CYCLES + 2; round += 1) {
-    for (const action of actions) {
-      const now = round * cycle + action.time;
+  /** The passenger on the last taken place boards the tram and takes its lowest free seat. */
+  const board = (tram: TramSpec, stop: string, now: number): boolean => {
+    const row = seats.get(tram.id) ?? [];
+    const queue = places.get(stop) ?? [];
+    const seat = row.indexOf(null);
+    const place = queue.findLastIndex((since) => since !== null);
+    const since = queue[place];
+    if (seat < 0 || since === null || since === undefined) return false;
+    record(waiting.get(stop)?.[place], since, now);
+    queue[place] = null;
+    row[seat] = now;
+    return true;
+  };
 
-      if (action.kind === 'spawn') {
-        arrive(action.stop, now);
-      } else if (action.kind === 'enter') {
-        const row = seats.get(action.tram.id) ?? [];
-        for (let seat = 0; seat < Math.min(action.tram.load, row.length); seat += 1) row[seat] = now;
-      } else if (action.kind === 'exit') {
-        leaveTram(action.tram, action.tram.capacity, now);
-      } else if (action.kind === 'alight') {
-        const row = seats.get(action.tram.id) ?? [];
-        const onBoard = row.filter((seat) => seat !== null).length;
-        const count = Math.round(onBoard * action.dwell.alight);
-        leaveTram(action.tram, count, now);
-        if (hubs.has(action.dwell.stop)) transfers.set(action.dwell, Math.min(count, MAX_TRANSFERS));
-      } else if (action.kind === 'transfer') {
-        // They come after the tram has taken its passengers, so they wait for the next tram.
-        for (let index = 0; index < (transfers.get(action.dwell) ?? 0); index += 1) arrive(action.dwell.stop, now);
-        transfers.delete(action.dwell);
-      } else {
-        const row = seats.get(action.tram.id) ?? [];
-        const queue = places.get(action.dwell.stop) ?? [];
-        const ready = queue
-          .map((since, place) => ({ since, place }))
-          .filter((entry): entry is { since: number; place: number } => entry.since !== null)
-          .sort((a, b) => b.place - a.place);
+  // The agenda: all moments in the order of time. A moment can add later moments.
+  const agenda: Moment[] = [];
+  let cursor = 0;
+  const before = (a: Moment, b: Moment): boolean => a.time < b.time || (a.time === b.time && a.order < b.order);
+  const schedule = (moment: Moment): void => {
+    let index = agenda.length;
+    while (index > cursor + 1 && before(moment, agenda[index - 1] as Moment)) index -= 1;
+    agenda.splice(index, 0, moment);
+  };
 
-        for (const { since, place } of ready) {
-          const seat = row.indexOf(null);
-          if (seat < 0) break;
-          release(waiting.get(action.dwell.stop)?.[place], since, now);
-          queue[place] = null;
-          row[seat] = now + (SEATED_AFTER - BOARD_AFTER);
+  /** One stay of a tram at a stop: plans each passenger who leaves and each passenger who boards. */
+  const exchange = (tram: TramSpec, dwell: Dwell, arrival: number): void => {
+    const start = arrival + EXCHANGE.after;
+    const end = arrival + (dwell.depart - dwell.arrive) - EXCHANGE.beforeDeparture;
+
+    schedule({
+      time: start,
+      order: 1,
+      run(now) {
+        const onBoard = taken(seats.get(tram.id));
+        const leaving = Math.round(onBoard * dwell.alight);
+        const boarding = Math.min(taken(places.get(dwell.stop)), tram.capacity - onBoard + leaving);
+        const pause = leaving > 0 && boarding > 0 ? EXCHANGE.pause : 0;
+        const moves = leaving + boarding;
+        const step = moves > 1 ? Math.min(EXCHANGE.step, Math.max(EXCHANGE.minStep, (end - now - pause) / (moves - 1))) : EXCHANGE.step;
+
+        // At a hub, some passengers change lines: they come to the stop and stay there when this tram goes.
+        let staying = 0;
+        for (let index = 0; index < leaving; index += 1) {
+          schedule({
+            time: now + index * step,
+            order: 2,
+            run(moment) {
+              if (!leave(tram, moment)) return;
+              if (hubs.has(dwell.stop) && staying < MAX_TRANSFERS && arrive(dwell.stop, moment)) staying += 1;
+            },
+          });
         }
-      }
+
+        const boardNext = (moment: number): void => {
+          if (moment > end || taken(places.get(dwell.stop)) <= staying || !board(tram, dwell.stop, moment)) return;
+          schedule({ time: moment + step, order: 3, run: boardNext });
+        };
+        schedule({ time: now + leaving * step + pause, order: 3, run: boardNext });
+      },
+    });
+  };
+
+  // Passengers come to the stops at the same moments of each cycle, so the picture repeats.
+  const arrivals = stops.flatMap((stop) =>
+    Array.from({ length: stop.rate }, (_, index) => ({ stop: stop.id, time: ((index + 0.15 + 0.7 * next()) / stop.rate) * cycle })),
+  );
+
+  for (let round = 0; round < rounds; round += 1) {
+    const base = round * cycle;
+    for (const { stop, time } of arrivals) agenda.push({ time: base + time, order: 4, run: (now) => arrive(stop, now) });
+    for (const tram of trams) {
+      const start = base + tram.offset;
+      agenda.push({
+        time: start,
+        order: 0,
+        run(now) {
+          const row = seats.get(tram.id) ?? [];
+          for (let seat = 0; seat < Math.min(tram.load, row.length); seat += 1) row[seat] = now;
+        },
+      });
+      // The tram leaves the picture with the passengers who stay on board.
+      agenda.push({
+        time: start + tram.journey.duration,
+        order: 5,
+        run(now) {
+          while (leave(tram, now));
+        },
+      });
+      for (const dwell of tram.journey.dwells) exchange(tram, dwell, start + dwell.arrive);
     }
+  }
+
+  agenda.sort((a, b) => a.time - b.time || a.order - b.order);
+  for (cursor = 0; cursor < agenda.length; cursor += 1) {
+    const moment = agenda[cursor] as Moment;
+    moment.run(moment.time);
   }
 
   // A passenger who came before the last round and is still at the stop never got a seat:

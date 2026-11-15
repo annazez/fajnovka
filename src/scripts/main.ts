@@ -1,7 +1,6 @@
 /** Entry point of the deck page: builds the parts and connects them. */
 import { createDeck } from './deck/deck.ts';
 import { required } from './deck/dom.ts';
-import { emit } from './deck/events.ts';
 import { createFullscreen } from './deck/fullscreen.ts';
 import { bindInput } from './deck/input.ts';
 import { createMotion } from './deck/motion.ts';
@@ -23,7 +22,6 @@ bindInput(root, deck, {
   fullscreen: () => void fullscreen.toggle(),
   notes: () => notes.toggle(),
   resetTimer: () => notes.reset(),
-  live: () => emit(deck.slide, 'slide:live'),
 });
 
 deck.start();

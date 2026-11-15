@@ -24,13 +24,11 @@ export const en = {
     fullscreen: 'Full screen',
     exitFullscreen: 'Exit full screen',
     language: 'Language',
+    manual: 'Read the full manual',
     notes: 'Speaker text',
   },
   title: {
     slogan: 'Ride well. Live Ostrava.',
-    manual: 'Read the full manual',
-    live: 'Ostrava now · vehicles on the road: %vehicles · places taken: %share · DPO',
-    snapshot: '%when · vehicles on the road: %vehicles · places taken: %share · DPO',
     notes:
       'Good afternoon. We are the Fajnovka team. Fajnovka is a loyalty programme for public transport in Ostrava.',
   },

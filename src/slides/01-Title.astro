@@ -1,20 +1,13 @@
 ---
 import SceneLines from '../components/SceneLines.astro';
 import Slide from '../components/Slide.astro';
-import UiIcon from '../components/UiIcon.astro';
 import Wordmark from '../components/Wordmark.astro';
-import { manualPdf } from '../data/manual.ts';
 import { useDictionary } from '../i18n/index.ts';
 import { languageName, localePath, locales, toLocale } from '../i18n/locales.ts';
-import { hasPublicFile } from '../lib/site.ts';
 
 const locale = toLocale(Astro.currentLocale);
 const t = useDictionary(locale);
 const layouts = ['stage', 'flow'] as const;
-
-// The button shows only when the manual exists, so the page never has a dead link.
-const manual = manualPdf(locale);
-const hasManual = hasPublicFile(manual);
 ---
 
 <Slide id="title" theme="cyan" notes={t.title.notes} {...Astro.props}>
@@ -42,24 +35,11 @@ const hasManual = hasPublicFile(manual);
     }
   </nav>
 
-  {/* The key L shows how full the real vehicles are. The script writes the text. */}
-  <p class="title__live" role="status" data-live-text data-now={t.title.live} data-snapshot={t.title.snapshot}></p>
-
   <h1 class="title__mark" id="title-title" data-in="0">
     <span class="sr-only">Fajnovka</span>
     <Wordmark />
   </h1>
   <p class="title__slogan t-title" data-in="2">{t.title.slogan}</p>
-  {
-    hasManual && (
-      <p data-in="4">
-        <a class="title__manual t-body" href={manual}>
-          <UiIcon name="book" />
-          {t.title.manual}
-        </a>
-      </p>
-    )
-  }
 </Slide>
 
 <script>
@@ -77,38 +57,8 @@ const hasManual = hasPublicFile(manual);
     margin-top: 5.5rem;
   }
 
-  .title__manual {
-    display: inline-flex;
-    gap: 1.6rem;
-    align-items: center;
-    margin-top: 5.5rem;
-    padding: 1.8rem 3.8rem 1.8rem 3rem;
-    border-radius: 10rem;
-    background: var(--fg);
-    color: var(--accent);
-    text-decoration: none;
-    transition: transform 0.4s var(--spring);
-  }
-
-  .title__manual:focus-visible,
   .title__languages a:focus-visible {
     outline-offset: 0.4rem;
-  }
-
-  @media (--hover) {
-    .title__manual:hover {
-      transform: scale(1.05);
-    }
-  }
-
-  .title__manual :global(svg) {
-    width: 4rem;
-    height: 4rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
   /* Language switch: one colour, the current language is the light pill. */
@@ -136,24 +86,6 @@ const hasManual = hasPublicFile(manual);
   .title__languages a[aria-current] {
     background: var(--accent);
     color: var(--fg);
-  }
-
-  /* Live data of the network: a pill like the language switch, on the other side. */
-  .title__live {
-    position: absolute;
-    top: 4.5rem;
-    left: var(--pad-x);
-    z-index: 1;
-  }
-
-  .title__live :global(span) {
-    display: flex;
-    align-items: center;
-    min-height: max(5.4rem, 34px);
-    padding: 1rem 2.8rem;
-    border-radius: 10rem;
-    background: var(--fg);
-    color: var(--accent);
   }
 
   /* The tram scene: two lines, stops, trams and passengers. The script adds trams and passengers. */
@@ -208,10 +140,28 @@ const hasManual = hasPublicFile(manual);
     height: 3em;
     margin: -1.5em 0 0 -4.3em;
     border-radius: 1.2em;
+
+    /* A ring in the colour of the slide cuts each line under the carriage, so a tram never merges with a line. */
+    box-shadow: 0 0 0 0.5em var(--bg);
     visibility: hidden;
   }
 
-  .scene :global(.scene__car.is-ready) {
+  /*
+   * Between two carriages, the round ends of the two rings leave a notch, and a line can show there.
+   * The link fills the notch: as wide as the gap (0.8em) and the two corner radii, as high as a carriage and its ring.
+   */
+  .scene :global(.scene__link) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3.2em;
+    height: 4em;
+    margin: -2em 0 0 -1.6em;
+    background: var(--bg);
+    visibility: hidden;
+  }
+
+  .scene :global(.is-ready) {
     visibility: visible;
   }
 
@@ -259,23 +209,8 @@ const hasManual = hasPublicFile(manual);
       align-self: flex-end;
     }
 
-    .title__live {
-      position: static;
-      order: 1;
-    }
-
     .title__slogan {
       margin-top: 0;
-    }
-
-    .title__manual {
-      margin-top: 0;
-      padding: 2.6rem 4.6rem 2.6rem 3.8rem;
-    }
-
-    .title__manual :global(svg) {
-      width: 5.2rem;
-      height: 5.2rem;
     }
 
     .scene[data-scene='stage'] {

@@ -9,20 +9,20 @@ This is a proposal by a student team. It is not an official product of the City 
 
 ## Present
 
-| Action                 | Input                                                  |
-| ---------------------- | ------------------------------------------------------ |
-| Next slide             | `→` `↓` `Space` `Enter` `PageDown` (clicker)           |
-| Previous slide         | `←` `↑` `Backspace` `PageUp` (clicker)                 |
-| Go to a slide          | `1`–`9`, `Home`, `End`, or a stop on the bottom line   |
-| Full screen            | `F`, or the button at the bottom right                 |
-| Pause the animations   | `P`, or the button at the bottom right                 |
-| Speaker text and timer | `N` (`R` resets the timer)                             |
-| Live data of DPO       | `L` on the first slide                                 |
-| Language               | The switch on the first slide (`/` English, `/cs/` Czech) |
+| Action                 | Input                                                         |
+| ---------------------- | ------------------------------------------------------------- |
+| Next slide             | `→` `↓` `Space` `Enter` `PageDown` (clicker)                  |
+| Previous slide         | `←` `↑` `Backspace` `PageUp` (clicker)                        |
+| Go to a slide          | `1`–`9`, `Home`, `End`, or a stop on the bottom line          |
+| Full screen            | `F`, or the button at the bottom right                        |
+| Pause the animations   | `P`, or the button at the bottom right                        |
+| Speaker text and timer | `N` (`R` resets the timer)                                    |
+| The full manual        | The book in the left corner (it shows when the pointer moves) |
+| Language               | The switch on the first slide (`/` English, `/cs/` Czech)     |
 
 On a touch screen, swipe left or right. The address keeps the slide number (`/#4`).
 
-The trams on the first slide are about as full as the real vehicles of DPO at this minute. `L` shows the numbers. Without a connection, the slide uses a stored reading from Friday 13 November 2026.
+The trams on the first slide are about as full as the real vehicles of DPO at this minute. At a stop, the passengers leave the tram one at a time, and then the passengers at the stop board one at a time. The slide shows no numbers; `/api/occupancy` gives them. Without a connection, the slide uses a stored reading from Friday 13 November 2026.
 
 The page needs the network only for the first load. Open it before the pitch starts.
 
@@ -87,4 +87,4 @@ The rules that keep the deck simple are in [`AGENTS.md`](AGENTS.md).
 
 ## Deploy
 
-Vercel builds each push to `main` and serves it at the address above. The site is static, with one server function in Frankfurt (`fra1`) that reads the public vehicle feed of DPO. The site has no analytics and no cookies, and search engines are told not to index it.
+Vercel builds each push to `main` and serves it at the address above. The site is static, with one server function in Frankfurt (`fra1`) that reads the public vehicle feed of DPO. The site has no analytics and no cookies. People and programs can read each page (`robots.txt` permits all), but each answer of the server tells search engines not to list it (`X-Robots-Tag: noindex, nofollow`).

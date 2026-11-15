@@ -14,12 +14,12 @@ Do not add other pages, routing, a CMS, analytics or a UI framework.
 ## Design rules
 
 1. One idea for each slide. The title is a sentence that gives the point, not a topic name.
-2. A slide uses one title, one hero size at most, body text, and one quiet source line. Do not add taglines, helper text or secondary labels. If a slide needs them to make sense, change the layout.
+2. A slide uses one title, one hero size at most, body text, and one quiet source line. Do not add taglines, helper text, secondary labels or status displays. If a slide needs them to make sense, change the layout. A link to a different page goes in the control bar, not on a slide. The language switch on the first slide is the only exception.
 3. Use the type classes from `global.css` only: `t-title`, `t-hero`, `t-body`, `t-small`. A slide can make its hero smaller. Text inside a mock-up (the card) can have its own size.
 4. Use the colour roles `--bg`, `--fg`, `--accent` and `--soft` only. Do not add colours. White text on cyan is for large shapes only.
 5. Give all sizes in `rem`. The stage is 192 × 108 rem. A figure that scales as one piece can use `em` inside.
-6. There is one graphic device: the line with stops. Use it for progress, journeys and timelines.
-7. Motion shows order or change. Start each animation from `.is-active` or the `slide:enter` event. An animation must not need a click.
+6. There is one graphic device: the line with stops. Use it for progress, journeys and timelines. A shape that moves on a line has a ring in the colour `--bg`, so the shape and a line of the same colour stay apart.
+7. Motion shows order or change. When the viewer must see how many things move, move them one at a time. Start each animation from `.is-active` or the `slide:enter` event. An animation must not need a click.
 8. Interactive parts are optional. The arrow keys must always go to the next slide. Remove focus from a button after a mouse click, or `Space` will press it again.
 9. Decorative layers must have `pointer-events: none`.
 

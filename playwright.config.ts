@@ -23,7 +23,9 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: `npm run preview -- --host 127.0.0.1 --port ${PORT}`,
+    // `--ignore-lock` keeps the server in the foreground. Without it, Astro starts a background server
+    // when an AI agent runs the tests, and Playwright sees that its command has ended.
+    command: `npm run preview -- --host 127.0.0.1 --port ${PORT} --ignore-lock`,
     url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },
