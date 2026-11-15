@@ -8,13 +8,15 @@ This is a proposal by a student team. It is not an official product of the City 
 
 ## Present
 
-| Action                 | Input                                               |
-| ---------------------- | --------------------------------------------------- |
-| Next slide             | `→` `↓` `Space` `Enter` `PageDown` (clicker)        |
-| Previous slide         | `←` `↑` `Backspace` `PageUp` (clicker)              |
-| Go to a slide          | `1`–`9`, `Home`, `End`, or a stop on the bottom line |
-| Fullscreen             | `F`, or the button on the first slide               |
-| Speaker text and timer | `N` (`R` resets the timer)                          |
+| Action                 | Input                                                  |
+| ---------------------- | ------------------------------------------------------ |
+| Next slide             | `→` `↓` `Space` `Enter` `PageDown` (clicker)           |
+| Previous slide         | `←` `↑` `Backspace` `PageUp` (clicker)                 |
+| Go to a slide          | `1`–`9`, `Home`, `End`, or a stop on the bottom line   |
+| Full screen            | `F`, or the button at the bottom right                 |
+| Pause the animations   | `P`, or the button at the bottom right                 |
+| Speaker text and timer | `N` (`R` resets the timer)                             |
+| Language               | The switch on the first slide (`/` English, `/cs/` Czech) |
 
 On a touch screen, swipe left or right. The address keeps the slide number (`/#4`).
 
@@ -24,9 +26,10 @@ The page needs the network only for the first load. Open it before the pitch sta
 
 ```sh
 npm install
-npm run dev     # http://localhost:4321
-npm run check   # types
-npm run build   # static site in dist/
+npm run dev        # http://localhost:4321
+npm run check      # types
+npm run build      # static site in dist/
+npm run test:e2e   # browser tests (Chromium, Firefox, WebKit); build first
 ```
 
 Node 22.23.4 or later is necessary (Astro 7).
@@ -35,26 +38,29 @@ Node 22.23.4 or later is necessary (Astro 7).
 
 ```text
 src/
-  pages/index.astro      page shell; the list of slides sets the order of the pitch
-  slides/NN-Name.astro   one file per slide: text, speaker notes, layout, own script
-  components/            Slide, Wordmark, Icon
+  pages/                 one page for each language
+  components/Deck.astro  the list of slides sets the order of the pitch
+  slides/NN-Name.astro   one file for each slide: layout, and its script if it has one
+  i18n/en.ts, cs.ts      all texts and speaker notes
   data/numbers.ts        every number in the deck, with its source
-  scripts/deck.ts        navigation, fullscreen, speaker notes
-  styles/global.css      design tokens, type styles, deck controls
+  data/scene.ts          the tram scene of the title slide
+  lib/                   pure functions (formats, typography, scene model)
+  scripts/               deck engine and the scenes of the slides
+  styles/                design tokens, type, deck controls
+tests/e2e/               Playwright tests
 ```
 
 ## Change the content
 
-- **Text:** edit the slide file. The `notes` attribute is the text that the speaker says.
-- **Numbers:** edit `src/data/numbers.ts` only. The ids `K01`–`K20` refer to `klicova_cisla.csv` in the team's data pack.
-- **Order:** change the `slides` list in `src/pages/index.astro`.
-- **New slide:** copy a slide file, rename it, add it to the list. The progress line gets a new stop automatically.
+- **Text:** edit `src/i18n/en.ts` and `src/i18n/cs.ts`. `notes` is the text that the speaker says.
+- **Numbers:** edit `src/data/numbers.ts` only. A text refers to a number as `{key}` or `{key:format}`.
+- **Order:** change the `slides` list in `src/components/Deck.astro`.
 
 ## Design
 
 - Colours and type follow the [City of Ostrava design manual](https://ostrava.cz/cs/o-meste/logo-mesta-ostravy/designmanual): `#00ADD0`, `#003C69`, white.
 - Montserrat replaces Gotham, because Gotham needs a licence.
-- The stage is always 192 × 108 rem. All sizes are in `rem`, so the deck looks the same on each screen.
+- Wide screens show a fixed 192 × 108 rem stage. Phones and zoomed windows show a 108 rem column that scrolls.
 - The `FAJNOVKA!!!` wordmark and the pictograms come from the team's graphic pack. The wordmark is a working proposal. The official `OSTRAVA!!!` logo is not used, because the city must approve each use.
 
 The rules that keep the deck simple are in [`AGENTS.md`](AGENTS.md).

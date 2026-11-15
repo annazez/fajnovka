@@ -1,140 +1,296 @@
 ---
-import Slide from '../components/Slide.astro';
-import Wordmark from '../components/Wordmark.astro';
+import { existsSync } from 'node:fs';
 
-// The line with stops is the motif of the brand. Grid: 1920 × 1080 (1 unit = 0.1rem).
-const track = 'M-40 880H560q80 0 136-56t136-56H1960';
-const stops = [
-  { x: 330, y: 880 },
-  { x: 1150, y: 768 },
-  { x: 1650, y: 768 },
-];
+import Slide from '../components/Slide.astro';
+import UiIcon from '../components/UiIcon.astro';
+import Wordmark from '../components/Wordmark.astro';
+import { scene } from '../data/scene.ts';
+import { useDictionary } from '../i18n/index.ts';
+import { languageName, localePath, locales, toLocale } from '../i18n/locales.ts';
+
+const locale = toLocale(Astro.currentLocale);
+const t = useDictionary(locale);
+
+// The button shows only when the manual exists, so the page never has a dead link.
+const manual = `/manual/fajnovka-manual-${locale}.pdf`;
+const hasManual = existsSync(new URL(`../../public${manual}`, import.meta.url));
 ---
 
-<Slide theme="cyan" class="title" notes="Dobrý den, jsme tým Fajnovka. Jezdi fajně. Žij Ostravou.">
-  <svg class="title__line" viewBox="0 0 1920 1080" aria-hidden="true">
-    <path id="title-track" d={track} pathLength="1"></path>
-    {stops.map(({ x, y }, index) => <circle cx={x} cy={y} r="19" style={`--n:${index}`} />)}
-    <rect x="-46" y="-16" width="92" height="32" rx="13">
-      <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
-        <mpath href="#title-track"></mpath>
-      </animateMotion>
-    </rect>
-  </svg>
+<Slide id="title" theme="cyan" notes={t.title.notes} {...Astro.props}>
+  {
+    Object.entries(scene).map(([layout, { width, height, lines, stops }]) => (
+      <div class="scene" data-scene={layout} aria-hidden="true">
+        <svg viewBox={`0 0 ${width} ${height}`}>
+          {lines.map((line) => (
+            <path data-line={line.id} data-tone={line.tone} d={line.d} />
+          ))}
+          {stops.map((stop) => (
+            <circle cx={stop.x} cy={stop.y} r={stop.hub ? 25 : 19} />
+          ))}
+        </svg>
+      </div>
+    ))
+  }
 
-  <h1 class="title__mark"><Wordmark /></h1>
-  <p class="title__slogan t-title" data-in style="--i:10">Jezdi fajně. Žij Ostravou.</p>
-  <div data-in style="--i:13">
-    <button class="title__start t-body" type="button" data-fullscreen data-when="windowed">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
-      Celá obrazovka
-    </button>
-  </div>
-  <p class="slide__foot t-small" data-in style="--i:15">Návrh pro výzvu města Ostravy · MSIC LabZero 2026</p>
+  <nav class="title__languages t-small" aria-label={t.ui.language}>
+    {
+      locales.map((code) => (
+        <a
+          href={localePath(code)}
+          hreflang={code}
+          lang={code}
+          aria-label={`${code.toUpperCase()} · ${languageName[code]}`}
+          aria-current={code === locale ? 'true' : undefined}
+        >
+          {code.toUpperCase()}
+        </a>
+      ))
+    }
+  </nav>
+
+  <h1 class="title__mark" id="title-title" data-in="0">
+    <span class="sr-only">Fajnovka</span>
+    <Wordmark />
+  </h1>
+  <p class="title__slogan t-title" data-in="2">{t.title.slogan}</p>
+  {
+    hasManual && (
+      <p data-in="4">
+        <a class="title__manual t-body" href={manual}>
+          <UiIcon name="book" />
+          {t.title.manual}
+        </a>
+      </p>
+    )
+  }
 </Slide>
 
+<script>
+  import '../scripts/scenes/title.ts';
+</script>
+
 <style>
+  @import '../styles/media.css';
+
   .title {
     padding-top: 15rem;
-  }
-
-  /* The word wipes in, then the three marks drop one by one. */
-  .title :global(.wordmark__word) {
-    clip-path: inset(0 100% 0 0);
-  }
-
-  .title.is-active :global(.wordmark__word) {
-    clip-path: inset(0);
-    transition: clip-path 1.1s var(--ease) 0.25s;
-  }
-
-  .title :global(.wordmark__bang) {
-    opacity: 0;
-    transform: translateY(-70%);
-    transform-box: fill-box;
-  }
-
-  .title.is-active :global(.wordmark__bang) {
-    opacity: 1;
-    transform: none;
-    transition:
-      transform 0.7s var(--spring),
-      opacity 0.2s ease;
-    transition-delay: calc(var(--n) * 150ms + 1.15s);
   }
 
   .title__slogan {
     margin-top: 5.5rem;
   }
 
-  .title__start {
+  .title__manual {
     display: inline-flex;
-    gap: 1.4rem;
+    gap: 1.6rem;
     align-items: center;
     margin-top: 5.5rem;
     padding: 1.8rem 3.8rem 1.8rem 3rem;
     border-radius: 10rem;
     background: var(--fg);
     color: var(--accent);
+    text-decoration: none;
     transition: transform 0.4s var(--spring);
   }
 
-  .title__start:hover {
-    transform: scale(1.06);
+  .title__manual:focus-visible,
+  .title__languages a:focus-visible {
+    outline-offset: 0.4rem;
   }
 
-  .title__start svg {
-    width: 3.4rem;
-    height: 3.4rem;
+  @media (--hover) {
+    .title__manual:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  .title__manual :global(svg) {
+    width: 4rem;
+    height: 4rem;
     fill: none;
     stroke: currentColor;
-    stroke-width: 2.6;
+    stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
-  /* The line draws itself, the stops pop in, then a vehicle keeps riding it. */
-  .title__line {
+  /* Language switch: one colour, the current language is the light pill. */
+  .title__languages {
+    position: absolute;
+    top: 4.5rem;
+    right: var(--pad-x);
+    z-index: 1;
+    display: flex;
+    padding: 0.5rem;
+    border-radius: 10rem;
+    background: var(--fg);
+  }
+
+  .title__languages a {
+    display: grid;
+    place-items: center;
+    min-width: max(6.4rem, 30px);
+    min-height: max(4.4rem, 24px);
+    border-radius: 10rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .title__languages a[aria-current] {
+    background: var(--accent);
+    color: var(--fg);
+  }
+
+  /* The tram scene: two lines, stops, trams and passengers. The script adds trams and passengers. */
+  .scene {
     position: absolute;
     inset: 0;
+    font-size: 1rem;
     pointer-events: none;
   }
 
-  .title__line path {
+  .scene[data-scene='flow'] {
+    display: none;
+  }
+
+  .scene svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scene path {
     fill: none;
-    stroke: var(--accent);
     stroke-width: 14;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
   }
 
-  .title.is-active .title__line path {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 2.2s var(--ease) 0.9s;
+  .scene path[data-tone='light'] {
+    stroke: var(--accent);
   }
 
-  .title__line circle {
+  .scene path[data-tone='dark'] {
+    stroke: var(--fg);
+  }
+
+  .scene circle {
     fill: var(--accent);
     stroke: var(--fg);
     stroke-width: 7;
-    transform: scale(0);
-    transform-box: fill-box;
-    transform-origin: center;
   }
 
-  .title.is-active .title__line circle {
-    transform: none;
-    transition: transform 0.6s var(--spring);
-    transition-delay: calc(var(--n) * 350ms + 1.5s);
+  /* The script draws its own stop markers, which it can hide under a tram. */
+  .scene:global(.is-built) circle {
+    display: none;
   }
 
-  .title__line rect {
-    fill: var(--fg);
+  .scene :global(.scene__stop) {
+    position: absolute;
+    width: 4.5em;
+    height: 4.5em;
+    margin: -2.25em 0 0 -2.25em;
+    border: 0.7em solid var(--fg);
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .scene :global(.scene__stop.is-hub) {
+    width: 5.7em;
+    height: 5.7em;
+    margin: -2.85em 0 0 -2.85em;
+  }
+
+  .scene :global(.scene__car) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    gap: 0.6em;
+    align-items: center;
+    justify-content: center;
+    width: 8.6em;
+    height: 3em;
+    margin: -1.5em 0 0 -4.3em;
+    border-radius: 1.2em;
+    visibility: hidden;
+  }
+
+  .scene :global(.scene__car.is-ready) {
+    visibility: visible;
+  }
+
+  .scene :global(.scene__car[data-tone='light']) {
+    background: var(--fg);
+    color: var(--accent);
+  }
+
+  .scene :global(.scene__car[data-tone='dark']) {
+    background: var(--accent);
+    color: var(--fg);
+  }
+
+  /* Passengers at a stop: the first row is the one nearest to the line and fills from the left. */
+  .scene :global(.scene__wait) {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap-reverse;
+    gap: 0.4em;
+    width: 5em;
+    margin: -1.6em 0 0 -2.5em;
+    color: var(--fg);
+  }
+
+  .scene :global(i) {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: currentColor;
     opacity: 0;
   }
 
-  .title.is-active .title__line rect {
-    opacity: 1;
-    transition: opacity 0.6s ease 3s;
+  .scene :global(.scene__wait i) {
+    width: 1.4em;
+    height: 1.4em;
+  }
+
+  @media (--flow) {
+    .title {
+      padding-top: 8rem;
+    }
+
+    .title__languages {
+      position: static;
+      align-self: flex-end;
+    }
+
+    .title__slogan {
+      margin-top: 0;
+    }
+
+    .title__manual {
+      margin-top: 0;
+      padding: 2.6rem 4.6rem 2.6rem 3.8rem;
+    }
+
+    .title__manual :global(svg) {
+      width: 5.2rem;
+      height: 5.2rem;
+    }
+
+    .scene[data-scene='stage'] {
+      display: none;
+    }
+
+    /* The scene comes first in the page and last in the column. */
+    .scene[data-scene='flow'] {
+      position: relative;
+      inset: auto;
+      display: block;
+      flex: none;
+      order: 1;
+      width: 108em;
+      height: 52em;
+      margin: auto calc(var(--pad-x) * -1) 0;
+    }
   }
 </style>

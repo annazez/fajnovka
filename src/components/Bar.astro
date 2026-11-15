@@ -1,0 +1,27 @@
+---
+/**
+ * One bar of a bar chart. The bar scales with the layout: set its height in CSS, the width follows.
+ * length and height use the same unit (0.1rem at the default height).
+ */
+interface Props {
+  length: number;
+  height: number;
+}
+
+const { length, height } = Astro.props;
+---
+
+<svg class="bar" viewBox={`0 0 ${length} ${height}`} aria-hidden="true">
+  <rect width={length} height={height} rx={height / 3.5}></rect>
+</svg>
+
+<style>
+  .bar {
+    flex: none;
+    width: auto;
+  }
+
+  rect {
+    fill: var(--fg);
+  }
+</style>

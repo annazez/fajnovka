@@ -1,65 +1,57 @@
 ---
+import Headline from '../components/Headline.astro';
 import Slide from '../components/Slide.astro';
-import { cs, numbers } from '../data/numbers';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
+
+const t = useDictionary(toLocale(Astro.currentLocale)).ask;
 
 // Timeline on a 1680 × 300 grid (1 unit = 0.1rem): four stops, then three possible decisions.
 const lineY = 170;
-const stops = [
-  { x: 40, when: 'Jaro', what: 'výchozí měření' },
-  { x: 440, when: 'Září', what: 'start v\u00a0Porubě' },
-  { x: 840, when: 'Každý měsíc', what: 'srovnání s\u00a0Jihem' },
-  { x: 1240, when: 'Únor', what: 'vyhodnocení' },
-];
-const decisions = [
-  { y: 30, label: 'Rozšířit' },
-  { y: 100, label: 'Upravit' },
-  { y: lineY, label: 'Ukončit' },
-];
-const needs = ['Data ODIS', 'Poruba a\u00a0Jih', '3\u00a0partneři z\u00a0kultury', '2\u00a0školy', '2\u00a0firmy', `${cs(numbers.pilotCostMillion)}\u00a0mil.\u00a0Kč`];
-
-const rem = (units: number) => `${units / 10}rem`;
+const stopX = [40, 440, 840, 1240];
+const decisionY = [30, 100, lineY];
 ---
 
-<Slide
-  theme="navy"
-  class="ask"
-  notes="Žádáme o data a jeden obvod. Pilot v Porubě na šest měsíců za tři celé čtyři milionu korun, kontrolní obvod Jih, data o jízdenkách od KODIS, tři partnery z kultury, dvě školy a dvě firmy. Za půl roku budeme vědět, jestli Fajnovku rozšířit, upravit, nebo ukončit. Děkujeme."
->
-  <h2 class="t-title" data-in><span class="mark">Dejte nám data a&nbsp;jeden obvod.</span></h2>
-  <p class="ask__promise t-body" data-in style="--i:2">Za šest měsíců ukážeme, zda Fajnovka přivádí a&nbsp;udržuje cestující.</p>
+<Slide id="ask" theme="navy" notes={t.notes} {...Astro.props}>
+  <Headline id="ask-title" lines={t.title} />
+  <p class="ask__lead t-body" data-in="2">{t.lead}</p>
 
   <div class="ask__timeline">
     <svg viewBox="0 0 1680 300" aria-hidden="true">
       <path class="ask__line" d={`M40 ${lineY}H1240`} pathLength="1"></path>
-      {decisions.map(({ y }) => <path class="ask__branch" d={`M1240 ${lineY}C1350 ${lineY} 1340 ${y} 1450 ${y}H1490`} pathLength="1" />)}
-      {stops.map(({ x }, index) => <circle class="ask__stop" cx={x} cy={lineY} r="17" style={`--n:${index}`} />)}
-      {decisions.map(({ y }) => <circle class="ask__stop ask__stop--end" cx="1490" cy={y} r="13" style="--n:5" />)}
+      {decisionY.map((y) => <path class="ask__branch" d={`M1240 ${lineY}C1350 ${lineY} 1340 ${y} 1450 ${y}H1490`} pathLength="1" />)}
+      {stopX.map((x) => <circle class="ask__stop" cx={x} cy={lineY} r="17" />)}
+      {decisionY.map((y) => <circle class="ask__stop ask__stop--end" cx="1490" cy={y} r="13" />)}
     </svg>
-    {
-      stops.map(({ x, when, what }, index) => (
-        <p class="ask__label t-body" data-in style={`left:${rem(x)};--i:${index * 2 + 5}`}>
-          <strong>{when}</strong>
-          <br />
-          {what}
-        </p>
-      ))
-    }
-    {
-      decisions.map(({ y, label }, index) => (
-        <p class="ask__decision t-body" data-in style={`top:${rem(y)};--i:${index + 15}`}>
-          <strong>{label}</strong>
-        </p>
-      ))
-    }
-  </div>
 
-  <ul class="ask__needs t-body">
-    {needs.map((need, index) => <li data-in style={`--i:${index + 19}`}>{need}</li>)}
-  </ul>
+    <ol class="ask__steps stops-list t-body">
+      {
+        t.steps.map(({ when, what }, index) => (
+          <li data-in={index * 2 + 5}>
+            <strong>{when}</strong>
+            <br />
+            {what}
+          </li>
+        ))
+      }
+    </ol>
+
+    <ul class="ask__decisions t-body">
+      {
+        t.decisions.map((decision, index) => (
+          <li data-in={index + 15}>
+            <strong>{decision}</strong>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </Slide>
 
 <style>
-  .ask__promise {
+  @import '../styles/media.css';
+
+  .ask__lead {
     margin-top: 3.6rem;
   }
 
@@ -67,7 +59,12 @@ const rem = (units: number) => `${units / 10}rem`;
     position: relative;
     width: 168rem;
     height: 30rem;
-    margin-top: auto;
+    margin: auto 0;
+  }
+
+  .ask__timeline svg {
+    position: absolute;
+    inset: 0;
   }
 
   .ask__line,
@@ -76,64 +73,113 @@ const rem = (units: number) => `${units / 10}rem`;
     stroke: var(--accent);
     stroke-width: 12;
     stroke-linecap: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-  }
-
-  .ask.is-active .ask__line {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1.6s var(--ease) 0.6s;
-  }
-
-  .ask.is-active .ask__branch {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.8s var(--ease) 2s;
   }
 
   .ask__stop {
     fill: var(--bg);
     stroke: var(--fg);
     stroke-width: 7;
-    transform: scale(0);
-    transform-box: fill-box;
-    transform-origin: center;
   }
 
   .ask__stop--end {
     fill: var(--fg);
   }
 
-  .ask.is-active .ask__stop {
+  /* The line draws itself, the stops appear, then the three branches open. */
+  :global(.deck.is-live) .ask__line,
+  :global(.deck.is-live) .ask__branch {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  :global(.deck.is-live) .ask.is-active .ask__line {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.6s var(--ease) 0.6s;
+  }
+
+  :global(.deck.is-live) .ask.is-active .ask__branch {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.8s var(--ease) 2s;
+  }
+
+  :global(.deck.is-live) .ask__stop {
+    transform: scale(0);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  :global(.deck.is-live) .ask.is-active .ask__stop {
     transform: none;
-    transition: transform 0.6s var(--spring);
-    transition-delay: calc(var(--n) * 320ms + 0.7s);
+    transition: transform 0.6s var(--spring) 0.7s;
   }
 
-  .ask__label,
-  .ask__decision {
+  :global(.deck.is-live) .ask.is-active .ask__stop:nth-of-type(2) {
+    transition-delay: 1s;
+  }
+
+  :global(.deck.is-live) .ask.is-active .ask__stop:nth-of-type(3) {
+    transition-delay: 1.3s;
+  }
+
+  :global(.deck.is-live) .ask.is-active .ask__stop:nth-of-type(4) {
+    transition-delay: 1.6s;
+  }
+
+  :global(.deck.is-live) .ask.is-active .ask__stop--end {
+    transition-delay: 2.5s;
+  }
+
+  /* Each step starts at its stop: the stops are 40rem apart, the first one is at 4rem. */
+  .ask__steps {
     position: absolute;
-  }
-
-  .ask__label {
     top: 20.6rem;
-    white-space: nowrap;
+    left: 4rem;
+    display: grid;
+    grid-template-columns: repeat(4, 40rem);
   }
 
-  .ask__decision {
+  .ask__decisions {
+    position: absolute;
+    top: -0.5rem;
     left: 153rem;
-    translate: 0 -50%;
+    display: grid;
+    grid-template-rows: repeat(3, 7rem);
+    align-items: center;
   }
 
-  .ask__needs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.6rem;
-    margin-top: 5rem;
-  }
+  @media (--flow) {
+    .ask__lead {
+      margin-top: 0;
+    }
 
-  .ask__needs li {
-    padding: 1.1rem 2.6rem;
-    border: 0.4rem solid var(--soft);
-    border-radius: 10rem;
+    .ask__timeline {
+      width: auto;
+      height: auto;
+      margin: 0;
+    }
+
+    .ask__timeline svg {
+      display: none;
+    }
+
+    .ask__steps {
+      position: relative;
+      inset: auto;
+      grid-template-columns: 1fr;
+    }
+
+    .ask__decisions {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.4rem;
+      margin-top: 7rem;
+    }
+
+    .ask__decisions li {
+      padding: 1.6rem 3.6rem;
+      border: var(--line) solid var(--accent);
+      border-radius: 10rem;
+    }
   }
 </style>

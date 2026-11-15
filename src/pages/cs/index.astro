@@ -1,0 +1,11 @@
+---
+import Deck from '../../components/Deck.astro';
+import { useDictionary } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+
+const { meta } = useDictionary('cs');
+---
+
+<Base locale="cs" title={meta.title} description={meta.description} path="/">
+  <Deck />
+</Base>

@@ -1,0 +1,161 @@
+---
+import Headline from '../components/Headline.astro';
+import Icon from '../components/Icon.astro';
+import Slide from '../components/Slide.astro';
+import { numbers } from '../data/numbers.ts';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
+import { formatNumber } from '../lib/format.ts';
+
+const locale = toLocale(Astro.currentLocale);
+const t = useDictionary(locale).leak;
+
+// Two lanes between the car and the tram. Grid: 1680 × 520 (1 unit = 0.1em of the figure).
+const lanes = {
+  arrive: 'M110 260C380 30 1300 30 1570 260',
+  leave: 'M1570 260C1300 490 380 490 110 260',
+};
+---
+
+<Slide id="leak" theme="navy" notes={t.notes} {...Astro.props}>
+  <Headline id="leak-title" lines={t.title} />
+
+  <div class="leak__body">
+    <div class="leak__figure" aria-hidden="true" data-in="3">
+      <svg viewBox="0 0 1680 520">
+        <path class="leak__lane" data-lane="arrive" d={lanes.arrive}></path>
+        <path class="leak__lane" data-lane="leave" d={lanes.leave}></path>
+        <path class="leak__arrow" d="m828 72 15.5 15.5L828 103"></path>
+        <path class="leak__arrow" d="m852 417-15.5 15.5L852 448"></path>
+      </svg>
+      <div class="leak__dots" data-dots></div>
+      <div class="leak__node leak__node--car"><Icon name="car" /></div>
+      <div class="leak__node leak__node--tram"><Icon name="tram" /></div>
+    </div>
+
+    <figure class="leak__number" data-in="5">
+      <p class="t-hero" data-count={numbers.nonRenewals.value}>{formatNumber(numbers.nonRenewals.value, locale)}</p>
+      <figcaption class="t-body">{t.caption}</figcaption>
+    </figure>
+  </div>
+
+  <p class="slide__source t-small" data-in="8">{t.source}</p>
+</Slide>
+
+<script>
+  import '../scripts/scenes/leak.ts';
+</script>
+
+<style>
+  @import '../styles/media.css';
+
+  .leak__body {
+    position: relative;
+    margin-top: auto;
+    margin-bottom: 5rem;
+  }
+
+  /* The figure scales as one piece: its sizes are in em. */
+  .leak__figure {
+    position: relative;
+    width: 168em;
+    height: 52em;
+    font-size: 1rem;
+  }
+
+  .leak__figure svg {
+    position: absolute;
+    inset: 0;
+  }
+
+  .leak__lane {
+    fill: none;
+    stroke: var(--soft);
+    stroke-width: 10;
+  }
+
+  .leak__arrow {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .leak__dots :global(i) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2.2em;
+    height: 2.2em;
+    margin: -1.1em 0 0 -1.1em;
+    border-radius: 50%;
+    background: var(--fg);
+  }
+
+  .leak__dots :global(i[data-lane='arrive']) {
+    background: var(--accent);
+  }
+
+  .leak__node {
+    position: absolute;
+    top: 16em;
+    display: grid;
+    place-items: center;
+    width: 20em;
+    height: 20em;
+    border: var(--line) solid var(--fg);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  .leak__node--car {
+    left: 1em;
+  }
+
+  .leak__node--tram {
+    right: 1em;
+  }
+
+  .leak__node :global(.icon) {
+    width: 11em;
+    height: 11em;
+  }
+
+  .leak__number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    translate: -50% -50%;
+  }
+
+  .leak .t-hero {
+    font-size: 15rem;
+  }
+
+  figcaption {
+    margin-top: 2.4rem;
+    white-space: nowrap;
+  }
+
+  @media (--flow) {
+    .leak__body {
+      margin: 0;
+    }
+
+    .leak__figure {
+      font-size: 0.5476rem;
+    }
+
+    .leak__number {
+      position: static;
+      margin-top: 6rem;
+      translate: none;
+    }
+
+    figcaption {
+      white-space: normal;
+    }
+  }
+</style>

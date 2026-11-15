@@ -1,0 +1,10 @@
+/*
+ * Layout modes. Import this file in each style block that uses them.
+ *
+ * Stage (the default): wide landscape screens. A slide is a fixed 192 × 108 rem picture that fills the screen.
+ * Flow: portrait screens, and narrow landscape windows with a mouse (this is how browser zoom looks).
+ *       A slide is a 108 rem column. It scrolls when the content is longer than the screen.
+ */
+@custom-media --flow (orientation: portrait), ((orientation: landscape) and (max-width: 960px) and (pointer: fine));
+@custom-media --motion (prefers-reduced-motion: no-preference);
+@custom-media --hover (hover: hover);

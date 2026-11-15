@@ -1,0 +1,73 @@
+/*
+ * Type. A slide uses one title, at most one hero size, body text, and one quiet source line.
+ * These four classes are the only way to set text size and weight.
+ */
+
+.t-title {
+  font-size: 8.8rem;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.t-hero {
+  font-size: 20rem;
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.t-body {
+  font-size: max(3.6rem, 12px);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.t-body strong {
+  font-weight: 900;
+}
+
+.t-small {
+  font-size: max(2.4rem, 10px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+@media (--flow) {
+  .t-title {
+    font-size: 8.4rem;
+    line-height: 1.08;
+  }
+
+  .t-hero {
+    font-size: 17rem;
+  }
+
+  .t-body {
+    font-size: 4.4rem;
+    line-height: 1.3;
+  }
+
+  .t-small {
+    font-size: 3.4rem;
+  }
+}
+
+/* Emphasis: a bar in the accent colour that draws under the words. */
+.mark {
+  padding-bottom: 0.08em;
+  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 100% / 100% 0.11em;
+  box-decoration-break: clone;
+}
+
+.deck.is-live .slide .mark {
+  background-size: 0% 0.11em;
+}
+
+.deck.is-live .slide.is-active .mark {
+  background-size: 100% 0.11em;
+  transition: background-size 0.9s var(--ease) 1.1s;
+}

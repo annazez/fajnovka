@@ -1,0 +1,43 @@
+---
+/**
+ * Page shell: metadata, fonts and the design system.
+ * path: the path of the page without the language prefix, for example `/` or `/manual/`.
+ */
+import { Font } from 'astro:assets';
+
+import '../styles/global.css';
+import { defaultLocale, localePath, locales, type Locale } from '../i18n/locales.ts';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  path: string;
+}
+
+const { locale, title, description, path } = Astro.props;
+const address = (target: Locale): string => new URL(localePath(target, path), Astro.site).href;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#00add0" />
+    <link rel="canonical" href={address(locale)} />
+    {locales.map((code) => <link rel="alternate" hreflang={code} href={address(code)} />)}
+    <link rel="alternate" hreflang="x-default" href={address(defaultLocale)} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <Font cssVariable="--font-montserrat" preload />
+    <Font cssVariable="--font-montserrat-ext" preload={locale === 'cs'} />
+    <slot name="head" />
+  </head>
+
+  <body>
+    <slot />
+  </body>
+</html>

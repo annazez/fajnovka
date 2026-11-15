@@ -1,0 +1,84 @@
+---
+/**
+ * The deck: the slides in the order of the pitch, the controls and the speaker notes.
+ * To change the order, or to add a slide, change the `slides` list.
+ */
+import UiIcon from './UiIcon.astro';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
+import Title from '../slides/01-Title.astro';
+import Paradox from '../slides/02-Paradox.astro';
+import Leak from '../slides/03-Leak.astro';
+import Product from '../slides/04-Product.astro';
+import Journey from '../slides/05-Journey.astro';
+import Evidence from '../slides/06-Evidence.astro';
+import Spread from '../slides/07-Spread.astro';
+import Economics from '../slides/08-Economics.astro';
+import Ask from '../slides/09-Ask.astro';
+
+const slides = [Title, Paradox, Leak, Product, Journey, Evidence, Spread, Economics, Ask];
+const { ui } = useDictionary(toLocale(Astro.currentLocale));
+---
+
+<main class="deck" data-deck data-theme="cyan" data-motion="running" aria-label={ui.deck}>
+  <div class="stage">
+    {slides.map((Slide, index) => <Slide active={index === 0} />)}
+
+    <div class="controls">
+      <nav class="controls__bar" aria-label={ui.controls}>
+        <button class="control control--step" type="button" data-action="previous" aria-label={ui.previous}>
+          <UiIcon name="previous" />
+        </button>
+        <div class="route">
+          {
+            slides.map((_, index) => (
+              <button
+                class="route__stop"
+                type="button"
+                data-stop={index}
+                aria-label={ui.goTo.replace('%n', String(index + 1))}
+                aria-current={index === 0 ? 'step' : undefined}
+              />
+            ))
+          }
+        </div>
+        <button class="control control--step" type="button" data-action="next" aria-label={ui.next}>
+          <UiIcon name="next" />
+        </button>
+        <button
+          class="control"
+          type="button"
+          data-action="motion"
+          data-label-pause={ui.pause}
+          data-label-play={ui.play}
+          aria-label={ui.pause}
+        >
+          <UiIcon name="pause" data-when="running" />
+          <UiIcon name="play" data-when="paused" />
+        </button>
+        <button
+          class="control"
+          type="button"
+          data-action="fullscreen"
+          data-label-enter={ui.fullscreen}
+          data-label-exit={ui.exitFullscreen}
+          aria-label={ui.fullscreen}
+        >
+          <UiIcon name="expand" data-when="windowed" />
+          <UiIcon name="collapse" data-when="fullscreen" />
+        </button>
+      </nav>
+    </div>
+
+    <aside class="notes t-body" data-theme="white" data-notes-panel aria-label={ui.notes} hidden>
+      <p class="notes__text" data-notes-text></p>
+      <p class="notes__time" data-notes-time>0:00</p>
+    </aside>
+  </div>
+
+  <p class="sr-only" aria-live="polite" data-announce data-template={ui.announce}></p>
+</main>
+
+<script>
+  import '../scripts/main.ts';
+</script>

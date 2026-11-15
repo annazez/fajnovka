@@ -1,0 +1,116 @@
+---
+import Headline from '../components/Headline.astro';
+import Icon from '../components/Icon.astro';
+import Slide from '../components/Slide.astro';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
+
+const t = useDictionary(toLocale(Astro.currentLocale)).spread;
+
+// Three ways in which the programme reaches people. All three are proposals.
+const channels = [
+  { icon: 'briefcase', ...t.items.employers },
+  { icon: 'group', ...t.items.groups },
+  { icon: 'ambassador', ...t.items.ambassadors },
+] as const;
+---
+
+<Slide id="spread" theme="navy" notes={t.notes} {...Astro.props}>
+  <Headline id="spread-title" lines={t.title} />
+
+  <ul class="spread__list">
+    {
+      channels.map(({ icon, lead, text }, index) => (
+        <li data-in={index * 3 + 3}>
+          <span class="spread__node">
+            <Icon name={icon} />
+          </span>
+          <p class="t-body">
+            <strong>{lead}</strong> {text}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</Slide>
+
+<style>
+  @import '../styles/media.css';
+
+  /* One line connects the three stops: the same device as the route at the bottom. */
+  .spread__list {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9rem;
+    margin: auto 0 6rem;
+  }
+
+  .spread__list::before {
+    position: absolute;
+    top: 10rem;
+    right: -200rem;
+    left: -200rem;
+    height: var(--track);
+    margin-top: calc(var(--track) / -2);
+    background: var(--soft);
+    content: '';
+  }
+
+  .spread__list li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4.5rem;
+  }
+
+  .spread__node {
+    display: grid;
+    place-items: center;
+    width: 20rem;
+    height: 20rem;
+    border: var(--line) solid var(--fg);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  .spread__node :global(.icon) {
+    width: 11rem;
+    height: 11rem;
+  }
+
+  @media (--flow) {
+    .spread__list {
+      grid-template-columns: 1fr;
+      gap: 7rem;
+      margin: 0;
+    }
+
+    .spread__list::before {
+      top: 0;
+      right: auto;
+      bottom: 0;
+      left: 8rem;
+      width: var(--track);
+      height: auto;
+      margin: 0 0 0 calc(var(--track) / -2);
+    }
+
+    .spread__list li {
+      display: grid;
+      grid-template-columns: 16rem 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .spread__node {
+      width: 16rem;
+      height: 16rem;
+    }
+
+    .spread__node :global(.icon) {
+      width: 9rem;
+      height: 9rem;
+    }
+  }
+</style>

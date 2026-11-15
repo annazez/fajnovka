@@ -1,68 +1,11 @@
 ---
-import '@fontsource-variable/montserrat/wght.css';
-import '../styles/global.css';
+import Deck from '../components/Deck.astro';
+import { useDictionary } from '../i18n/index.ts';
+import Base from '../layouts/Base.astro';
 
-import latinExt from '@fontsource-variable/montserrat/files/montserrat-latin-ext-wght-normal.woff2?url';
-import latin from '@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2?url';
-
-import Title from '../slides/01-Title.astro';
-import Paradox from '../slides/02-Paradox.astro';
-import Flow from '../slides/03-Flow.astro';
-import Product from '../slides/04-Product.astro';
-import Journey from '../slides/05-Journey.astro';
-import Evidence from '../slides/06-Evidence.astro';
-import Family from '../slides/07-Family.astro';
-import Economics from '../slides/08-Economics.astro';
-import Ask from '../slides/09-Ask.astro';
-
-// The order of this list is the order of the pitch.
-const slides = [Title, Paradox, Flow, Product, Journey, Evidence, Family, Economics, Ask];
+const { meta } = useDictionary('en');
 ---
 
-<!doctype html>
-<html lang="cs">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#00add0" />
-    <meta name="description" content="Fajnovka: návrh věrnostního programu MHD pro výzvu města Ostravy, MSIC LabZero 2026." />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preload" as="font" type="font/woff2" href={latin} crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href={latinExt} crossorigin />
-    <title>Fajnovka · pitch</title>
-  </head>
-
-  <body>
-    <main class="deck" data-deck data-theme="cyan">
-      <div class="stage">
-        {slides.map((Slide) => <Slide />)}
-
-        <button class="edge edge--prev" type="button" data-go="prev" aria-label="Předchozí snímek">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"></path></svg>
-        </button>
-        <button class="edge edge--next" type="button" data-go="next" aria-label="Další snímek">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"></path></svg>
-        </button>
-
-        <button class="fullscreen" type="button" data-fullscreen aria-label="Celá obrazovka">
-          <svg viewBox="0 0 24 24" aria-hidden="true" data-when="windowed"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true" data-when="fullscreen"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"></path></svg>
-        </button>
-
-        <nav class="route" aria-label="Snímky">
-          {slides.map((_, index) => <button class="route__stop" type="button" data-stop={index} aria-label={`Snímek ${index + 1}`} />)}
-        </nav>
-
-        <aside class="notes t-body" data-theme="white" data-notes-panel hidden>
-          <p class="notes__text" data-notes-text></p>
-          <p class="notes__time" data-notes-time>0:00</p>
-        </aside>
-      </div>
-    </main>
-
-    <script>
-      import '../scripts/deck.ts';
-    </script>
-  </body>
-</html>
+<Base locale="en" title={meta.title} description={meta.description} path="/">
+  <Deck />
+</Base>

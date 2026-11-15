@@ -1,18 +1,31 @@
 ---
 /**
  * One slide of the deck.
- * theme: colour roles from global.css. notes: the text the speaker says (key N).
+ * id: short name of the slide; the title inside must have the id `<id>-title`.
+ * theme: colour roles from tokens.css. notes: the text that the speaker says (key N).
+ * active: the slide that is visible before the script starts.
  */
 interface Props {
+  id: string;
   theme: 'cyan' | 'white' | 'navy';
   notes: string;
-  class?: string;
+  active?: boolean;
 }
 
 // `rest` carries the caller's scoped-style attribute, so a slide can style its own section.
-const { theme, notes, class: className, ...rest } = Astro.props;
+const { id, theme, notes, active = false, ...rest } = Astro.props;
 ---
 
-<section class:list={['slide', className]} data-slide data-theme={theme} data-notes={notes} {...rest}>
+<section
+  class:list={['slide', id, { 'is-active': active }]}
+  id={id}
+  data-slide
+  data-theme={theme}
+  data-notes={notes}
+  aria-roledescription="slide"
+  aria-labelledby={`${id}-title`}
+  inert={!active}
+  {...rest}
+>
   <slot />
 </section>

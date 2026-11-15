@@ -1,0 +1,71 @@
+/*
+ * Design tokens: the only place for colours, fonts, easing, line weights and page margins.
+ * Colours follow the City of Ostrava design manual. Do not add colours.
+ */
+
+:root {
+  /* Colour */
+  --cyan: #00add0; /* Ostrava light blue, RGB 0 173 208 */
+  --navy: #003c69; /* Ostrava dark blue, RGB 0 60 105 */
+  --white: #fff;
+
+  /* Type: Montserrat replaces Gotham. The second family holds the Latin Extended subset (Czech letters). */
+  --font: var(--font-montserrat), var(--font-montserrat-ext), system-ui, sans-serif;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --step: 110ms; /* delay between two elements that enter a slide */
+
+  /* Lines */
+  --line: 0.5rem; /* rules, rings and control strokes */
+  --track: 1rem; /* the line with stops */
+
+  /* Margins of a slide */
+  --pad-x: 12rem;
+  --pad-top: 9rem;
+  --pad-bottom: 16rem;
+
+  /* Space between the edge of the screen and the 108rem column of the flow layout. */
+  --gutter: 0rem;
+}
+
+@media (--flow) {
+  :root {
+    --line: 0.6rem;
+    --track: 1.2rem;
+    --pad-x: 8rem;
+    --pad-top: 10rem;
+    --pad-bottom: 24rem;
+    --gutter: max(0rem, calc((100vw - 108rem) / 2));
+  }
+}
+
+/*
+ * Themes. Each theme sets the same roles.
+ * Contrast: navy/white 11.4:1, navy/cyan 4.3:1, white/cyan 2.7:1.
+ * So the cyan theme can hold title-size text and navy shapes only, and cyan is never a text colour on white.
+ */
+[data-theme='cyan'] {
+  --bg: var(--cyan);
+  --fg: var(--navy);
+  --accent: var(--white);
+}
+
+[data-theme='white'] {
+  --bg: var(--white);
+  --fg: var(--navy);
+  --accent: var(--cyan);
+}
+
+[data-theme='navy'] {
+  --bg: var(--navy);
+  --fg: var(--white);
+  --accent: var(--cyan);
+}
+
+[data-theme] {
+  --soft: color-mix(in srgb, var(--fg) 18%, transparent);
+  --shadow: color-mix(in srgb, var(--navy) 55%, transparent);
+}

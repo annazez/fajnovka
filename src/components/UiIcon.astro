@@ -1,0 +1,21 @@
+---
+/** Icons of the controls on a 24 × 24 grid. They take the colour of the text. */
+const icons = {
+  previous: 'm15 5-7 7 7 7',
+  next: 'm9 5 7 7-7 7',
+  pause: 'M9 5v14M15 5v14',
+  play: 'm8 5 11 7-11 7Z',
+  expand: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  collapse: 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
+  book: 'M12 6.5C9.8 4.9 7 4.5 4 5v13c3-.5 5.8-.1 8 1.5 2.2-1.6 5-2 8-1.5V5c-3-.5-5.8-.1-8 1.5ZM12 6.5v13',
+} as const;
+
+interface Props {
+  name: keyof typeof icons;
+  [key: `data-${string}`]: string;
+}
+
+const { name, ...rest } = Astro.props;
+---
+
+<svg viewBox="0 0 24 24" aria-hidden="true" {...rest}><path d={icons[name]}></path></svg>

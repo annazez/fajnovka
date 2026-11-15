@@ -1,0 +1,412 @@
+/* Deck, stage, slides and the controls. */
+
+/* The deck fills the window and cuts what leaves it. Its colours follow the active slide. */
+.deck {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  transition:
+    background-color 0.7s var(--ease),
+    color 0.7s var(--ease);
+}
+
+.deck.is-idle {
+  cursor: none;
+}
+
+/* The stage does not cut its content: a line can run on to the edge of a screen that is wider than the stage. */
+.stage {
+  position: relative;
+  width: 192rem;
+  height: 108rem;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  color: var(--fg);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0s 0.3s;
+}
+
+.slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.5s ease 0.15s,
+    visibility 0s;
+}
+
+/* The quiet source line of a slide. */
+.slide__source {
+  position: absolute;
+  bottom: 10rem;
+  left: var(--pad-x);
+  opacity: 0.75;
+}
+
+@media (--flow) {
+  /* The slide has the full width, so it scrolls anywhere on the screen. The gutter keeps the column in the centre. */
+  .stage {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .slide {
+    gap: 7rem;
+    padding-right: calc(var(--gutter) + var(--pad-x));
+    padding-left: calc(var(--gutter) + var(--pad-x));
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .slide__source {
+    position: static;
+    margin-top: auto;
+  }
+}
+
+/*
+ * Entrance. Elements with data-in rise into place when their slide enters; the attribute value sets the order.
+ * The deck gets .is-live from the script. Without the script, and at the first paint, all content is visible.
+ */
+.deck.is-live .slide [data-in] {
+  opacity: 0;
+  transform: translateY(3rem);
+}
+
+.deck.is-live .slide.is-active [data-in] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.9s var(--ease);
+  transition-delay: calc(var(--i, 0) * var(--step) + 250ms);
+}
+
+/* ---------- Controls: a layer above the stage. The bar at the bottom works like a video player. ---------- */
+
+.controls {
+  --target: max(5rem, 24px);
+
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  align-content: end;
+  padding: 0 var(--pad-x) 3.5rem;
+  pointer-events: none;
+}
+
+.controls__bar {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  height: var(--target);
+  pointer-events: auto;
+}
+
+.control {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--target);
+  height: var(--target);
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+
+.control svg {
+  width: 3.2rem;
+  height: 3.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The buttons leave the picture while nobody moves the pointer. Focus brings them back. */
+.deck.is-idle .control:not(:focus-visible) {
+  opacity: 0;
+}
+
+.deck[data-motion='running'] [data-when='paused'],
+.deck[data-motion='paused'] [data-when='running'],
+.deck.is-fullscreen [data-when='windowed'],
+.deck:not(.is-fullscreen) [data-when='fullscreen'],
+.deck.no-fullscreen [data-action='fullscreen'] {
+  display: none;
+}
+
+/* Pause and full screen sit in the right margin, so the route has the full width of the content. */
+.control[data-action='motion'],
+.control[data-action='fullscreen'] {
+  position: absolute;
+  bottom: 3.5rem;
+}
+
+.control[data-action='motion'] {
+  right: 6.4rem;
+}
+
+.control[data-action='fullscreen'] {
+  right: 1rem;
+}
+
+/* Previous and next are invisible zones at the left and right edge of the stage. */
+.control--step {
+  position: absolute;
+  top: 0;
+  bottom: 14rem;
+  width: 9rem;
+  height: auto;
+  border-radius: 0;
+  opacity: 0;
+  pointer-events: auto;
+}
+
+.control--step[data-action='previous'] {
+  left: 0;
+}
+
+.control--step[data-action='next'] {
+  right: 0;
+}
+
+.control--step:focus-visible {
+  opacity: 1;
+}
+
+@media (--hover) {
+  .control--step:hover {
+    opacity: 1;
+  }
+}
+
+/* The route: the progress line with one stop for each slide. */
+.route {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--target);
+}
+
+.route::before,
+.route::after {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--target) / 2);
+  left: calc(var(--target) / 2);
+  height: var(--line);
+  margin-top: calc(var(--line) / -2);
+  border-radius: 1rem;
+  background: currentColor;
+  content: '';
+}
+
+.route::before {
+  opacity: 0.22;
+}
+
+.route::after {
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: transform 0.7s var(--ease);
+}
+
+.route__stop {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--target);
+  height: var(--target);
+}
+
+.route__stop::before {
+  width: 1.9rem;
+  height: 1.9rem;
+  border: var(--line) solid currentColor;
+  border-radius: 50%;
+  background: var(--bg);
+  content: '';
+  transition:
+    transform 0.5s var(--spring),
+    background-color 0.7s var(--ease);
+}
+
+.route__stop[data-passed]::before {
+  background: currentColor;
+}
+
+.route__stop[aria-current]::before {
+  background: var(--accent);
+  transform: scale(1.55);
+}
+
+@media (--hover) {
+  .route__stop:hover::before {
+    transform: scale(1.3);
+  }
+}
+
+@media (--flow) {
+  .controls {
+    --target: max(11rem, 44px);
+
+    padding: 0;
+  }
+
+  .controls__bar {
+    gap: 0;
+    height: calc(var(--target) + 5rem + env(safe-area-inset-bottom));
+    padding: 1rem calc(var(--gutter) + 3rem) calc(4rem + env(safe-area-inset-bottom));
+    background: linear-gradient(transparent, var(--bg) 3rem);
+    transition: background 0.7s var(--ease);
+  }
+
+  .control--step {
+    position: static;
+    width: var(--target);
+    height: var(--target);
+    border-radius: 50%;
+    opacity: 1;
+  }
+
+  .control svg {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .control[data-action='motion'] {
+    position: static;
+  }
+
+  /* A phone has no use for the full-screen button; the key F still works. */
+  .control[data-action='fullscreen'] {
+    display: none;
+  }
+
+  /* Here the route only shows progress. Its stops are too near to each other for a finger; the arrows do the work. */
+  .route {
+    margin: 0 1rem;
+  }
+
+  .route__stop {
+    width: 6rem;
+    pointer-events: none;
+  }
+
+  .route::before,
+  .route::after {
+    right: 3rem;
+    left: 3rem;
+  }
+
+  .route__stop::before {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .deck.is-idle .control:not(:focus-visible) {
+    opacity: 1;
+  }
+}
+
+/* ---------- Speaker notes (key N) ---------- */
+
+.notes {
+  position: absolute;
+  right: var(--pad-x);
+  bottom: 10rem;
+  left: var(--pad-x);
+  z-index: 4;
+  display: flex;
+  gap: 4rem;
+  align-items: flex-start;
+  padding: 3rem 4rem;
+  border-radius: 2rem;
+  background: var(--bg);
+  box-shadow: 0 2rem 6rem -2rem var(--shadow);
+  color: var(--fg);
+}
+
+.notes[hidden] {
+  display: none;
+}
+
+.notes__text {
+  flex: 1;
+}
+
+.notes__time {
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (--flow) {
+  .notes {
+    right: calc(var(--gutter) + 4rem);
+    bottom: 22rem;
+    left: calc(var(--gutter) + 4rem);
+    flex-direction: column-reverse;
+    gap: 2rem;
+  }
+}
+
+/* ---------- The line with stops as a vertical list (flow layout only) ---------- */
+
+@media (--flow) {
+  .stops-list {
+    position: relative;
+    display: grid;
+    gap: 3.6rem;
+    margin-left: 1.6rem;
+    padding-left: 6.4rem;
+    text-align: left;
+  }
+
+  .stops-list::before {
+    position: absolute;
+    top: 1.4rem;
+    bottom: 1.4rem;
+    left: 0;
+    width: var(--track);
+    margin-left: calc(var(--track) / -2);
+    border-radius: 1rem;
+    background: var(--line-colour, var(--accent));
+    content: '';
+  }
+
+  .stops-list > li {
+    position: relative;
+  }
+
+  .stops-list > li::before {
+    position: absolute;
+    top: 1rem;
+    left: -6.4rem;
+    width: 3rem;
+    height: 3rem;
+    margin-left: -1.5rem;
+    border: var(--line) solid var(--fg);
+    border-radius: 50%;
+    background: var(--bg);
+    content: '';
+  }
+}

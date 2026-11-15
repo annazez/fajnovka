@@ -1,187 +1,195 @@
 ---
+import Bar from '../components/Bar.astro';
+import Headline from '../components/Headline.astro';
 import Slide from '../components/Slide.astro';
-import { cs, numbers } from '../data/numbers';
+import { numbers } from '../data/numbers.ts';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
+import { format, percentSign } from '../lib/format.ts';
 
-const { costPerPassengerYear: cost, paybackYear } = numbers;
+const locale = toLocale(Astro.currentLocale);
+const t = useDictionary(locale).economics;
 
-const bars = [
-  { label: 'Vrátit odešlého', value: cost.return, cheap: true },
-  { label: 'Udržet stálého', value: cost.loyalty, cheap: true },
-  { label: 'Získat nového z\u00a0auta', value: cost.acquisition, cheap: false },
+// Bars: 1 unit = 0.1rem. The longest bar has the full length, the shortest one is a dot.
+const BAR = { length: 460, height: 28 };
+const costs = [
+  { label: t.rows.return, value: numbers.costReturn.value },
+  { label: t.rows.keep, value: numbers.costKeep.value },
+  { label: t.rows.acquire, value: numbers.costAcquire.value },
 ];
+const highest = Math.max(...costs.map(({ value }) => value));
 
+// The model ends in the year of the worse scenario, so that scenario shows the year with a plus sign.
 const scenarios = [
-  { label: 'horší', year: paybackYear.pessimistic },
-  { label: 'základní', year: paybackYear.base },
-  { label: 'lepší', year: paybackYear.optimistic },
-].map(({ label, year }) => ({
-  label,
-  hero: year === null ? '—' : String(year),
-  caption: year === null ? 'do roku 2036 se nevrátí' : 'rok návratnosti',
-  selected: year === paybackYear.base,
-}));
-
-const base = scenarios.find(({ selected }) => selected);
-if (!base) throw new Error('The base scenario is missing.');
+  { id: 'worse', label: t.scenarios.worse, year: `${numbers.paybackWorse.value}+` },
+  { id: 'base', label: t.scenarios.base, year: String(numbers.paybackBase.value) },
+  { id: 'better', label: t.scenarios.better, year: String(numbers.paybackBetter.value) },
+];
 ---
 
-<Slide
-  theme="white"
-  class="econ"
-  notes="Program stojí jedenáct a půl milionu ročně, půl procenta toho, co město platí DPO. Vrácený cestující nás stojí devadesát pět korun na rok, udržený pět set deset, nový z auta přes dva tisíce. Proto stavíme na udržení a návratu. V základním scénáři se program městu vrátí v roce 2034. A měříme proti kontrolnímu obvodu, takže víme, co program skutečně přidal."
->
-  <h2 class="t-title" data-in>Odměňujeme změnu i&nbsp;věrnost.<br /><span class="mark">Měříme skutečný přínos.</span></h2>
+<Slide id="economics" theme="white" notes={t.notes} {...Astro.props}>
+  <Headline id="economics-title" lines={t.title} />
 
-  <div class="econ__grid">
-    <figure data-in style="--i:3">
-      <p class="econ__visual t-hero">{cs(numbers.compensationSharePercent)}&nbsp;%</p>
-      <figcaption class="t-body">kompenzace DPO: {cs(numbers.programmeCostMillion)}&nbsp;mil.&nbsp;Kč ročně</figcaption>
+  <div class="economics__facts">
+    <figure data-in="3">
+      <p class="t-hero">
+        <span data-count={numbers.compensationShare.value} data-digits="2">{format(numbers.compensationShare.value, 'number', locale)}</span>{
+          percentSign(locale)
+        }
+      </p>
+      <figcaption class="t-body">{t.share}</figcaption>
     </figure>
 
-    <figure data-in style="--i:6">
-      <ul class="econ__visual econ__bars t-body">
+    <div class="economics__chart" data-in="6">
+      <p class="t-body" id="economics-chart"><strong>{t.chart}</strong></p>
+      <dl class="t-body" aria-labelledby="economics-chart">
         {
-          bars.map(({ label, value, cheap }, index) => (
-            <li class:list={{ cheap }} style={`--share:${value / cost.acquisition};--n:${index}`}>
-              {label}
-              <span class="econ__bar">
-                <strong>{cs(value)}&nbsp;Kč</strong>
-              </span>
-            </li>
+          costs.map(({ label, value }) => (
+            <div>
+              <dt>{label}</dt>
+              <dd>
+                <Bar length={Math.max(Math.round((value / highest) * BAR.length), BAR.height)} height={BAR.height} />
+                <strong>{format(value, 'czk', locale)}</strong>
+              </dd>
+            </div>
           ))
         }
-      </ul>
-      <figcaption class="t-body">za cestujícího a&nbsp;rok</figcaption>
-    </figure>
+      </dl>
+    </div>
 
-    <figure data-in style="--i:9">
-      <div class="econ__visual econ__payback">
-        <div class="econ__switch t-small" role="group" aria-label="Scénář">
-          {
-            scenarios.map(({ label, hero, caption, selected }) => (
-              <button type="button" data-hero={hero} data-caption={caption} aria-pressed={selected ? 'true' : 'false'}>
-                {label}
-              </button>
-            ))
-          }
-        </div>
-        <p class="t-hero" data-payback-hero>{base.hero}</p>
+    <figure class="economics__payback" data-scenario="base" data-in="9">
+      <p class="t-hero">
+        {scenarios.map(({ id, year }) => <span data-year={id}>{year}</span>)}
+      </p>
+      <figcaption class="t-body">{t.payback}</figcaption>
+      <div class="economics__switch t-small" role="group" aria-label={t.scenario}>
+        {
+          scenarios.map(({ id, label }) => (
+            <button type="button" data-choose={id} aria-pressed={id === 'base' ? 'true' : 'false'}>
+              {label}
+            </button>
+          ))
+        }
       </div>
-      <figcaption class="t-body" data-payback-caption>{base.caption}</figcaption>
     </figure>
   </div>
 
-  <p class="slide__foot t-small">Hrubý odhad týmu v&nbsp;cenách roku 2025 · Výroční zpráva DPO 2025</p>
+  <p class="slide__source t-small" data-in="11">{t.source}</p>
 </Slide>
 
 <script>
-  // The scenario switch changes the payback year. It is there for questions from the jury.
-  const slide = document.querySelector<HTMLElement>('.econ');
-  const hero = slide?.querySelector<HTMLElement>('[data-payback-hero]');
-  const caption = slide?.querySelector<HTMLElement>('[data-payback-caption]');
-  const buttons = slide?.querySelectorAll<HTMLButtonElement>('.econ__switch button');
-
-  if (hero && caption && buttons) {
-    buttons.forEach((button) => {
-      button.addEventListener('click', () => {
-        buttons.forEach((other) => other.setAttribute('aria-pressed', String(other === button)));
-        hero.textContent = button.dataset.hero ?? '';
-        caption.textContent = button.dataset.caption ?? '';
-        button.blur();
-      });
-    });
-  }
+  import '../scripts/scenes/economics.ts';
 </script>
 
 <style>
-  .econ__grid {
+  @import '../styles/media.css';
+
+  .economics__facts {
     display: grid;
-    grid-template-columns: 46rem 1fr 42rem;
+    grid-template-columns: 44rem 66rem 1fr;
     gap: 7rem;
-    margin-top: auto;
+    align-items: start;
+    margin: auto 0 9rem;
   }
 
-  /* Every column: a visual of the same height, then one caption on a shared baseline. */
-  .econ__grid figure {
-    display: grid;
-    grid-template-rows: 30rem auto;
-  }
-
-  .econ__visual {
-    align-self: end;
-  }
-
-  .econ .t-hero {
-    font-size: 14rem;
+  .economics .t-hero {
+    font-size: 13rem;
   }
 
   figcaption {
     margin-top: 2.6rem;
   }
 
-  .econ__bars {
-    display: grid;
-    gap: 2.2rem;
-  }
-
-  .econ__bars li {
-    display: grid;
-    gap: 0.8rem;
-  }
-
-  /* Bar length is the cost relative to the most expensive lever; the value sits at its end. */
-  .econ__bar {
-    position: relative;
-    width: 0.8rem;
-    height: 3rem;
-    border-radius: 0.6rem;
-    background: var(--fg);
-  }
-
-  .econ__bars .cheap .econ__bar {
-    background: var(--accent);
-  }
-
-  .econ.is-active .econ__bar {
-    width: max(0.8rem, calc(var(--share) * (100% - 19rem)));
-    transition: width 1.2s var(--ease);
-    transition-delay: calc(var(--n) * 200ms + 1.2s);
-  }
-
-  .econ__bar strong {
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 1.6rem);
+  /* Chart: the unit is the heading, each row is a label, a bar and its value. */
+  .economics__chart > p {
     white-space: nowrap;
-    translate: 0 -50%;
   }
 
-  .econ__payback {
+  .economics__chart dl {
+    display: grid;
+    gap: 2.6rem;
+    margin-top: 3.4rem;
+  }
+
+  .economics__chart dd {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 100%;
+    gap: 2.4rem;
+    align-items: center;
+    margin-top: 0.8rem;
   }
 
-  .econ__switch {
+  .economics__chart :global(.bar) {
+    height: 2.8rem;
+    transform-origin: left;
+  }
+
+  .economics__chart strong {
+    white-space: nowrap;
+  }
+
+  :global(.deck.is-live) .economics__chart :global(.bar) {
+    transform: scaleX(0);
+  }
+
+  :global(.deck.is-live) .economics.is-active .economics__chart :global(.bar) {
+    transform: none;
+    transition: transform 1.2s var(--ease) 1.2s;
+  }
+
+  /* Payback: one year is visible, the scenario decides which one. */
+  .economics__payback [data-year] {
+    display: none;
+  }
+
+  .economics__payback[data-scenario='worse'] [data-year='worse'],
+  .economics__payback[data-scenario='base'] [data-year='base'],
+  .economics__payback[data-scenario='better'] [data-year='better'] {
+    display: inline;
+  }
+
+  .economics__switch {
     display: inline-flex;
-    gap: 0.4rem;
+    margin-top: 3rem;
     padding: 0.5rem;
     border-radius: 10rem;
-    background: var(--soft);
-  }
-
-  .econ__switch button {
-    padding: 0.9rem 2rem;
-    border-radius: 10rem;
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
-  }
-
-  .econ__switch button[aria-pressed='true'] {
     background: var(--fg);
+  }
+
+  .economics__switch button {
+    min-width: 24px;
+    min-height: max(4.4rem, 24px);
+    padding: 0 2.2rem;
+    border-radius: 10rem;
     color: var(--bg);
+  }
+
+  .economics__switch button[aria-pressed='true'] {
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  .economics__switch button:focus-visible {
+    outline-offset: 0.9rem;
+  }
+
+  @media (--flow) {
+    .economics__facts {
+      grid-template-columns: 1fr;
+      gap: 9rem;
+      margin: 0;
+    }
+
+    .economics .t-hero {
+      font-size: 15rem;
+    }
+
+    .economics__chart :global(.bar) {
+      height: 3.4rem;
+    }
+
+    .economics__switch button {
+      min-height: max(8rem, 44px);
+      padding: 0 3.4rem;
+    }
   }
 </style>

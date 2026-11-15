@@ -1,49 +1,37 @@
 ---
+import Headline from '../components/Headline.astro';
 import Slide from '../components/Slide.astro';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
+
+const t = useDictionary(toLocale(Astro.currentLocale)).journey;
 
 /*
  * Two riders, two lines, one terminus. Grid: 1680 × 560 (1 unit = 0.1rem).
- * Tomáš is new and rides the "steps" (Schody); Lenka is a regular and rides the "plaques" (Plakety).
+ * Jakub is new in the city. Pavla is a loyal rider.
  */
 const stopX = [330, 590, 850, 1110];
 const merge = { x: 1400, y: 285 };
-
 const riders = [
-  {
-    id: 'new',
-    name: 'Tomáš',
-    y: 170,
-    stops: ['Stěhuje se do Ostravy', 'Zkušební měsíc', 'ZOO za polovinu', 'Roční jízdenka'],
-  },
-  {
-    id: 'loyal',
-    name: 'Lenka',
-    y: 400,
-    stops: ['15\u00a0let s\u00a0jízdenkou', 'Diamantová plaketa', 'Mění práci', 'Pauza místo odchodu'],
-  },
+  { id: 'new', name: 'Jakub', y: 170, stops: t.jakub },
+  { id: 'loyal', name: 'Pavla', y: 400, stops: t.pavla },
 ].map((rider) => ({
   ...rider,
   path: `M250 ${rider.y}H1130C1280 ${rider.y} 1270 ${merge.y} ${merge.x} ${merge.y}`,
 }));
-
-const rem = (units: number) => `${units / 10}rem`;
 ---
 
-<Slide
-  theme="cyan"
-  class="journey"
-  notes="Tomáš se přistěhoval a zvažuje auto. Dostane uvítací body, zkusí měsíc, do dvou týdnů jde do ZOO za polovinu a po třech měsících kupuje roční jízdenku. Lenka jezdí patnáct let: hned má diamantovou plaketu, a když změní práci, dá si pauzu místo odchodu. Výhoda přivede, postup udrží, hrdost posílí vztah k městu."
->
-  <h2 class="t-title" data-in>Výhoda přivede. Postup udrží.<br />Hrdost posílí vztah k&nbsp;městu.</h2>
+<Slide id="journey" theme="navy" notes={t.notes} {...Astro.props}>
+  <Headline id="journey-title" lines={t.title} />
 
   <div class="journey__map">
     <svg viewBox="0 0 1680 560" aria-hidden="true">
       {
         riders.map(({ id, path, y }) => (
-          <g class={`journey__line journey__line--${id}`} data-rider={id}>
+          <g class:list={['journey__line', `journey__line--${id}`]}>
             <path d={path} pathLength="1" />
-            {stopX.map((x, index) => (
-              <circle cx={x} cy={y} r="17" style={`--n:${index}`} />
+            {stopX.map((x) => (
+              <circle cx={x} cy={y} r="17" />
             ))}
           </g>
         ))
@@ -52,24 +40,27 @@ const rem = (units: number) => `${units / 10}rem`;
     </svg>
 
     {
-      riders.map(({ id, name, y, stops }, line) => (
-        <div class={`journey__rider journey__rider--${id}`} data-rider={id}>
-          <p class="journey__name t-body" data-in style={`top:${rem(y)};--i:${line * 5 + 2}`}>
-            {name}
+      riders.map(({ id, name, stops }, line) => (
+        <div class:list={['journey__rider', `journey__rider--${id}`]} role="group" aria-label={name}>
+          <p class="journey__name t-body" data-in={line * 5 + 2}>
+            <strong>{name}</strong>
           </p>
-          {stops.map((stop, index) => (
-            <p class="journey__stop t-body" data-in style={`left:${rem(stopX[index] ?? 0)};top:${rem(y)};--i:${line * 5 + index * 2 + 4}`}>
-              {stop}
-            </p>
-          ))}
+          <ol class="journey__stops stops-list t-body">
+            {stops.map((stop, index) => (
+              <li data-in={line * 5 + index * 2 + 4}>{stop}</li>
+            ))}
+          </ol>
         </div>
       ))
     }
-    <p class="journey__end t-body" data-in style={`left:${rem(merge.x + 56)};top:${rem(merge.y)};--i:18`}>Jezdí dál</p>
+
+    <p class="journey__end t-body" data-in="18"><strong>{t.end}</strong></p>
   </div>
 </Slide>
 
 <style>
+  @import '../styles/media.css';
+
   .journey__map {
     position: relative;
     width: 168rem;
@@ -77,110 +68,190 @@ const rem = (units: number) => `${units / 10}rem`;
     margin-top: auto;
   }
 
+  .journey__map svg {
+    position: absolute;
+    inset: 0;
+  }
+
   .journey__line path {
     fill: none;
     stroke-width: 12;
     stroke-linecap: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
   }
 
-  .journey__line--new path {
+  .journey__line--new {
     stroke: var(--accent);
   }
 
-  .journey__line--loyal path {
+  .journey__line--loyal {
     stroke: var(--fg);
-  }
-
-  .journey.is-active .journey__line path {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1.8s var(--ease) 0.5s;
-  }
-
-  .journey.is-active .journey__line--loyal path {
-    transition-delay: 1.05s;
   }
 
   .journey__line circle,
   .journey__terminus {
+    fill: var(--bg);
+    stroke-width: 7;
+  }
+
+  .journey__terminus {
     fill: var(--accent);
     stroke: var(--fg);
-    stroke-width: 7;
+    stroke-width: 10;
+  }
+
+  /* The lines draw themselves, then the stops appear one after the other. */
+  :global(.deck.is-live) .journey__line path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  :global(.deck.is-live) .journey.is-active .journey__line path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.8s var(--ease) 0.5s;
+  }
+
+  :global(.deck.is-live) .journey.is-active .journey__line--loyal path {
+    transition-delay: 1.05s;
+  }
+
+  :global(.deck.is-live) .journey__map circle {
     transform: scale(0);
     transform-box: fill-box;
     transform-origin: center;
   }
 
-  .journey.is-active .journey__line circle {
+  :global(.deck.is-live) .journey.is-active .journey__map circle {
     transform: none;
-    transition: transform 0.6s var(--spring);
-    transition-delay: calc(var(--n) * 220ms + 0.8s);
+    transition: transform 0.6s var(--spring) 1.2s;
   }
 
-  .journey.is-active .journey__line--loyal circle {
-    transition-delay: calc(var(--n) * 220ms + 1.35s);
+  :global(.deck.is-live) .journey.is-active .journey__map circle:nth-of-type(2) {
+    transition-delay: 1.45s;
   }
 
-  .journey__terminus {
-    stroke-width: 10;
+  :global(.deck.is-live) .journey.is-active .journey__map circle:nth-of-type(3) {
+    transition-delay: 1.7s;
   }
 
-  .journey.is-active .journey__terminus {
-    transform: none;
-    transition: transform 0.8s var(--spring) 2.5s;
+  :global(.deck.is-live) .journey.is-active .journey__map circle:nth-of-type(4) {
+    transition-delay: 1.95s;
   }
 
-  .journey__name,
-  .journey__stop,
-  .journey__end {
+  :global(.deck.is-live) .journey.is-active .journey__map .journey__terminus {
+    transition-delay: 2.5s;
+  }
+
+  .journey__rider {
     position: absolute;
+    left: 0;
+    width: 124rem;
+  }
+
+  /* Jakub's line is at 17rem, Pavla's at 40rem. His stops have their text above the line, hers below. */
+  .journey__rider--new {
+    top: 0;
+    height: 17rem;
+  }
+
+  .journey__rider--loyal {
+    top: 40rem;
+    height: 16rem;
   }
 
   .journey__name {
+    position: absolute;
     left: 0;
-    padding: 1.2rem 3rem;
+    padding: 1.1rem 2.8rem;
+    border: var(--line) solid var(--fg);
     border-radius: 10rem;
-    font-weight: 900;
+    background: var(--bg);
     translate: 0 -50%;
   }
 
   .journey__rider--new .journey__name {
-    background: var(--accent);
+    top: 100%;
+    border-color: var(--accent);
   }
 
   .journey__rider--loyal .journey__name {
-    background: var(--fg);
-    color: var(--accent);
+    top: 0;
   }
 
-  .journey__stop {
-    width: 24rem;
+  .journey__stops {
+    position: absolute;
+    left: 20rem;
+    display: grid;
+    grid-template-columns: repeat(4, 26rem);
     text-align: center;
   }
 
-  /* Tomáš's stops are labelled above his line, Lenka's below hers. */
-  .journey__rider--new .journey__stop {
-    translate: -50% calc(-100% - 3.6rem);
+  .journey__stops li {
+    padding: 0 1rem;
   }
 
-  .journey__rider--loyal .journey__stop {
-    translate: -50% 3.6rem;
+  .journey__rider--new .journey__stops {
+    bottom: 3.6rem;
+    align-items: end;
+  }
+
+  .journey__rider--loyal .journey__stops {
+    top: 3.6rem;
   }
 
   .journey__end {
-    font-weight: 900;
+    position: absolute;
+    top: 28.5rem;
+    left: 145.6rem;
     white-space: nowrap;
     translate: 0 -50%;
   }
 
-  /* Pointing at one rider dims the other. */
-  .journey__map [data-rider] {
-    transition: opacity 0.4s ease;
-  }
+  @media (--flow) {
+    .journey__map {
+      display: grid;
+      gap: 7rem;
+      width: auto;
+      height: auto;
+      margin: 0;
+    }
 
-  .journey__map:has([data-rider='new']:hover) [data-rider='loyal'],
-  .journey__map:has([data-rider='loyal']:hover) [data-rider='new'] {
-    opacity: 0.25;
+    .journey__map svg {
+      display: none;
+    }
+
+    .journey__rider {
+      position: static;
+      width: auto;
+      height: auto;
+    }
+
+    .journey__name {
+      position: static;
+      display: inline-block;
+      margin-bottom: 4rem;
+      translate: none;
+    }
+
+    .journey__rider--new .journey__stops,
+    .journey__rider--loyal .journey__stops {
+      position: relative;
+      inset: auto;
+      grid-template-columns: 1fr;
+      text-align: left;
+    }
+
+    .journey__stops li {
+      padding: 0;
+    }
+
+    .journey__rider--loyal .journey__stops {
+      --line-colour: var(--fg);
+    }
+
+    .journey__end {
+      position: static;
+      white-space: normal;
+      translate: none;
+    }
   }
 </style>

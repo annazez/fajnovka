@@ -1,52 +1,33 @@
 ---
+import Headline from '../components/Headline.astro';
 import Icon from '../components/Icon.astro';
 import Slide from '../components/Slide.astro';
+import { useDictionary } from '../i18n/index.ts';
+import { toLocale } from '../i18n/locales.ts';
 
-// Each item names the principle the programme borrows. An analogy is not proof for Ostrava.
+const t = useDictionary(toLocale(Astro.currentLocale)).evidence;
+
+// Each item names a principle that the programme uses. An analogy is not a proof for Ostrava.
 const evidence = [
-  {
-    icon: 'drop',
-    lead: 'Dárci krve',
-    text: 'darují častěji, když se blíží k\u00a0další medaili.',
-    source: 'Lacetera a\u00a0Macis 2010',
-  },
-  {
-    icon: 'home',
-    lead: 'V\u00a0Kodani i\u00a0Stuttgartu',
-    text: 'zabrala nabídka MHD u\u00a0lidí, kteří se právě stěhovali.',
-    source: 'Thøgersen\u00a02009, Bamberg\u00a02006',
-  },
-  {
-    icon: 'medal',
-    lead: '40\u00a0let věrnostních programů',
-    text: 'ukazuje malý, ale kladný vliv na\u00a0věrnost.',
-    source: 'Belli a\u00a0kol. 2022',
-  },
-  {
-    icon: 'card',
-    lead: 'ODISka',
-    text: 'už v\u00a0kraji zlevnila vstup na hrady a\u00a0zámky až o\u00a0polovinu.',
-    source: 'S ODISkou na hrad, KODIS',
-  },
+  { icon: 'drop', ...t.items.donors },
+  { icon: 'home', ...t.items.movers },
+  { icon: 'levels', ...t.items.loyalty },
+  { icon: 'card', ...t.items.odiska },
 ] as const;
 ---
 
-<Slide
-  theme="white"
-  class="evidence"
-  notes="Neopíráme se o přání. Dárci krve darují častěji, když se blíží k další medaili. V Kodani i ve Stuttgartu zabrala nabídka MHD u lidí, kteří se právě stěhovali. Čtyřicet let věrnostních programů ukazuje malý, ale kladný vliv na věrnost. A ODISka už slevovou kartou byla: v kraji zlevnila vstup na hrady a zámky až o polovinu. Jestli to zabere v Ostravě, změří pilot."
->
-  <h2 class="t-title" data-in>Principy jsou ověřené.<br /><span class="mark">Účinek v&nbsp;Ostravě změří pilot.</span></h2>
+<Slide id="evidence" theme="white" notes={t.notes} {...Astro.props}>
+  <Headline id="evidence-title" lines={t.title} />
 
   <ul class="evidence__list">
     {
       evidence.map(({ icon, lead, text, source }, index) => (
-        <li data-in style={`--i:${index * 3 + 3}`}>
+        <li data-in={index * 3 + 3}>
           <Icon name={icon} />
           <p class="t-body">
             <strong>{lead}</strong> {text}
           </p>
-          <p class="t-small">{source}</p>
+          <p class="evidence__source t-small">{source}</p>
         </li>
       ))
     }
@@ -54,28 +35,52 @@ const evidence = [
 </Slide>
 
 <style>
+  @import '../styles/media.css';
+
   .evidence__list {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 5rem;
     margin-top: auto;
+    margin-bottom: 3rem;
   }
 
   .evidence__list li {
     display: flex;
     flex-direction: column;
-    gap: 2.8rem;
-    padding-top: 4rem;
-    border-top: 0.6rem solid var(--fg);
+    gap: 3rem;
+    padding-top: 4.5rem;
+    border-top: var(--line) solid var(--fg);
   }
 
   .evidence__list :global(.icon) {
-    width: 11rem;
-    height: 11rem;
+    width: 10rem;
+    height: 10rem;
   }
 
-  .evidence__list .t-small {
+  .evidence__source {
     margin-top: auto;
-    opacity: 0.7;
+    opacity: 0.75;
+  }
+
+  @media (--flow) {
+    .evidence__list {
+      grid-template-columns: 1fr;
+      gap: 6rem;
+      margin: 0;
+    }
+
+    .evidence__list li {
+      display: grid;
+      grid-template-columns: 11rem 1fr;
+      gap: 2rem 4rem;
+      padding-top: 5rem;
+    }
+
+    .evidence__list :global(.icon) {
+      grid-row: span 2;
+      width: 11rem;
+      height: 11rem;
+    }
   }
 </style>

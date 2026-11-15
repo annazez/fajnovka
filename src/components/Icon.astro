@@ -1,23 +1,29 @@
 ---
 /**
- * Pictograms on a 100 × 100 grid, drawn in the style of the team's graphic pack.
- * Three roles: line (text colour), fill (background), accent.
+ * Pictograms on a 100 × 100 grid.
+ *
+ * Rules (a test checks them in the browser):
+ * - One stroke width (5) with round caps and joins.
+ * - Paint order: accent shapes first, then strokes. An accent shape never covers a stroke.
+ * - An accent shape either stops 3 units before a stroke, or goes under it and ends flush.
+ * - The drawing sits in the centre of the grid.
  */
 const star =
   '50,27 55.88,41.91 71.87,42.89 59.51,53.09 63.52,68.61 50,60 36.48,68.61 40.49,53.09 28.13,42.89 44.12,41.91';
 
 const icons = {
-  car: `<path class="line" d="M17 54 28 31h43l12 23M14 55h72v25H14ZM24 81v9M76 81v9"/><path class="accent" d="M30 40h37l6 13H24Z"/><circle class="dot" cx="28" cy="68" r="4"/><circle class="dot" cx="72" cy="68" r="4"/>`,
-  tram: `<path class="line" d="M37 15 50 5l13 10-13 10ZM50 25v4"/><rect class="line fill" x="23" y="30" width="54" height="51" rx="9"/><rect class="accent" x="29" y="37" width="42" height="23" rx="3"/><circle class="dot" cx="35" cy="70" r="4"/><circle class="dot" cx="65" cy="70" r="4"/><path class="line" d="m32 82-7 12M68 82l7 12M28 91h44"/>`,
-  medal: `<path class="line" d="m34 8 9 22M66 8l-9 22"/><circle class="line fill" cx="50" cy="60" r="30"/><polygon class="accent" transform="translate(50 60) scale(0.72) translate(-50 -48)" points="${star}"/>`,
-  back: `<path class="line" d="M80 72H42q-20 0-20-20t20-20h30"/><path class="line accent-line" d="m60 16 16 16-16 16"/>`,
-  star: `<circle class="line fill" cx="50" cy="50" r="38"/><polygon class="accent" points="${star}"/>`,
-  gift: `<rect class="line fill" x="18" y="44" width="64" height="41" rx="3"/><rect class="accent" x="13" y="31" width="74" height="17" rx="3"/><path class="line" d="M50 32v53M50 31C14 32 22 3 38 13l12 18c33 1 28-28 13-18Z"/>`,
-  ticket: `<path class="line fill" d="M12 29h76v15c-15 0-15 16 0 16v15H12V60c15 0 15-16 0-16Z"/><path class="line accent-line" d="m33 51 9 9 12-17"/>`,
-  home: `<path class="line" d="M12 48 50 15l38 33M22 44v43h56V44"/><rect class="accent" x="43" y="59" width="16" height="28" rx="2"/>`,
-  drop: `<path class="line fill" d="M50 10C40 28 22 48 22 63a28 28 0 0 0 56 0c0-15-18-35-28-53Z"/><path class="line accent-line" d="M37 63a13 13 0 0 0 13 13"/>`,
-  card: `<rect class="line fill" x="10" y="22" width="80" height="56" rx="9"/><rect class="accent" x="10" y="36" width="80" height="11"/><path class="line" d="M24 63h22"/>`,
-  family: `<circle class="line fill" cx="27" cy="24" r="10"/><circle class="line fill" cx="73" cy="24" r="10"/><path class="line" d="M10 86V62q0-16 17-16t17 16M90 86V62q0-16-17-16T56 62"/><circle class="accent" cx="50" cy="58" r="8"/><path class="line accent-line" d="M38 90V82q0-10 12-10t12 10v8"/>`,
+  car: `<path class="accent soft" d="M31 37.5 34.3 29.5H65.7L69 37.5Z"/><path class="line" d="M22 44 30 22H70L78 44"/><rect class="line" x="14" y="44" width="72" height="28" rx="7"/><path class="line" d="M24 76v4M76 76v4"/><circle class="dot" cx="27" cy="58" r="3.5"/><circle class="dot" cx="73" cy="58" r="3.5"/>`,
+  tram: `<rect class="accent" x="30" y="37.5" width="40" height="21" rx="3"/><path class="line" d="M38 16 50 6 62 16 50 26ZM50 26v4M34 81 28 93M66 81l6 12M22 93H78"/><rect class="line" x="23" y="30" width="54" height="51" rx="9"/><circle class="dot" cx="35" cy="69.5" r="3.5"/><circle class="dot" cx="65" cy="69.5" r="3.5"/>`,
+  levels: `<rect class="accent" x="68" y="18" width="18" height="66" rx="4"/><rect class="line" x="14" y="58" width="18" height="26" rx="4"/><rect class="line" x="41" y="38" width="18" height="46" rx="4"/><rect class="line" x="68" y="18" width="18" height="66" rx="4"/>`,
+  points: `<polygon class="accent" points="${star}" transform="translate(0 2)"/><circle class="line" cx="50" cy="50" r="36"/>`,
+  discount: `<circle class="accent" cx="39" cy="41" r="4.5"/><circle class="accent" cx="61" cy="59" r="4.5"/><path class="line accent-line" d="M60 38 40 62"/><path class="line" d="M12 30H88V43a7 7 0 0 0 0 14V70H12V57a7 7 0 0 0 0-14Z"/>`,
+  resume: `<path class="accent soft" d="M61.5 32.5 82.5 50 61.5 67.5Z"/><rect class="line" x="17" y="28" width="11" height="44" rx="4"/><rect class="line" x="36" y="28" width="11" height="44" rx="4"/>`,
+  home: `<path class="accent" d="M42 86V63a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3V86Z"/><path class="line" d="M22 38V86H78V38M10 48 50 14 90 48"/>`,
+  card: `<rect class="accent" x="10" y="38" width="80" height="11"/><rect class="line" x="10" y="24" width="80" height="52" rx="9"/><path class="line" d="M24 62H44"/>`,
+  drop: `<path class="line" d="M50 12C40 30 22 48 22 62a28 28 0 0 0 56 0C78 48 60 30 50 12Z"/><path class="line accent-line" d="M36 62a14 14 0 0 0 14 14"/>`,
+  briefcase: `<rect class="accent" x="43" y="48" width="14" height="14" rx="3"/><path class="line" d="M38 34V27a5 5 0 0 1 5-5H57a5 5 0 0 1 5 5V34M12 55H37M63 55H88"/><rect class="line" x="12" y="34" width="76" height="46" rx="8"/>`,
+  group: `<circle class="accent" cx="50" cy="28" r="10"/><path class="line accent-line" d="M36 80V68Q36 50 50 50 64 50 64 68V80"/><circle class="line" cx="15" cy="38" r="7"/><circle class="line" cx="85" cy="38" r="7"/><path class="line" d="M5 80V72Q5 58 15 58 25 58 25 72V80M75 80V72Q75 58 85 58 95 58 95 72V80"/>`,
+  ambassador: `<polygon class="accent" points="${star}" transform="translate(75 24) scale(0.52) translate(-50 -48)"/><circle class="line" cx="41" cy="34" r="11"/><path class="line" d="M17 84V76Q17 56 41 56 65 56 65 76V84"/>`,
 } as const;
 
 interface Props {
@@ -43,12 +49,15 @@ const { name } = Astro.props;
     stroke-linejoin: round;
   }
 
-  .icon .fill {
-    fill: var(--bg);
-  }
-
   .icon .accent {
     fill: var(--accent);
+  }
+
+  /* A soft accent shape has round corners: a thin stroke in its own colour. */
+  .icon .soft {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
   }
 
   .icon .accent-line {
