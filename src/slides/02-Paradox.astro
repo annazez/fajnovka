@@ -39,10 +39,14 @@ const people = [
   <div class="paradox__stats">
     <figure data-in="3">
       <div class="paradox__number">
-        <p class="t-hero" data-count={numbers.residentsNearStop.value}>{formatNumber(numbers.residentsNearStop.value, locale)}</p>
+        <p class="t-hero" data-count={numbers.residentsNearStop.value}>
+          {formatNumber(numbers.residentsNearStop.value, locale)}
+        </p>
         <svg class="paradox__walk" viewBox="0 0 100 100" aria-hidden="true">
           <circle class="paradox__reach" cx="50" cy="50" r="46"></circle>
-          {people.map(([x, y]) => <circle class="paradox__person" cx={x} cy={y} r="3.4" />)}
+          {people.map(([x, y]) => (
+            <circle class="paradox__person" cx={x} cy={y} r="3.4" />
+          ))}
           <circle class="paradox__stop" cx="50" cy="50" r="7.5"></circle>
         </svg>
       </div>
@@ -52,17 +56,22 @@ const people = [
     <figure data-in="6">
       <div class="paradox__number">
         <p class="t-hero">
-          <span data-count={numbers.peakOccupancy.value}>{numbers.peakOccupancy.value}</span>{percentSign(locale)}
+          <span data-count={numbers.peakOccupancy.value}>{numbers.peakOccupancy.value}</span>
+          {percentSign(locale)}
         </p>
         <div class="paradox__seats" aria-hidden="true">
-          {Array.from({ length: SEATS }, (_, seat) => <i class:list={{ taken: taken.has(seat) }} />)}
+          {Array.from({ length: SEATS }, (_, seat) => (
+            <i class:list={{ taken: taken.has(seat) }} />
+          ))}
         </div>
       </div>
       <figcaption class="t-body">{t.occupancy}</figcaption>
     </figure>
   </div>
 
-  <p class="slide__source t-small" data-in="8">{t.source}</p>
+  <p class="slide__source t-small" data-in="8">
+    {t.source}
+  </p>
 </Slide>
 
 <style>

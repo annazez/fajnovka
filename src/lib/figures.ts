@@ -5,21 +5,44 @@
  * Marks have one ink colour. The accent colour only fills a stop or a wash, because it is too light to stand alone.
  * Each chart labels its values directly, so it has no legend box and stays clear in black-and-white print.
  */
-import { budget, passengersCarried, scenarios, tenYears, yearlyEffect, type ModelYear, type Scenario } from '../data/model.ts';
+import {
+  budget,
+  passengersCarried,
+  scenarios,
+  tenYears,
+  yearlyEffect,
+  type ModelYear,
+  type Scenario,
+} from '../data/model.ts';
 import { numbers } from '../data/numbers.ts';
 import { useDictionary } from '../i18n/index.ts';
 import type { Locale } from '../i18n/locales.ts';
 import { format, formatNumber, insert } from './format.ts';
 import { element, join, text, type Markup } from './svg.ts';
 
-export const figureIds = ['passengers', 'estimates', 'budget', 'levers', 'revenue', 'passengers-extra', 'payback', 'region'] as const;
+export const figureIds = [
+  'passengers',
+  'estimates',
+  'budget',
+  'levers',
+  'revenue',
+  'passengers-extra',
+  'payback',
+  'region',
+] as const;
 export type FigureId = (typeof figureIds)[number];
+
+/** The values of a chart as a table. */
+export interface FigureTable {
+  head: readonly string[];
+  rows: readonly (readonly string[])[];
+}
 
 export interface Figure {
   /** The chart as one SVG element. */
   svg: Markup;
-  /** The values of the chart as a table, for a reader who cannot see the chart. Only when the text near the chart does not give them. */
-  table?: { head: readonly string[]; rows: readonly (readonly string[])[] };
+  /** For a reader who cannot see the chart. Only when the text near the chart does not give the values. */
+  table?: FigureTable;
 }
 
 type Point = readonly [x: number, y: number];
@@ -56,7 +79,11 @@ export function signed(value: number, locale: Locale): string {
 // Marks
 
 function frame(height: number, summary: string, ...children: readonly Markup[]): Markup {
-  return element('svg', { class: 'chart', viewBox: `0 0 ${WIDTH} ${height}`, 'font-size': FONT_SIZE, role: 'img', 'aria-label': summary }, ...children);
+  return element(
+    'svg',
+    { class: 'chart', viewBox: `0 0 ${WIDTH} ${height}`, 'font-size': FONT_SIZE, role: 'img', 'aria-label': summary },
+    ...children,
+  );
 }
 
 function label(x: number, y: number, value: string, anchor: Anchor = 'start', kind = ''): Markup {
@@ -72,7 +99,10 @@ function line(points: readonly Point[], kind = ''): Markup {
 /** The area between two lines. */
 function wash(upper: readonly Point[], lower: readonly Point[]): Markup {
   const outline = [...upper, ...lower.toReversed()];
-  return element('path', { class: 'chart__wash', d: outline.map(([x, y], index) => `${index === 0 ? 'M' : 'L'}${x} ${y}`).join('') + 'Z' });
+  return element('path', {
+    class: 'chart__wash',
+    d: outline.map(([x, y], index) => `${index === 0 ? 'M' : 'L'}${x} ${y}`).join('') + 'Z',
+  });
 }
 
 /** A stop on a line. The larger invisible circle makes the tooltip easy to reach. */
@@ -107,7 +137,10 @@ function valueAxis(plot: Plot, y: Scale, ticks: readonly number[], show: (tick: 
   return join(
     ...ticks.map((tick) =>
       join(
-        element('path', { class: tick === 0 ? 'chart__grid chart__grid--zero' : 'chart__grid', d: `M${plot.left} ${y(tick)}H${plot.right}` }),
+        element('path', {
+          class: tick === 0 ? 'chart__grid chart__grid--zero' : 'chart__grid',
+          d: `M${plot.left} ${y(tick)}H${plot.right}`,
+        }),
         label(plot.left - 8, y(tick) + 4, show(tick), 'end', 'tick'),
       ),
     ),
@@ -136,7 +169,13 @@ function lineSummary(t: Chart, series: readonly Series[]): string {
     const [first] = values;
     const last = values[values.length - 1];
     if (!first || !last) throw new Error(`The series "${name}" is empty.`);
-    return insert(t.line, { name, from: show(first[1]), start: String(first[0]), to: show(last[1]), end: String(last[0]) });
+    return insert(t.line, {
+      name,
+      from: show(first[1]),
+      start: String(first[0]),
+      to: show(last[1]),
+      end: String(last[0]),
+    });
   });
   return `${t.kinds.line}. ${parts.join('; ')}.`;
 }
@@ -145,12 +184,15 @@ function barSummary(t: Chart, items: readonly { name: string; shown: string }[])
   return `${t.kinds.bars}. ${items.map(({ name, shown }) => insert(t.bar, { name, value: shown })).join('; ')}.`;
 }
 
-function yearTable(t: Chart, series: readonly Series[]): Figure['table'] {
+function yearTable(t: Chart, series: readonly Series[]): FigureTable {
   const [first] = series;
   if (!first) throw new Error('A table needs one series or more.');
   return {
     head: [t.year, ...series.map(({ name }) => name)],
-    rows: first.values.map(([year], index) => [String(year), ...series.map(({ values, show }) => show(values[index]?.[1] ?? Number.NaN))]),
+    rows: first.values.map(([year], index) => [
+      String(year),
+      ...series.map(({ values, show }) => show(values[index]?.[1] ?? Number.NaN)),
+    ]),
   };
 }
 
@@ -180,7 +222,9 @@ function passengers(locale: Locale): Figure {
       valueAxis(plot, y, [70, 80, 90, 100, 110], (tick) => formatNumber(tick, locale)),
       yearAxis(plot, x, [2010, 2015, 2020, 2025]),
       line(values.map(at)),
-      ...values.map((value) => stop(at(value), `${value[0]}: ${show(value[1])} ${t.units.passengers}`, value === first || value === last)),
+      ...values.map((value) =>
+        stop(at(value), `${value[0]}: ${show(value[1])} ${t.units.passengers}`, value === first || value === last),
+      ),
       label(at(first)[0] + 12, at(first)[1] - 6, show(first[1]), 'start', 'strong'),
       label(at(last)[0], at(last)[1] - 14, show(last[1]), 'middle', 'strong'),
       label(lowX, lowY + 21, show(lowest[1]), 'middle', 'strong'),
@@ -202,7 +246,9 @@ function estimates(locale: Locale): Figure {
   const plot: Plot = { left: 232, right: 648, top: 34, bottom: 190 };
   const x = linear([0, 800], [plot.left, plot.right]);
   const show = (value: number): string => formatNumber(value, locale);
-  const summary = rows.map(({ name, range }) => insert(t.range, { name, mid: show(range.mid), low: show(range.low), high: show(range.high) }));
+  const summary = rows.map(({ name, range }) =>
+    insert(t.range, { name, mid: show(range.mid), low: show(range.low), high: show(range.high) }),
+  );
 
   return {
     svg: frame(
@@ -211,7 +257,10 @@ function estimates(locale: Locale): Figure {
       label(plot.left, 14, t.units.people, 'start', 'tick'),
       ...[0, 200, 400, 600, 800].map((tick) =>
         join(
-          element('path', { class: tick === 0 ? 'chart__grid chart__grid--zero' : 'chart__grid', d: `M${x(tick)} ${plot.top}V${plot.bottom}` }),
+          element('path', {
+            class: tick === 0 ? 'chart__grid chart__grid--zero' : 'chart__grid',
+            d: `M${x(tick)} ${plot.top}V${plot.bottom}`,
+          }),
           label(x(tick), plot.bottom + 18, show(tick), 'middle', 'tick'),
         ),
       ),
@@ -306,7 +355,11 @@ function revenue(locale: Locale): Figure {
   const t = useDictionary(locale).manual.chart;
   const model = tenYears.base;
   const show = (value: number): string => formatNumber(Math.round(value), locale);
-  const without: Series = { name: t.revenue.without, values: model.map((row) => [row.year, row.revenueWithout / MILLION]), show };
+  const without: Series = {
+    name: t.revenue.without,
+    values: model.map((row) => [row.year, row.revenueWithout / MILLION]),
+    show,
+  };
   const withProgramme: Series = {
     name: t.revenue.with,
     values: model.map((row) => [row.year, (row.revenueWithout + row.extraRevenue) / MILLION]),
@@ -360,7 +413,12 @@ function byScenario(
     const numbersOfYear = value(tenYears[scenario]);
     const values = tenYears[scenario].map((row, index) => [row.year, numbersOfYear[index] ?? Number.NaN] as const);
     const series: Series = { name: t.scenarios[scenario], values, show };
-    return { scenario, series, points: values.map(([year, amount]): Point => [x(year), y(amount)]), marked: mark(scenario, numbersOfYear) };
+    return {
+      scenario,
+      series,
+      points: values.map(([year, amount]): Point => [x(year), y(amount)]),
+      marked: mark(scenario, numbersOfYear),
+    };
   });
   const find = (scenario: Scenario) => {
     const found = all.find((item) => item.scenario === scenario);
@@ -389,7 +447,10 @@ function byScenario(
           stop(end, `${year}, ${series.name}: ${show(amount)} ${unit}`, scenario === 'base'),
           endLabel(end, series.name, show(amount)),
           markedPoint && markedYear !== undefined
-            ? join(stop(markedPoint, `${series.name}: ${markedYear}`, true), label(markedPoint[0] - 2, markedPoint[1] - 14, String(markedYear), 'end', 'strong'))
+            ? join(
+                stop(markedPoint, `${series.name}: ${markedYear}`, true),
+                label(markedPoint[0] - 2, markedPoint[1] - 14, String(markedYear), 'end', 'strong'),
+              )
             : text(''),
         );
       }),
@@ -415,7 +476,15 @@ export function paybackYear(scenario: Scenario): number | undefined {
 
 function passengersExtra(locale: Locale): Figure {
   const hundreds = (value: number): string => formatNumber(Math.round(value / 100) * 100, locale);
-  return byScenario(locale, 290, [0, 12_000], [0, 4000, 8000, 12_000], useDictionary(locale).manual.chart.units.extra, (rows) => rows.map((row) => row.extraPassengers), hundreds);
+  return byScenario(
+    locale,
+    290,
+    [0, 12_000],
+    [0, 4000, 8000, 12_000],
+    useDictionary(locale).manual.chart.units.extra,
+    (rows) => rows.map((row) => row.extraPassengers),
+    hundreds,
+  );
 }
 
 function payback(locale: Locale): Figure {
@@ -436,8 +505,15 @@ function payback(locale: Locale): Figure {
 }
 
 /** Sums of the ten years for one scenario, in CZK million: the four parts of the benefit for the region. */
-export function regionBenefit(scenario: Scenario): { city: number; kodis: number; partners: number; cars: number; total: number } {
-  const sum = (pick: (row: ModelYear) => number): number => tenYears[scenario].reduce((total, row) => total + pick(row), 0) / MILLION;
+export function regionBenefit(scenario: Scenario): {
+  city: number;
+  kodis: number;
+  partners: number;
+  cars: number;
+  total: number;
+} {
+  const sum = (pick: (row: ModelYear) => number): number =>
+    tenYears[scenario].reduce((total, row) => total + pick(row), 0) / MILLION;
   const parts = {
     city: sum((row) => row.extraRevenue - row.cost),
     kodis: sum((row) => row.kodis),
@@ -456,7 +532,10 @@ function region(locale: Locale): Figure {
   const show = (value: number): string => signed(Math.round(value), locale);
   const parts = ['city', 'kodis', 'partners', 'cars'] as const;
   const groups = scenarios.map((scenario) => ({ name: t.scenarios[scenario], benefit: regionBenefit(scenario) }));
-  const summary = groups.flatMap(({ name, benefit }) => [...parts.map((part) => ({ name: `${name}, ${t.region[part]}`, shown: show(benefit[part]) })), { name: `${name}, ${t.total}`, shown: show(benefit.total) }]);
+  const summary = groups.flatMap(({ name, benefit }) => [
+    ...parts.map((part) => ({ name: `${name}, ${t.region[part]}`, shown: show(benefit[part]) })),
+    { name: `${name}, ${t.total}`, shown: show(benefit.total) },
+  ]);
 
   return {
     svg: frame(
@@ -474,10 +553,15 @@ function region(locale: Locale): Figure {
             return join(
               label(left - 34, y + 11, t.region[part], 'end'),
               bar(x(0), end, y, 14, `${name}, ${t.region[part]}: ${show(value)} ${t.units.mczk}`),
-              value < 0 ? label(end - 6, y + 11, show(value), 'end', 'strong') : label(end + 6, y + 11, show(value), 'start', 'strong'),
+              value < 0
+                ? label(end - 6, y + 11, show(value), 'end', 'strong')
+                : label(end + 6, y + 11, show(value), 'start', 'strong'),
             );
           }),
-          element('path', { class: 'chart__grid chart__grid--zero', d: `M${x(0)} ${top + 22}V${top + 26 + parts.length * pitch - 4}` }),
+          element('path', {
+            class: 'chart__grid chart__grid--zero',
+            d: `M${x(0)} ${top + 22}V${top + 26 + parts.length * pitch - 4}`,
+          }),
         );
       }),
     ),

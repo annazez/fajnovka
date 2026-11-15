@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import type { RefProxy } from 'pdfjs-dist/types/src/display/api.js';
 import { describe, expect, test } from 'vitest';
 
 import record from '../../src/data/manual-pdf.json' with { type: 'json' };
@@ -30,9 +31,12 @@ describe.each(locales)('PDF of the manual (%s)', (locale) => {
 
   test('the bookmarks list the contents and each chapter', async () => {
     const { task, document } = await open();
-    const [cover] = (await document.getOutline()) ?? [];
-    const titles = cover?.items.map((item) => dense(item.title)) ?? [];
-    expect(titles).toEqual([dictionaries[locale].manual.contents, ...chapters[locale].map(({ title }) => title)].map(dense));
+    const [cover] = await document.getOutline();
+    const chaptersOf = (cover?.items ?? []) as { title: string }[];
+    const titles = chaptersOf.map((item) => dense(item.title));
+    expect(titles).toEqual(
+      [dictionaries[locale].manual.contents, ...chapters[locale].map(({ title }) => title)].map(dense),
+    );
     await task.destroy();
   });
 
@@ -42,8 +46,8 @@ describe.each(locales)('PDF of the manual (%s)', (locale) => {
     const printed = dense(contents.items.map((item) => ('str' in item ? item.str : '')).join(''));
     const expected = await Promise.all(
       chapters[locale].map(async ({ name, order, title }) => {
-        const destination = await document.getDestination(name.replace(/^\d+-/, ''));
-        const start = (await document.getPageIndex(destination?.[0])) + 1;
+        const [reference] = (await document.getDestination(name.replace(/^\d+-/, ''))) as [RefProxy];
+        const start = (await document.getPageIndex(reference)) + 1;
         return dense(`${order}${title}${start}`);
       }),
     );

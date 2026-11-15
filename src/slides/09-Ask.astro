@@ -14,36 +14,40 @@ const decisionY = [30, 100, lineY];
 
 <Slide id="ask" theme="navy" notes={t.notes} {...Astro.props}>
   <Headline id="ask-title" lines={t.title} />
-  <p class="ask__lead t-body" data-in="2">{t.lead}</p>
+  <p class="ask__lead t-body" data-in="2">
+    {t.lead}
+  </p>
 
   <div class="ask__timeline">
     <svg viewBox="0 0 1680 300" aria-hidden="true">
       <path class="ask__line" d={`M40 ${lineY}H1240`} pathLength="1"></path>
-      {decisionY.map((y) => <path class="ask__branch" d={`M1240 ${lineY}C1350 ${lineY} 1340 ${y} 1450 ${y}H1490`} pathLength="1" />)}
-      {stopX.map((x) => <circle class="ask__stop" cx={x} cy={lineY} r="17" />)}
-      {decisionY.map((y) => <circle class="ask__stop ask__stop--end" cx="1490" cy={y} r="13" />)}
+      {decisionY.map((y) => (
+        <path class="ask__branch" d={`M1240 ${lineY}C1350 ${lineY} 1340 ${y} 1450 ${y}H1490`} pathLength="1" />
+      ))}
+      {stopX.map((x) => (
+        <circle class="ask__stop" cx={x} cy={lineY} r="17" />
+      ))}
+      {decisionY.map((y) => (
+        <circle class="ask__stop ask__stop--end" cx="1490" cy={y} r="13" />
+      ))}
     </svg>
 
     <ol class="ask__steps stops-list t-body">
-      {
-        t.steps.map(({ when, what }, index) => (
-          <li data-in={index * 2 + 5}>
-            <strong>{when}</strong>
-            <br />
-            {what}
-          </li>
-        ))
-      }
+      {t.steps.map(({ when, what }, index) => (
+        <li data-in={index * 2 + 5}>
+          <strong>{when}</strong>
+          <br />
+          {what}
+        </li>
+      ))}
     </ol>
 
     <ul class="ask__decisions t-body">
-      {
-        t.decisions.map((decision, index) => (
-          <li data-in={index + 15}>
-            <strong>{decision}</strong>
-          </li>
-        ))
-      }
+      {t.decisions.map((decision, index) => (
+        <li data-in={index + 15}>
+          <strong>{decision}</strong>
+        </li>
+      ))}
     </ul>
   </div>
 </Slide>

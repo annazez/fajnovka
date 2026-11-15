@@ -41,7 +41,11 @@ function dataTable(table: NonNullable<Figure['table']>, caption: string): Markup
       'table',
       { 'aria-label': caption },
       element('thead', {}, element('tr', {}, ...table.head.map((cell) => element('th', { scope: 'col' }, text(cell))))),
-      element('tbody', {}, ...table.rows.map((row) => element('tr', {}, ...row.map((cell) => element('td', {}, text(cell)))))),
+      element(
+        'tbody',
+        {},
+        ...table.rows.map((row) => element('tr', {}, ...row.map((cell) => element('td', {}, text(cell))))),
+      ),
     ),
   );
 }

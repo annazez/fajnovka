@@ -12,7 +12,11 @@ const scene = (page: Page) => page.locator('#title [data-scene].is-built');
 const waiting = (page: Page) =>
   scene(page).evaluate((root) => {
     const shows = (seat: Element): boolean =>
-      seat.getAnimations().some((animation) => (animation.effect as KeyframeEffect).getKeyframes().some((frame) => frame.opacity === '1'));
+      seat
+        .getAnimations()
+        .some((animation) =>
+          (animation.effect as KeyframeEffect).getKeyframes().some((frame) => frame.opacity === '1'),
+        );
     return [...root.querySelectorAll('.scene__wait i')].filter(shows).length;
   });
 
@@ -21,7 +25,8 @@ test.describe('live data of DPO on the first slide', () => {
     const { problems } = watchPage(page);
     const requests: string[] = [];
     page.on('request', (request) => {
-      if (request.url().includes('/api/')) requests.push(`${request.method()} ${new URL(request.url()).pathname}${new URL(request.url()).search}`);
+      if (request.url().includes('/api/'))
+        requests.push(`${request.method()} ${new URL(request.url()).pathname}${new URL(request.url()).search}`);
     });
     await openDeck(page);
     await expect.poll(() => requests).toEqual(['GET /api/occupancy']);
@@ -79,7 +84,9 @@ test.describe('live data of DPO on the first slide', () => {
 
     // All animations of the scene share one start time: the start of the loop.
     const starts = () =>
-      scene(page).evaluate((root) => [...new Set(root.getAnimations({ subtree: true }).map((animation) => animation.startTime))]);
+      scene(page).evaluate((root) => [
+        ...new Set(root.getAnimations({ subtree: true }).map((animation) => animation.startTime)),
+      ]);
     const before = await starts();
     expect(before).toHaveLength(1);
 

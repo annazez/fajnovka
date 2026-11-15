@@ -59,7 +59,13 @@ function stays(frames: readonly Frame[], line: string): number[][] {
   frames.slice(1).forEach((frame, index) => {
     const now = frame.trams.find((tram) => tram.line === line);
     const before = frames[index]?.trams.find((tram) => tram.line === line);
-    const stands = now && before && now.inView && before.inView && Math.abs(now.x - before.x) < 0.01 && Math.abs(now.y - before.y) < 0.01;
+    const stands =
+      now &&
+      before &&
+      now.inView &&
+      before.inView &&
+      Math.abs(now.x - before.x) < 0.01 &&
+      Math.abs(now.y - before.y) < 0.01;
     if (!stands) {
       run = null;
       return;
@@ -72,7 +78,9 @@ function stays(frames: readonly Frame[], line: string): number[][] {
 }
 
 test.describe('the tram scene of the first slide', () => {
-  test('passengers leave a tram one at a time, and only then the passengers at the stop board one at a time', async ({ page }) => {
+  test('passengers leave a tram one at a time, and only then the passengers at the stop board one at a time', async ({
+    page,
+  }) => {
     await openDeck(page);
     const frames = await film(page);
 
@@ -80,7 +88,10 @@ test.describe('the tram scene of the first slide', () => {
     for (const { id } of layouts.stage.lines) {
       for (const changes of stays(frames, id)) {
         // Each step moves one passenger, and no passenger leaves after the first one has boarded.
-        expect(changes.every((change) => Math.abs(change) === 1), `${id}: ${changes.join(' ')}`).toBe(true);
+        expect(
+          changes.every((change) => Math.abs(change) === 1),
+          `${id}: ${changes.join(' ')}`,
+        ).toBe(true);
         const firstIn = changes.indexOf(1);
         expect(firstIn < 0 || !changes.slice(firstIn).includes(-1), `${id}: ${changes.join(' ')}`).toBe(true);
         if (changes.includes(-1) && changes.includes(1)) exchanges += 1;
@@ -106,12 +117,16 @@ test.describe('the tram scene of the first slide', () => {
     await openDeck(page);
     for (const frame of await film(page)) {
       for (const row of [...frame.trams.map((tram) => tram.seats), ...frame.stops]) {
-        expect(row.lastIndexOf(true), `at ${frame.time.toFixed(2)} s: ${row.map(Number).join('')}`).toBe(count(row) - 1);
+        expect(row.lastIndexOf(true), `at ${frame.time.toFixed(2)} s: ${row.map(Number).join('')}`).toBe(
+          count(row) - 1,
+        );
       }
     }
   });
 
-  test('each carriage has a ring in the colour of the slide, and a link joins the rings of two carriages', async ({ page }) => {
+  test('each carriage has a ring in the colour of the slide, and a link joins the rings of two carriages', async ({
+    page,
+  }) => {
     await openDeck(page);
     const root = page.locator('#title [data-scene].is-built');
     // The colour that the theme of the slide gives to the role `--bg`.

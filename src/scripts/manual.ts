@@ -32,7 +32,9 @@ offerTools([
     async run(input) {
       const chapter = chapters[numberFrom(input, 'chapter', chapters.length) - 1];
       if (!markdownAddress || !chapter) throw new Error('The text of the manual is not available.');
-      markdown ??= fetch(markdownAddress).then((response) => (response.ok ? response.text() : Promise.reject(new Error('The text of the manual is not available.'))));
+      markdown ??= fetch(markdownAddress).then((response) =>
+        response.ok ? response.text() : Promise.reject(new Error('The text of the manual is not available.')),
+      );
       return { ...chapter, markdown: chapterOf(await markdown, chapter.number) ?? '' };
     },
   },

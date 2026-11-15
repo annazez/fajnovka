@@ -4,7 +4,14 @@ import { snapshot } from '../../src/data/occupancy.ts';
 import type { Occupancy } from '../../src/lib/occupancy.ts';
 import { readOccupancy } from '../../src/scripts/deck/live.ts';
 
-const live: Occupancy = { live: true, time: '2026-11-15T13:07:00.000Z', vehicles: 1102, counted: 98, passengers: 1698, places: 12_286 };
+const live: Occupancy = {
+  live: true,
+  time: '2026-11-15T13:07:00.000Z',
+  vehicles: 1102,
+  counted: 98,
+  passengers: 1698,
+  places: 12_286,
+};
 
 describe('reading from the server function', () => {
   afterEach(() => vi.unstubAllGlobals());

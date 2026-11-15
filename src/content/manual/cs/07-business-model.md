@@ -55,15 +55,15 @@ Výsledek: okno změny přináší asi 330 lidí, ostatní řidiči 70 a student
 
 **3. Návraty a udržení stejným způsobem.** Návraty: 12 000 odešlých × 30–50 % se souhlasem s kontaktem × 5–20 % návratu navíc = **540 ročně (360–790)**. Oborová míra úspěšných návratových kampaní je [10–30 %](https://opensend.com/post/win-back-campaign-success-rate-statistics) a výzkum ukazuje, že [návratová nabídka se vyplácí](https://sciencedaily.com/releases/2015/07/150707134215.htm) (Kumar a kol. 2015). Udržení: metaanalýza 429 výsledků za 40 let potvrzuje, že [věrnostní programy loajalitu zvyšují](https://www.springerprofessional.de/en/40-years-of-loyalty-programs-how-effective-are-they-generalizati/19645230) (Belli a kol. 2022), ale efekty jsou malé. Snížení odtoku o 0,75 bodu (z 15 na 14,25 %) je proto střední odhad, rozpětí 0–1,5 bodu.
 
-| Další odhady | Hodnota |
-| --- | --- |
-| Roční odtok držitelů | 15 %, asi 12 000 lidí (ověřit u KODIS) |
-| Noví držitelé, kteří by přišli i bez programu | 12 000 ročně, z nich 6 000 se zaregistruje |
-| Skutečně noví díky Fajnovce | 410 ročně (280–600) |
-| Snížení odtoku držitelů s úrovní (49 000) | 0,75 bodu, tedy 370 lidí (0–735) |
-| Vrácení odešlí navíc | 540 ročně (360–790); v prvním roce jezdí v průměru půl roku |
-| Jak dlouho jezdí | nový a vrácený 3,3 roku, stálý 6,7 roku |
-| Tržba za rok | nový 3 300 Kč, stálý a vrácený 3 400 Kč |
+| Další odhady                                  | Hodnota                                                     |
+| --------------------------------------------- | ----------------------------------------------------------- |
+| Roční odtok držitelů                          | 15 %, asi 12 000 lidí (ověřit u KODIS)                      |
+| Noví držitelé, kteří by přišli i bez programu | 12 000 ročně, z nich 6 000 se zaregistruje                  |
+| Skutečně noví díky Fajnovce                   | 410 ročně (280–600)                                         |
+| Snížení odtoku držitelů s úrovní (49 000)     | 0,75 bodu, tedy 370 lidí (0–735)                            |
+| Vrácení odešlí navíc                          | 540 ročně (360–790); v prvním roce jezdí v průměru půl roku |
+| Jak dlouho jezdí                              | nový a vrácený 3,3 roku, stálý 6,7 roku                     |
+| Tržba za rok                                  | nový 3 300 Kč, stálý a vrácený 3 400 Kč                     |
 
 ![Cestující navíc za rok díky Fajnovce: rozpětí odhadu od 10. percentilu přes medián po 90. percentil.](figure:estimates)
 
@@ -118,11 +118,11 @@ Investice v roce 1: 4,5 mil. Kč (napojení na ODIS 3,0; losování a portál pa
 
 Pravidlo: každou korunu tam, kde je nejlevnější **čistý cestující-rok**, tedy rok jízdy, který by bez programu nebyl.
 
-| Páka | Rozpočet | Čisté cestující-roky | Cena za cestující-rok |
-| --- | --- | --- | --- |
-| Návrat odešlých | 0,17 mil. | 540 × 3,3 = 1 780 | **95 Kč** |
-| Loajalita | 1,27 mil. | 370 × 6,7 = 2 480 | **510 Kč** |
-| Akvizice z aut | 3,01 mil. | 410 × 3,3 = 1 350 | **2 220 Kč** |
+| Páka            | Rozpočet  | Čisté cestující-roky | Cena za cestující-rok |
+| --------------- | --------- | -------------------- | --------------------- |
+| Návrat odešlých | 0,17 mil. | 540 × 3,3 = 1 780    | **95 Kč**             |
+| Loajalita       | 1,27 mil. | 370 × 6,7 = 2 480    | **510 Kč**            |
+| Akvizice z aut  | 3,01 mil. | 410 × 3,3 = 1 350    | **2 220 Kč**          |
 
 ![Cena jednoho čistého cestujícího-roku podle páky, v Kč. Hrubý odhad.](figure:levers)
 
@@ -143,9 +143,9 @@ Pravidlo: každou korunu tam, kde je nejlevnější **čistý cestující-rok**,
 **Citlivost** (mil. Kč, rok 1 / ročník za celou dobu jízdy; návraty vždy 540):
 
 | Skutečně noví ročně | Odtok beze změny | Odtok −0,75 bodu | Odtok −1,5 bodu |
-| --- | --- | --- | --- |
-| 280 | −9,2 / −1,8 | −8,0 / +6,7 | −6,7 / +15,0 |
-| 410 | −8,8 / −0,3 | −7,5 / +8,1 | −6,3 / +16,4 |
-| 600 | −8,2 / +1,7 | −6,9 / +10,2 | −5,7 / +18,5 |
+| ------------------- | ---------------- | ---------------- | --------------- |
+| 280                 | −9,2 / −1,8      | −8,0 / +6,7      | −6,7 / +15,0    |
+| 410                 | −8,8 / −0,3      | −7,5 / +8,1      | −6,3 / +16,4    |
+| 600                 | −8,2 / +1,7      | −6,9 / +10,2     | −5,7 / +18,5    |
 
 Počet nových mění výsledek o pár milionů, odtok o desítky. Ročník se vyplatí už při malém snížení odtoku (zhruba 15 udržených lidí ročně), bez něj ne.

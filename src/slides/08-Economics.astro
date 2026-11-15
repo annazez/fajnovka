@@ -33,48 +33,51 @@ const scenarios = [
   <div class="economics__facts">
     <figure data-in="3">
       <p class="t-hero">
-        <span data-count={numbers.compensationShare.value} data-digits="2">{format(numbers.compensationShare.value, 'number', locale)}</span>{
-          percentSign(locale)
-        }
+        <span data-count={numbers.compensationShare.value} data-digits="2">
+          {format(numbers.compensationShare.value, 'number', locale)}
+        </span>
+        {percentSign(locale)}
       </p>
       <figcaption class="t-body">{t.share}</figcaption>
     </figure>
 
     <div class="economics__chart" data-in="6">
-      <p class="t-body" id="economics-chart"><strong>{t.chart}</strong></p>
+      <p class="t-body" id="economics-chart">
+        <strong>{t.chart}</strong>
+      </p>
       <dl class="t-body" aria-labelledby="economics-chart">
-        {
-          costs.map(({ label, value }) => (
-            <div>
-              <dt>{label}</dt>
-              <dd>
-                <Bar length={Math.max(Math.round((value / highest) * BAR.length), BAR.height)} height={BAR.height} />
-                <strong>{format(value, 'czk', locale)}</strong>
-              </dd>
-            </div>
-          ))
-        }
+        {costs.map(({ label, value }) => (
+          <div>
+            <dt>{label}</dt>
+            <dd>
+              <Bar length={Math.max(Math.round((value / highest) * BAR.length), BAR.height)} height={BAR.height} />
+              <strong>{format(value, 'czk', locale)}</strong>
+            </dd>
+          </div>
+        ))}
       </dl>
     </div>
 
     <figure class="economics__payback" data-scenario="base" data-in="9">
       <p class="t-hero">
-        {scenarios.map(({ id, year }) => <span data-year={id}>{year}</span>)}
+        {scenarios.map(({ id, year }) => (
+          <span data-year={id}>{year}</span>
+        ))}
       </p>
       <figcaption class="t-body">{t.payback}</figcaption>
       <div class="economics__switch t-small" role="group" aria-label={t.scenario}>
-        {
-          scenarios.map(({ id, label }) => (
-            <button type="button" data-choose={id} aria-pressed={id === 'base' ? 'true' : 'false'}>
-              {label}
-            </button>
-          ))
-        }
+        {scenarios.map(({ id, label }) => (
+          <button type="button" data-choose={id} aria-pressed={id === 'base' ? 'true' : 'false'}>
+            {label}
+          </button>
+        ))}
       </div>
     </figure>
   </div>
 
-  <p class="slide__source t-small" data-in="11">{t.source}</p>
+  <p class="slide__source t-small" data-in="11">
+    {t.source}
+  </p>
 </Slide>
 
 <script>
@@ -156,7 +159,7 @@ const scenarios = [
   }
 
   .economics__switch button {
-    min-width: 24px;
+    min-width: max(2.4rem, 24px);
     min-height: max(4.4rem, 24px);
     padding: 0 2.2rem;
     border-radius: 10rem;

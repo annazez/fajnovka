@@ -186,7 +186,8 @@ export function simulate(cycle: number, stops: readonly StopSpec[], trams: reado
   // A waiting place or a seat holds the time at which its passenger came. It is null when free.
   const places = new Map(stops.map((stop) => [stop.id, new Array<number | null>(WAITING_PLACES).fill(null)]));
   const seats = new Map(trams.map((tram) => [tram.id, new Array<number | null>(tram.capacity).fill(null)]));
-  const taken = (row: readonly (number | null)[] | undefined): number => row?.filter((since) => since !== null).length ?? 0;
+  const taken = (row: readonly (number | null)[] | undefined): number =>
+    row?.filter((since) => since !== null).length ?? 0;
   const waiting = new Map(stops.map((stop) => [stop.id, Array.from({ length: WAITING_PLACES }, (): Interval[] => [])]));
   const riding = new Map(trams.map((tram) => [tram.id, Array.from({ length: tram.capacity }, (): Interval[] => [])]));
 
@@ -234,9 +235,12 @@ export function simulate(cycle: number, stops: readonly StopSpec[], trams: reado
   let cursor = 0;
   const before = (a: Moment, b: Moment): boolean => a.time < b.time || (a.time === b.time && a.order < b.order);
   const schedule = (moment: Moment): void => {
-    let index = agenda.length;
-    while (index > cursor + 1 && before(moment, agenda[index - 1] as Moment)) index -= 1;
-    agenda.splice(index, 0, moment);
+    // The new moment goes after the last moment that is not later than it, and never before the moment that runs now.
+    const index = Math.max(
+      cursor,
+      agenda.findLastIndex((other) => !before(moment, other)),
+    );
+    agenda.splice(index + 1, 0, moment);
   };
 
   /** One stay of a tram at a stop: plans each passenger who leaves and each passenger who boards. */
@@ -253,7 +257,10 @@ export function simulate(cycle: number, stops: readonly StopSpec[], trams: reado
         const boarding = Math.min(taken(places.get(dwell.stop)), tram.capacity - onBoard + leaving);
         const pause = leaving > 0 && boarding > 0 ? EXCHANGE.pause : 0;
         const moves = leaving + boarding;
-        const step = moves > 1 ? Math.min(EXCHANGE.step, Math.max(EXCHANGE.minStep, (end - now - pause) / (moves - 1))) : EXCHANGE.step;
+        const step =
+          moves > 1
+            ? Math.min(EXCHANGE.step, Math.max(EXCHANGE.minStep, (end - now - pause) / (moves - 1)))
+            : EXCHANGE.step;
 
         // At a hub, some passengers change lines: they come to the stop and stay there when this tram goes.
         let staying = 0;
@@ -279,12 +286,16 @@ export function simulate(cycle: number, stops: readonly StopSpec[], trams: reado
 
   // Passengers come to the stops at the same moments of each cycle, so the picture repeats.
   const arrivals = stops.flatMap((stop) =>
-    Array.from({ length: stop.rate }, (_, index) => ({ stop: stop.id, time: ((index + 0.15 + 0.7 * next()) / stop.rate) * cycle })),
+    Array.from({ length: stop.rate }, (_, index) => ({
+      stop: stop.id,
+      time: ((index + 0.15 + 0.7 * next()) / stop.rate) * cycle,
+    })),
   );
 
   for (let round = 0; round < rounds; round += 1) {
     const base = round * cycle;
-    for (const { stop, time } of arrivals) agenda.push({ time: base + time, order: 4, run: (now) => arrive(stop, now) });
+    for (const { stop, time } of arrivals)
+      agenda.push({ time: base + time, order: 4, run: (now) => arrive(stop, now) });
     for (const tram of trams) {
       const start = base + tram.offset;
       agenda.push({
@@ -308,8 +319,9 @@ export function simulate(cycle: number, stops: readonly StopSpec[], trams: reado
   }
 
   agenda.sort((a, b) => a.time - b.time || a.order - b.order);
-  for (cursor = 0; cursor < agenda.length; cursor += 1) {
-    const moment = agenda[cursor] as Moment;
+  // The agenda grows while it runs: the loop also reaches the moments that an earlier moment added.
+  for (const [index, moment] of agenda.entries()) {
+    cursor = index;
     moment.run(moment.time);
   }
 
@@ -333,7 +345,14 @@ export function occupied(intervals: readonly Interval[], time: number): boolean 
 /** Joins intervals that overlap or touch. The result has no interval across the end of the cycle: such a span becomes two. */
 export function merge(intervals: readonly Interval[], cycle: number): Interval[] {
   const flat = intervals
-    .flatMap(({ from, to }) => (from <= to ? [{ from, to }] : [{ from, to: cycle }, { from: 0, to }]))
+    .flatMap(({ from, to }) =>
+      from <= to
+        ? [{ from, to }]
+        : [
+            { from, to: cycle },
+            { from: 0, to },
+          ],
+    )
     .sort((a, b) => a.from - b.from);
   const merged: { from: number; to: number }[] = [];
   for (const span of flat) {

@@ -10,7 +10,12 @@ import { snapshot } from '../src/data/occupancy.ts';
 import { summarise, type Occupancy } from '../src/lib/occupancy.ts';
 
 const FEED = 'https://dashboard.dpo.cz/api/server';
-const QUERY = { endpoint: 'transport/vehicle/list?page=dashboard&withTripId=1&vehicleStates=ride', apiMethod: 'GET', data: {}, host: null };
+const QUERY = {
+  endpoint: 'transport/vehicle/list?page=dashboard&withTripId=1&vehicleStates=ride',
+  apiMethod: 'GET',
+  data: {},
+  host: null,
+};
 const TIMEOUT = 5000;
 
 async function read(): Promise<Occupancy> {

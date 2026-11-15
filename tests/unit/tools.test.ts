@@ -1,7 +1,16 @@
 import Ajv2020 from 'ajv/dist/2020.js';
 import { describe, expect, test, vi } from 'vitest';
 
-import { chapterOf, deckToolSpecs, manualToolSpecs, numberFrom, plainText, registerTools, type Tool, type ToolSpec } from '../../src/lib/tools.ts';
+import {
+  chapterOf,
+  deckToolSpecs,
+  manualToolSpecs,
+  numberFrom,
+  plainText,
+  registerTools,
+  type Tool,
+  type ToolSpec,
+} from '../../src/lib/tools.ts';
 import { manualText } from '../../src/lib/agents.ts';
 import { chapters } from './manual-content.ts';
 
@@ -10,7 +19,13 @@ const ajv = new Ajv2020({ strict: true, allErrors: true });
 
 describe('tools for an AI agent (WebMCP)', () => {
   test('each tool has a unique name of permitted characters, a title and a description', () => {
-    expect(specs.map(({ name }) => name)).toEqual(['list_slides', 'go_to_slide', 'get_live_occupancy', 'list_chapters', 'get_chapter']);
+    expect(specs.map(({ name }) => name)).toEqual([
+      'list_slides',
+      'go_to_slide',
+      'get_live_occupancy',
+      'list_chapters',
+      'get_chapter',
+    ]);
     for (const { name, title, description } of specs) {
       expect(name).toMatch(/^[\w.-]{1,128}$/);
       expect(title.trim(), name).not.toBe('');
@@ -18,15 +33,22 @@ describe('tools for an AI agent (WebMCP)', () => {
     }
   });
 
-  test.each(specs)('$name: the input schema is a valid JSON Schema of an object with no unknown fields', ({ inputSchema }) => {
-    expect(ajv.validateSchema(inputSchema), JSON.stringify(ajv.errors)).toBe(true);
-    expect(inputSchema).toMatchObject({ type: 'object', additionalProperties: false });
-    const validate = ajv.compile(inputSchema);
-    expect(validate({ unknown: 1 })).toBe(false);
-  });
+  test.each(specs)(
+    '$name: the input schema is a valid JSON Schema of an object with no unknown fields',
+    ({ inputSchema }) => {
+      expect(ajv.validateSchema(inputSchema), JSON.stringify(ajv.errors)).toBe(true);
+      expect(inputSchema).toMatchObject({ type: 'object', additionalProperties: false });
+      const validate = ajv.compile(inputSchema);
+      expect(validate({ unknown: 1 })).toBe(false);
+    },
+  );
 
   test('a tool without input accepts an empty object', () => {
-    for (const { inputSchema } of [deckToolSpecs(9).listSlides, deckToolSpecs(9).getLiveOccupancy, manualToolSpecs(15).listChapters]) {
+    for (const { inputSchema } of [
+      deckToolSpecs(9).listSlides,
+      deckToolSpecs(9).getLiveOccupancy,
+      manualToolSpecs(15).listChapters,
+    ]) {
       expect(ajv.compile(inputSchema)({})).toBe(true);
     }
   });
@@ -38,12 +60,15 @@ describe('tools for an AI agent (WebMCP)', () => {
     const validate = ajv.compile(inputSchema);
     expect(validate({ [name]: 1 })).toBe(true);
     expect(validate({ [name]: max })).toBe(true);
-    for (const wrong of [{}, { [name]: 0 }, { [name]: max + 1 }, { [name]: 1.5 }, { [name]: '1' }]) expect(validate(wrong), JSON.stringify(wrong)).toBe(false);
+    for (const wrong of [{}, { [name]: 0 }, { [name]: max + 1 }, { [name]: 1.5 }, { [name]: '1' }])
+      expect(validate(wrong), JSON.stringify(wrong)).toBe(false);
     expect(description).toMatch(/Call list_\w+ first/);
   });
 
   test('only the tool that changes the slide is not read-only', () => {
-    expect(specs.filter(({ annotations }) => !annotations.readOnlyHint).map(({ name }) => name)).toEqual(['go_to_slide']);
+    expect(specs.filter(({ annotations }) => !annotations.readOnlyHint).map(({ name }) => name)).toEqual([
+      'go_to_slide',
+    ]);
   });
 
   test('the descriptions give the number of slides and chapters', () => {
@@ -61,11 +86,14 @@ describe('input and text of a tool', () => {
   });
 
   test('plain text has ordinary single spaces', () => {
-    expect(plainText(' 12 000  holders\nof a pass ')).toBe('12 000 holders of a pass');
+    expect(plainText(' 12\u00a0000  holders\nof a\u00a0pass ')).toBe('12 000 holders of a pass');
   });
 
   test('a chapter is cut from the Markdown form of the manual', () => {
-    const markdown = manualText('en', chapters.en.map(({ name, title, order, body }) => ({ slug: name, number: order, title, body })));
+    const markdown = manualText(
+      'en',
+      chapters.en.map(({ name, title, order, body }) => ({ slug: name, number: order, title, body })),
+    );
     for (const { order, title } of chapters.en) {
       const chapter = chapterOf(markdown, order) ?? '';
       expect(chapter.split('\n')[0]).toBe(`## ${order} ${title}`);
@@ -82,11 +110,19 @@ describe('registration of the tools', () => {
 
   test('each tool goes to the browser with its description, and its answer is JSON text', async () => {
     const registerTool = vi.fn((_: { name: string; execute(input: unknown): Promise<string> }) => Promise.resolve());
-    registerTools({ registerTool }, [tool('one', () => ({ ok: true })), tool('two', async (input) => ({ got: input }))]);
+    registerTools({ registerTool }, [
+      tool('one', () => ({ ok: true })),
+      tool('two', (input) => Promise.resolve({ got: input })),
+    ]);
 
     expect(registerTool).toHaveBeenCalledTimes(2);
     const [first, second] = registerTool.mock.calls.map(([registered]) => registered);
-    expect(first).toMatchObject({ name: 'one', description: deckToolSpecs(9).listSlides.description, inputSchema: { type: 'object' }, annotations: { readOnlyHint: true } });
+    expect(first).toMatchObject({
+      name: 'one',
+      description: deckToolSpecs(9).listSlides.description,
+      inputSchema: { type: 'object' },
+      annotations: { readOnlyHint: true },
+    });
     expect(first).not.toHaveProperty('run');
     await expect(first?.execute({})).resolves.toBe('{"ok":true}');
     await expect(second?.execute({ slide: 2 })).resolves.toBe('{"got":{"slide":2}}');
@@ -116,7 +152,9 @@ describe('registration of the tools', () => {
       names.push(name);
       return Promise.resolve();
     });
-    expect(() => registerTools({ registerTool }, [tool('throws', vi.fn()), tool('rejects', vi.fn()), tool('good', vi.fn())])).not.toThrow();
+    expect(() =>
+      registerTools({ registerTool }, [tool('throws', vi.fn()), tool('rejects', vi.fn()), tool('good', vi.fn())]),
+    ).not.toThrow();
     await Promise.resolve();
     expect(names).toEqual(['good']);
   });

@@ -3,7 +3,15 @@ import { describe, expect, test } from 'vitest';
 import { scenarios, tenYears } from '../../src/data/model.ts';
 import { numbers } from '../../src/data/numbers.ts';
 import { locales } from '../../src/i18n/locales.ts';
-import { cumulativeBenefit, drawFigure, figureIds, isFigureId, paybackYear, regionBenefit, signed } from '../../src/lib/figures.ts';
+import {
+  cumulativeBenefit,
+  drawFigure,
+  figureIds,
+  isFigureId,
+  paybackYear,
+  regionBenefit,
+  signed,
+} from '../../src/lib/figures.ts';
 
 const cases = locales.flatMap((locale) => figureIds.map((id) => [locale, id] as const));
 
@@ -58,7 +66,9 @@ describe('charts of the manual', () => {
 describe('ten-year model', () => {
   test('each scenario has the ten years from 2027', () => {
     for (const scenario of scenarios) {
-      expect(tenYears[scenario].map(({ year }) => year)).toEqual([2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036]);
+      expect(tenYears[scenario].map(({ year }) => year)).toEqual([
+        2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036,
+      ]);
     }
   });
 
@@ -69,7 +79,8 @@ describe('ten-year model', () => {
   });
 
   test('the sums of ten years are the sums in the text of the manual', () => {
-    const rounded = (scenario: (typeof scenarios)[number]) => Object.fromEntries(Object.entries(regionBenefit(scenario)).map(([key, value]) => [key, Math.round(value)]));
+    const rounded = (scenario: (typeof scenarios)[number]) =>
+      Object.fromEntries(Object.entries(regionBenefit(scenario)).map(([key, value]) => [key, Math.round(value)]));
     expect(rounded('worse')).toEqual({ city: -70, kodis: 21, partners: 34, cars: 72, total: 56 });
     expect(rounded('base')).toEqual({ city: 18, kodis: 42, partners: 34, cars: 162, total: 256 });
     expect(rounded('better')).toEqual({ city: 102, kodis: 74, partners: 34, cars: 257, total: 468 });

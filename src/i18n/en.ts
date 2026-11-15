@@ -29,8 +29,7 @@ export const en = {
   },
   title: {
     slogan: 'Ride well. Live Ostrava.',
-    notes:
-      'Good afternoon. We are the Fajnovka team. Fajnovka is a loyalty programme for public transport in Ostrava.',
+    notes: 'Good afternoon. We are the Fajnovka team. Fajnovka is a loyalty programme for public transport in Ostrava.',
   },
   paradox: {
     title: lines('The stop is near.', 'The seats are free.', 'Still, the car wins.'),

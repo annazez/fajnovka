@@ -34,7 +34,9 @@ const structuredData = JSON.stringify(data).replaceAll('<', '\\u003c');
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#00add0" />
     <link rel="canonical" href={address(locale)} />
-    {locales.map((code) => <link rel="alternate" hreflang={code} href={address(code)} />)}
+    {locales.map((code) => (
+      <link rel="alternate" hreflang={code} href={address(code)} />
+    ))}
     <link rel="alternate" hreflang="x-default" href={address(defaultLocale)} />
     {markdown && <link rel="alternate" type="text/markdown" href={markdown} />}
     {/* The catalogue of what the site gives to AI agents (Agentic Resource Discovery). */}

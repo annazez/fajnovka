@@ -5,7 +5,8 @@ export function createFullscreen(deck: HTMLElement, button: HTMLElement): { togg
 
   const keepAwake = async (): Promise<void> => {
     try {
-      wakeLock = (await navigator.wakeLock?.request('screen')) ?? null;
+      // Old browsers have no wake lock.
+      wakeLock = 'wakeLock' in navigator ? await navigator.wakeLock.request('screen') : null;
     } catch {
       wakeLock = null; // The browser can refuse, for example on low battery. The deck works without it.
     }

@@ -112,7 +112,9 @@ test.describe('navigation', () => {
         ([from, to]) => {
           const target = document.querySelector('[data-deck]');
           const fire = (type: string, x: number): void => {
-            target?.dispatchEvent(new PointerEvent(type, { pointerType: 'touch', clientX: x, clientY: 300, bubbles: true }));
+            target?.dispatchEvent(
+              new PointerEvent(type, { pointerType: 'touch', clientX: x, clientY: 300, bubbles: true }),
+            );
           };
           fire('pointerdown', from ?? 0);
           fire('pointerup', to ?? 0);
@@ -129,6 +131,8 @@ test.describe('navigation', () => {
   test('a screen reader hears the number and the title of the new slide', async ({ page }) => {
     await openDeck(page);
     await page.keyboard.press('ArrowRight');
-    await expect(page.locator('[data-announce]')).toHaveText('Slide 2 of 9: The stop is near. The seats are free. Still, the car wins.');
+    await expect(page.locator('[data-announce]')).toHaveText(
+      'Slide 2 of 9: The stop is near. The seats are free. Still, the car wins.',
+    );
   });
 });

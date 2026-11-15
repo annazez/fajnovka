@@ -88,7 +88,16 @@ const rows: Record<Scenario, readonly Row[]> = {
   ],
 };
 
-const toYear = ([year, extraPassengers, revenueWithout, extraRevenue, cost, kodis, partners, externalities]: Row): ModelYear => ({
+const toYear = ([
+  year,
+  extraPassengers,
+  revenueWithout,
+  extraRevenue,
+  cost,
+  kodis,
+  partners,
+  externalities,
+]: Row): ModelYear => ({
   year,
   extraPassengers,
   revenueWithout,

@@ -14,7 +14,12 @@
     "build": "astro build --force",
     "build:test": "astro build --force --mode test",
     "preview": "astro preview",
-    "check": "astro check",
+    "format": "prettier --write .",
+    "check": "npm run check:format && npm run check:types && npm run check:code && npm run check:styles",
+    "check:format": "prettier --check .",
+    "check:types": "astro check",
+    "check:code": "eslint .",
+    "check:styles": "stylelint \"src/**/*.{css,astro}\"",
     "manual:pdf": "node scripts/manual-pdf.ts",
     "test:unit": "vitest run",
     "test:e2e": "playwright test"
@@ -27,13 +32,31 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@axe-core/playwright": "^4.14.0",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.1",
     "@types/node": "^22.20.5",
     "@vitest/coverage-v8": "^5.1.0",
     "ajv": "^8.20.0",
+    "eslint": "^10.15.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.14.0",
     "pdfjs-dist": "^6.5.438",
+    "postcss-html": "^2.0.0",
+    "prettier": "^3.10.1",
+    "prettier-plugin-astro": "^1.1.2",
     "satteri": "^0.11.7",
+    "stylelint": "^18.0.0",
+    "stylelint-config-html": "^2.0.0",
+    "stylelint-config-standard": "^41.0.0",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
     "vitest": "^5.1.0"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.8"
+    }
   }
 }

@@ -30,9 +30,11 @@ const chapters = await Promise.all(
 );
 
 const pdf = manualPdf(locale);
-const published = new Intl.DateTimeFormat(languageTag[locale], { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
-  new Date(`${manual.published}-01T00:00:00Z`),
-);
+const published = new Intl.DateTimeFormat(languageTag[locale], {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+}).format(new Date(`${manual.published}-01T00:00:00Z`));
 ---
 
 <div class="manual" data-theme="white">
@@ -42,35 +44,35 @@ const published = new Intl.DateTimeFormat(languageTag[locale], { month: 'long', 
       {t.pitch}
     </a>
     <nav class="bar__languages" aria-label={ui.language}>
-      {
-        locales.map((code) => (
-          <a
-            href={localePath(code, '/manual/')}
-            hreflang={code}
-            lang={code}
-            aria-label={`${code.toUpperCase()} · ${languageName[code]}`}
-            aria-current={code === locale ? 'true' : undefined}
-          >
-            {code.toUpperCase()}
-          </a>
-        ))
-      }
-    </nav>
-    {
-      hasPublicFile(pdf) && (
-        <a class="bar__link bar__link--strong" href={pdf}>
-          <UiIcon name="book" />
-          {t.download}
+      {locales.map((code) => (
+        <a
+          href={localePath(code, '/manual/')}
+          hreflang={code}
+          lang={code}
+          aria-label={`${code.toUpperCase()} · ${languageName[code]}`}
+          aria-current={code === locale ? 'true' : undefined}
+        >
+          {code.toUpperCase()}
         </a>
-      )
-    }
+      ))}
+    </nav>
+    {hasPublicFile(pdf) && (
+      <a class="bar__link bar__link--strong" href={pdf}>
+        <UiIcon name="book" />
+        {t.download}
+      </a>
+    )}
   </header>
 
   <main>
     <header class="cover" data-theme="navy">
-      <p class="cover__team">{manual.team} · {published}</p>
+      <p class="cover__team">
+        {manual.team} · {published}
+      </p>
       <h1 class="cover__title">
-        <span class="cover__mark" role="img" aria-label="Fajnovka"><Wordmark /></span>
+        <span class="cover__mark" role="img" aria-label="Fajnovka">
+          <Wordmark />
+        </span>
         {t.title}
       </h1>
       <p class="cover__lead">{t.lead}</p>
@@ -81,40 +83,38 @@ const published = new Intl.DateTimeFormat(languageTag[locale], { month: 'long', 
     </header>
 
     <nav class="contents" aria-labelledby="contents-title">
-      <h2 class="contents__title" id="contents-title">{t.contents}</h2>
+      <h2 class="contents__title" id="contents-title">
+        {t.contents}
+      </h2>
       {/* The list and the headings give the numbers to a screen reader, so the printed numbers are for the eye only. */}
       <ol class="contents__list">
-        {
-          chapters.map(({ slug, number, title }) => (
-            <li>
-              <a href={`#${slug}`}>
-                <span class="contents__number" aria-hidden="true">
-                  {number}
-                </span>
-                <span class="contents__name">{title}</span>
-                <span class="contents__page" data-page-of={slug} />
-              </a>
-            </li>
-          ))
-        }
+        {chapters.map(({ slug, number, title }) => (
+          <li>
+            <a href={`#${slug}`}>
+              <span class="contents__number" aria-hidden="true">
+                {number}
+              </span>
+              <span class="contents__name">{title}</span>
+              <span class="contents__page" data-page-of={slug} />
+            </a>
+          </li>
+        ))}
       </ol>
     </nav>
 
-    {
-      chapters.map(({ slug, number, title, Content }) => (
-        <section class="chapter" id={slug}>
-          <h2 class="chapter__title">
-            <span class="chapter__number" aria-hidden="true">
-              {number}
-            </span>
-            <span>{title}</span>
-          </h2>
-          <div class="prose">
-            <Content />
-          </div>
-        </section>
-      ))
-    }
+    {chapters.map(({ slug, number, title, Content }) => (
+      <section class="chapter" id={slug}>
+        <h2 class="chapter__title">
+          <span class="chapter__number" aria-hidden="true">
+            {number}
+          </span>
+          <span>{title}</span>
+        </h2>
+        <div class="prose">
+          <Content />
+        </div>
+      </section>
+    ))}
   </main>
 </div>
 

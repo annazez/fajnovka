@@ -13,12 +13,10 @@ const last = lines.length - 1;
 ---
 
 <h2 class="t-title" id={id} data-in="0">
-  {
-    lines.map((line, index) => (
-      <>
-        {index > 0 && <br />}
-        {index === last ? <span class="mark">{line}</span> : line}
-      </>
-    ))
-  }
+  {lines.map((line, index) => (
+    <>
+      {index > 0 && <br />}
+      {index === last ? <span class="mark">{line}</span> : line}
+    </>
+  ))}
 </h2>

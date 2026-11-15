@@ -27,36 +27,45 @@ const RING_PROGRESS = 86;
 
   <div class="product__row">
     <ul class="product__points t-body">
-      {
-        points.map(({ icon, text }, index) => (
-          <li data-in={index * 2 + 4}>
-            <Icon name={icon} />
-            {text}
-          </li>
-        ))
-      }
+      {points.map(({ icon, text }, index) => (
+        <li data-in={index * 2 + 4}>
+          <Icon name={icon} />
+          {text}
+        </li>
+      ))}
     </ul>
 
     <div class="product__stage" data-in="3" aria-hidden="true">
-    <div class="card" data-theme="navy" data-tilt>
-      <div class="card__mark"><Wordmark /></div>
-      <div class="card__account">
-        <svg viewBox="0 0 120 120">
-          <circle class="card__track" cx="60" cy="60" r="50"></circle>
-          <circle class="card__ring" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray={`${RING_PROGRESS} 1000`}></circle>
+      <div class="card" data-theme="navy" data-tilt>
+        <div class="card__mark">
+          <Wordmark />
+        </div>
+        <div class="card__account">
+          <svg viewBox="0 0 120 120">
+            <circle class="card__track" cx="60" cy="60" r="50"></circle>
+            <circle
+              class="card__ring"
+              cx="60"
+              cy="60"
+              r="50"
+              pathLength="100"
+              stroke-dasharray={`${RING_PROGRESS} 1000`}
+            ></circle>
+          </svg>
+          <p class="card__text">
+            <b>{formatNumber(numbers.cardPoints.value, locale)}</b>
+            {t.card.points}
+            <br />
+            {t.card.level}
+          </p>
+        </div>
+        <svg class="card__line" viewBox="0 0 720 100">
+          <path d="M-10 70H250q32 0 54-22t54-22H730"></path>
+          <circle cx="130" cy="70" r="10"></circle>
+          <circle cx="450" cy="26" r="10"></circle>
+          <circle cx="620" cy="26" r="10"></circle>
         </svg>
-        <p class="card__text">
-          <b>{formatNumber(numbers.cardPoints.value, locale)}</b>
-          {t.card.points}<br />{t.card.level}
-        </p>
       </div>
-      <svg class="card__line" viewBox="0 0 720 100">
-        <path d="M-10 70H250q32 0 54-22t54-22H730"></path>
-        <circle cx="130" cy="70" r="10"></circle>
-        <circle cx="450" cy="26" r="10"></circle>
-        <circle cx="620" cy="26" r="10"></circle>
-      </svg>
-    </div>
     </div>
   </div>
 </Slide>
@@ -130,7 +139,12 @@ const RING_PROGRESS = 86;
     overflow: hidden;
     border-radius: 3.8em;
     background:
-      linear-gradient(105deg, transparent 30%, color-mix(in srgb, var(--fg) 14%, transparent) var(--shine, 46%), transparent 62%),
+      linear-gradient(
+        105deg,
+        transparent 30%,
+        color-mix(in srgb, var(--fg) 14%, transparent) var(--shine, 46%),
+        transparent 62%
+      ),
       var(--bg);
     box-shadow: 0 6em 9em -3em var(--shadow);
     color: var(--fg);

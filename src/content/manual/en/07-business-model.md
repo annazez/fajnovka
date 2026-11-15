@@ -118,11 +118,11 @@ Investment in year 1: CZK 4.5 million (connection to ODIS 3.0; prize draw and pa
 
 The rule: put each crown where a **net passenger-year** is cheapest. A net passenger-year is a year of travel that would not exist without the programme.
 
-| Lever | Budget | Net passenger-years | Price of a passenger-year |
-| --- | --- | --- | --- |
-| Win-back of those who left | CZK 0.17 million | 540 × 3.3 = 1,780 | **CZK 95** |
-| Loyalty | CZK 1.27 million | 370 × 6.7 = 2,480 | **CZK 510** |
-| Acquisition from cars | CZK 3.01 million | 410 × 3.3 = 1,350 | **CZK 2,220** |
+| Lever                      | Budget           | Net passenger-years | Price of a passenger-year |
+| -------------------------- | ---------------- | ------------------- | ------------------------- |
+| Win-back of those who left | CZK 0.17 million | 540 × 3.3 = 1,780   | **CZK 95**                |
+| Loyalty                    | CZK 1.27 million | 370 × 6.7 = 2,480   | **CZK 510**               |
+| Acquisition from cars      | CZK 3.01 million | 410 × 3.3 = 1,350   | **CZK 2,220**             |
 
 ![The price of one net passenger-year by lever, in CZK. Rough estimate.](figure:levers)
 
@@ -143,9 +143,9 @@ The rule: put each crown where a **net passenger-year** is cheapest. A net passe
 **Sensitivity** (CZK million, year 1 / the cohort over the whole time it rides; returns are always 540):
 
 | Truly new a year | Churn without change | Churn −0.75 points | Churn −1.5 points |
-| --- | --- | --- | --- |
-| 280 | −9.2 / −1.8 | −8.0 / +6.7 | −6.7 / +15.0 |
-| 410 | −8.8 / −0.3 | −7.5 / +8.1 | −6.3 / +16.4 |
-| 600 | −8.2 / +1.7 | −6.9 / +10.2 | −5.7 / +18.5 |
+| ---------------- | -------------------- | ------------------ | ----------------- |
+| 280              | −9.2 / −1.8          | −8.0 / +6.7        | −6.7 / +15.0      |
+| 410              | −8.8 / −0.3          | −7.5 / +8.1        | −6.3 / +16.4      |
+| 600              | −8.2 / +1.7          | −6.9 / +10.2       | −5.7 / +18.5      |
 
 The number of new passengers changes the result by a few million. Churn changes it by tens of millions. A cohort pays back with only a small decrease of churn (about 15 people kept each year). Without it, the cohort does not pay back.

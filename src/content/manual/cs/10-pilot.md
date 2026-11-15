@@ -10,16 +10,16 @@ Pilot ověří dvě čísla, na kterých program stojí: zda úrovně a návrato
 - **Co běží:** registrace, schody, úrovně podle historie, losování, životní cyklus a návratové zprávy, uvítací nabídka jako náhodný experiment, 3 kulturní partneři, 2 školy, 2 firmy. Navrhujeme, aby prvním zaměstnavatelem v pilotu bylo samo město (viz Jak se Fajnovka dostane k lidem).
 - **Rychlý signál:** měsíční obnovy 30denních jízdenek ukážou změnu odtoku už po 3 měsících; roční obnovy až po roce.
 
-| Položka pilotu | Mil. Kč |
-| --- | --- |
-| Minimální IT: export dat ODIS, bodový účet na webu, e-maily, losování | 1,00 |
-| Tým na 6 měsíců (vedoucí, marketing a CRM, partneři na půl úvazku) | 1,16 |
-| Odměny: slevy, losování, úrovně pro asi 12 000 členů | 0,15 |
-| Kampaň v obvodě | 0,30 |
-| Evaluace: design experimentu, dotazníky, analýza | 0,35 |
-| Právní a GDPR | 0,15 |
-| Rezerva 10 % | 0,31 |
-| **Celkem** | **3,42** |
+| Položka pilotu                                                        | Mil. Kč  |
+| --------------------------------------------------------------------- | -------- |
+| Minimální IT: export dat ODIS, bodový účet na webu, e-maily, losování | 1,00     |
+| Tým na 6 měsíců (vedoucí, marketing a CRM, partneři na půl úvazku)    | 1,16     |
+| Odměny: slevy, losování, úrovně pro asi 12 000 členů                  | 0,15     |
+| Kampaň v obvodě                                                       | 0,30     |
+| Evaluace: design experimentu, dotazníky, analýza                      | 0,35     |
+| Právní a GDPR                                                         | 0,15     |
+| Rezerva 10 %                                                          | 0,31     |
+| **Celkem**                                                            | **3,42** |
 
 Pilot se vejde do rozpočtu, se kterým počítá zadání výzvy (1,5–3,5 mil. Kč).
 

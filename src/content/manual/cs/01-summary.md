@@ -16,15 +16,15 @@ Fajnovka je věrnostní program města Ostravy na osobní ODISce. Bere mechaniky
 
 **Klíčová čísla** (základní scénář, hrubý odhad):
 
-| Ukazatel | Hodnota |
-| --- | --- |
-| Členové v roce 1 | asi 80 000 |
-| Náklady programu | 11,6 mil. Kč ročně (0,55 % kompenzace DPO) |
-| Pilot (6 měsíců, Poruba) | 3,4 mil. Kč |
-| Skutečně noví cestující | 410 ročně (280–600) |
-| Udržení stálí díky nižšímu odtoku | 370 ročně (0–735) |
-| Vrácení odešlí | 540 ročně (360–790) |
-| Cena za čistý cestující-rok | návrat 95 Kč, věrnost 510 Kč, akvizice 2 220 Kč |
-| Náklad na jízdu MHD navíc | asi 10 Kč ve 2. roce, 3 Kč v roce 2036 |
-| Návratnost pro DPO a město | 2034 (+18 mil. Kč za 10 let) |
-| Přínos pro region za 10 let | asi +256 mil. Kč |
+| Ukazatel                          | Hodnota                                         |
+| --------------------------------- | ----------------------------------------------- |
+| Členové v roce 1                  | asi 80 000                                      |
+| Náklady programu                  | 11,6 mil. Kč ročně (0,55 % kompenzace DPO)      |
+| Pilot (6 měsíců, Poruba)          | 3,4 mil. Kč                                     |
+| Skutečně noví cestující           | 410 ročně (280–600)                             |
+| Udržení stálí díky nižšímu odtoku | 370 ročně (0–735)                               |
+| Vrácení odešlí                    | 540 ročně (360–790)                             |
+| Cena za čistý cestující-rok       | návrat 95 Kč, věrnost 510 Kč, akvizice 2 220 Kč |
+| Náklad na jízdu MHD navíc         | asi 10 Kč ve 2. roce, 3 Kč v roce 2036          |
+| Návratnost pro DPO a město        | 2034 (+18 mil. Kč za 10 let)                    |
+| Přínos pro region za 10 let       | asi +256 mil. Kč                                |

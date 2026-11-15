@@ -28,14 +28,14 @@ První roky jsou nejdražší (investice, efekt teprve nabíhá). Základní sc�
 
 Přínos se dělí zhruba na třetiny mezi nové, vrácené a udržené cestující, ale návraty a udržení stojí zlomek akvizice.
 
-| Za 10 let (2027–2036), mil. Kč | Pesimistický | Základní | Optimistický |
-| --- | --- | --- | --- |
-| Tržby navíc pro DPO | 53 | 131 | 215 |
-| Náklady programu | 123 | 113 | 113 |
-| **Čistý přínos pro DPO a město** | **−70** | **+18** | **+102** |
-| Čistá současná hodnota (4 %) | −59 | +9 | +74 |
-| Návratnost | do 2036 ne | 2034 | 2030 |
-| Cestující navíc v roce 2036 | 2 400 | 6 200 | 10 200 |
+| Za 10 let (2027–2036), mil. Kč   | Pesimistický | Základní | Optimistický |
+| -------------------------------- | ------------ | -------- | ------------ |
+| Tržby navíc pro DPO              | 53           | 131      | 215          |
+| Náklady programu                 | 123          | 113      | 113          |
+| **Čistý přínos pro DPO a město** | **−70**      | **+18**  | **+102**     |
+| Čistá současná hodnota (4 %)     | −59          | +9       | +74          |
+| Návratnost                       | do 2036 ne   | 2034     | 2030         |
+| Cestující navíc v roce 2036      | 2 400        | 6 200    | 10 200       |
 
 ### Širší přínosy: KODIS, partneři a méně aut
 
@@ -48,13 +48,13 @@ Model DPO počítá jen tržby DPO. Fajnovka ale přináší peníze i jinam:
 
 ![Přínos pro region za 10 let, podle složky a scénáře, mil. Kč. Hrubý odhad. Externí náklady podle příručky Handbook on the external costs of transport (2019).](figure:region)
 
-| Za 10 let, mil. Kč | Pesimistický | Základní | Optimistický |
-| --- | --- | --- | --- |
-| Čistý přínos pro DPO a město | −70 | +18 | +102 |
-| Tržby KODIS navíc | +21 | +42 | +74 |
-| Příjmy partnerů navíc | +34 | +34 | +34 |
-| Ušetřené externí náklady aut | +72 | +162 | +257 |
-| **Celkový přínos pro region** | **+56** | **+256** | **+468** |
+| Za 10 let, mil. Kč            | Pesimistický | Základní | Optimistický |
+| ----------------------------- | ------------ | -------- | ------------ |
+| Čistý přínos pro DPO a město  | −70          | +18      | +102         |
+| Tržby KODIS navíc             | +21          | +42      | +74          |
+| Příjmy partnerů navíc         | +34          | +34      | +34          |
+| Ušetřené externí náklady aut  | +72          | +162     | +257         |
+| **Celkový přínos pro region** | **+56**      | **+256** | **+468**     |
 
 - **Tržby navíc snižují kompenzaci,** kterou město DPO platí. Čistý přínos DPO je úspora městského rozpočtu.
 - **I pesimistický scénář je pro region kladný,** ale pro rozpočet města ne. Kraj a KODIS jsou proto přirozený spolufinancovatel.

@@ -36,6 +36,9 @@ export default defineConfig({
     { name: 'phone-chromium', use: { ...devices['Pixel 7'] } },
     { name: 'phone-webkit', use: { ...devices['iPhone 14'] } },
     // Firefox has no mobile emulation in Playwright: a touch screen of phone size is the nearest thing.
-    { name: 'phone-firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 390, height: 844 }, hasTouch: true } },
+    {
+      name: 'phone-firefox',
+      use: { ...devices['Desktop Firefox'], viewport: { width: 390, height: 844 }, hasTouch: true },
+    },
   ],
 });

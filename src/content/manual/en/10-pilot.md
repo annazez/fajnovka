@@ -10,16 +10,16 @@ The pilot verifies the two numbers on which the programme stands: if levels and 
 - **What runs:** registration, the steps, levels from the history, the prize draw, the member life cycle and win-back messages, the welcome offer as a randomised experiment, 3 cultural partners, 2 schools, 2 companies. We propose that the first employer in the pilot is the city itself (see How Fajnovka reaches people).
 - **A fast signal:** the monthly renewals of 30-day passes show a change of churn after only 3 months. The yearly renewals show it after a year.
 
-| Item of the pilot | CZK million |
-| --- | --- |
-| Minimum IT: export of ODIS data, a points account on the website, e-mails, the prize draw | 1.00 |
-| Team for 6 months (head, marketing and CRM, partners part-time) | 1.16 |
-| Rewards: discounts, the prize draw, levels for about 12,000 members | 0.15 |
-| Campaign in the district | 0.30 |
-| Evaluation: design of the experiment, questionnaires, analysis | 0.35 |
-| Legal and GDPR | 0.15 |
-| Reserve 10% | 0.31 |
-| **Total** | **3.42** |
+| Item of the pilot                                                                         | CZK million |
+| ----------------------------------------------------------------------------------------- | ----------- |
+| Minimum IT: export of ODIS data, a points account on the website, e-mails, the prize draw | 1.00        |
+| Team for 6 months (head, marketing and CRM, partners part-time)                           | 1.16        |
+| Rewards: discounts, the prize draw, levels for about 12,000 members                       | 0.15        |
+| Campaign in the district                                                                  | 0.30        |
+| Evaluation: design of the experiment, questionnaires, analysis                            | 0.35        |
+| Legal and GDPR                                                                            | 0.15        |
+| Reserve 10%                                                                               | 0.31        |
+| **Total**                                                                                 | **3.42**    |
 
 The pilot fits the budget that the challenge of the city expects (CZK 1.5–3.5 million).
 

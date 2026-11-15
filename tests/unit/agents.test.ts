@@ -25,10 +25,25 @@ import { chapters, figures } from './manual-content.ts';
 
 /** The chapters in the form that the pages give to the agent layer. */
 const chapterTexts = (locale: Locale): ChapterText[] =>
-  chapters[locale].map(({ name, title, order, body }) => ({ slug: name.replace(/^\d+-/, ''), number: order, title, body }));
+  chapters[locale].map(({ name, title, order, body }) => ({
+    slug: name.replace(/^\d+-/, ''),
+    number: order,
+    title,
+    body,
+  }));
 
 /** Paths of the site that exist after a build: pages, generated files, and files in `public`. */
-const BUILT = ['/', '/cs/', '/manual/', '/cs/manual/', '/manual.md', '/cs/manual.md', '/llms.txt', '/openapi.json', '/api/occupancy'];
+const BUILT = [
+  '/',
+  '/cs/',
+  '/manual/',
+  '/cs/manual/',
+  '/manual.md',
+  '/cs/manual.md',
+  '/llms.txt',
+  '/openapi.json',
+  '/api/occupancy',
+];
 const exists = (address: string): boolean => {
   const { origin, pathname } = new URL(address);
   if (origin !== SITE) return address === REPOSITORY;
@@ -44,7 +59,12 @@ describe('llms.txt', () => {
     expect(lines[0]).toBe('# Fajnovka');
     expect(lines.filter((line) => line.startsWith('# '))).toHaveLength(1);
     expect(lines[2]).toMatch(/^> \S/);
-    expect(lines.filter((line) => line.startsWith('## '))).toEqual(['## Manual', '## Pitch deck', '## Data', '## Optional']);
+    expect(lines.filter((line) => line.startsWith('## '))).toEqual([
+      '## Manual',
+      '## Pitch deck',
+      '## Data',
+      '## Optional',
+    ]);
     expect(lines.filter((line) => /^#{3,}/.test(line))).toEqual([]);
     expect(text.endsWith('\n')).toBe(true);
   });
@@ -69,7 +89,7 @@ describe('llms.txt', () => {
   });
 
   test('it has ordinary spaces only', () => {
-    expect(text).not.toContain(' ');
+    expect(text).not.toContain('\u00a0');
   });
 });
 
@@ -87,7 +107,8 @@ describe.each(locales)('the manual as Markdown (%s)', (locale) => {
     const all = chapters[locale].flatMap(({ body }) => figures(body));
     expect(all.toSorted()).toEqual([...figureIds].toSorted());
     for (const { body } of chapters[locale]) {
-      for (const [, caption = ''] of body.matchAll(/^!\[(.*)\]\(figure:[\w-]+\)$/gm)) expect(text).toContain(`*${caption}*`);
+      for (const [, caption = ''] of body.matchAll(/^!\[(.*)\]\(figure:[\w-]+\)$/gm))
+        expect(text).toContain(`*${caption}*`);
     }
     // The chart of passengers has a table of years: its first year is in the text as a row.
     expect(text).toMatch(/^\| 2010 \| .+ \|$/m);
@@ -95,7 +116,10 @@ describe.each(locales)('the manual as Markdown (%s)', (locale) => {
 
   test('each block of each chapter is in the text, word for word', () => {
     for (const { name, body } of chapters[locale]) {
-      const blocks = body.trim().split(/\n\s*\n/).filter((block) => !block.includes('](figure:'));
+      const blocks = body
+        .trim()
+        .split(/\n\s*\n/)
+        .filter((block) => !block.includes('](figure:'));
       expect(blocks.length, name).toBeGreaterThan(0);
       for (const block of blocks) expect(text.includes(block), `${name}: ${block.slice(0, 60)}`).toBe(true);
     }
@@ -145,8 +169,24 @@ describe('OpenAPI description of the live data', () => {
   const document = openApi() as {
     openapi: string;
     servers: { url: string }[];
-    paths: Record<string, { get: { operationId: string; responses: Record<string, { content: Record<string, { schema: { $ref: string } }> }> } }>;
-    components: { schemas: { Occupancy: { required: string[]; properties: Record<string, { type: string; description: string }>; additionalProperties: boolean } } };
+    paths: Record<
+      string,
+      {
+        get: {
+          operationId: string;
+          responses: Record<string, { content: Record<string, { schema: { $ref: string } }> }>;
+        };
+      }
+    >;
+    components: {
+      schemas: {
+        Occupancy: {
+          required: string[];
+          properties: Record<string, { type: string; description: string }>;
+          additionalProperties: boolean;
+        };
+      };
+    };
   };
   const schema = document.components.schemas.Occupancy;
 
@@ -154,7 +194,9 @@ describe('OpenAPI description of the live data', () => {
     expect(document.openapi).toBe('3.1.0');
     expect(document.servers).toEqual([{ url: SITE }]);
     expect(Object.keys(document.paths)).toEqual(['/api/occupancy']);
-    expect(document.paths['/api/occupancy']?.get.responses['200']?.content['application/json']?.schema.$ref).toBe('#/components/schemas/Occupancy');
+    expect(document.paths['/api/occupancy']?.get.responses['200']?.content['application/json']?.schema.$ref).toBe(
+      '#/components/schemas/Occupancy',
+    );
   });
 
   test('the schema has the fields of a reading, each with a description, and no other field', () => {
@@ -172,12 +214,21 @@ describe('OpenAPI description of the live data', () => {
 });
 
 describe('structured data (JSON-LD)', () => {
-  type Work = Record<string, unknown> & { url: string; workTranslation?: { '@id': string }[]; translationOfWork?: { '@id': string }[] };
+  type Work = Record<string, unknown> & {
+    url: string;
+    workTranslation?: { '@id': string }[];
+    translationOfWork?: { '@id': string }[];
+  };
   const pages = { deck: deckJsonLd, manual: manualJsonLd } as const;
 
   test.each(locales)('%s: the deck is a presentation and the manual is a report, each at its own address', (locale) => {
     const prefix = locale === 'en' ? '' : `/${locale}`;
-    expect(deckJsonLd(locale)).toMatchObject({ '@context': 'https://schema.org', '@type': 'PresentationDigitalDocument', url: `${SITE}${prefix}/`, inLanguage: locale });
+    expect(deckJsonLd(locale)).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'PresentationDigitalDocument',
+      url: `${SITE}${prefix}/`,
+      inLanguage: locale,
+    });
     expect(manualJsonLd(locale)).toMatchObject({
       '@type': 'Report',
       url: `${SITE}${prefix}/manual/`,
@@ -199,8 +250,10 @@ describe('structured data (JSON-LD)', () => {
     for (const make of Object.values(pages)) {
       for (const locale of locales) {
         const data = make(locale) as Work;
-        expect(data.author).toEqual(['Anna Zezulka', 'Richard Albrecht', 'Jakub Dedek'].map((name) => ({ '@type': 'Person', name })));
-        expect(JSON.stringify(data)).not.toContain(' ');
+        expect(data.author).toEqual(
+          ['Anna Zezulka', 'Richard Albrecht', 'Jakub Dedek'].map((name) => ({ '@type': 'Person', name })),
+        );
+        expect(JSON.stringify(data)).not.toContain('\u00a0');
       }
     }
   });

@@ -10,10 +10,11 @@ export interface Deck {
   readonly total: number;
   readonly index: number;
   readonly slide: HTMLElement;
-  go(target: number): void;
-  next(): void;
-  previous(): void;
-  start(): void;
+  // Functions, not methods: a caller can pass one of them on without the deck.
+  readonly go: (target: number) => void;
+  readonly next: () => void;
+  readonly previous: () => void;
+  readonly start: () => void;
 }
 
 /** The title that a screen reader hears: the text of the element that labels the slide, with its line breaks as spaces. */
@@ -23,7 +24,7 @@ export function titleOf(slide: HTMLElement): string {
   // A copy, because the rendered text of a slide that just became visible is not ready yet.
   const copy = label.cloneNode(true) as HTMLElement;
   copy.querySelectorAll('br').forEach((lineBreak) => lineBreak.replaceWith(' '));
-  return (copy.textContent ?? '').replace(/\s+/g, ' ').trim();
+  return copy.textContent.replace(/\s+/g, ' ').trim();
 }
 
 export function createDeck(root: HTMLElement, canAnimate: () => boolean): Deck {
@@ -100,7 +101,9 @@ export function createDeck(root: HTMLElement, canAnimate: () => boolean): Deck {
     previous: () => go(current - 1),
     start() {
       // The order of entrance comes from the data-in value. The script sets it, so the page needs no inline styles.
-      all<HTMLElement>('[data-in]', root).forEach((element) => element.style.setProperty('--i', element.dataset.in || '0'));
+      all<HTMLElement>('[data-in]', root).forEach((element) =>
+        element.style.setProperty('--i', element.dataset.in || '0'),
+      );
       root.classList.add('is-live');
 
       const requested = Number.parseInt(location.hash.slice(1), 10);

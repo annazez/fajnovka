@@ -1,0 +1,17 @@
+# Made by tools
+.astro
+dist
+coverage
+playwright-report
+test-results
+package-lock.json
+src/data/manual-pdf.json
+tests/e2e/__snapshots__
+
+# Files that the browser gets as they are
+public
+
+# Texts of other authors: they stay word for word
+LICENCE.md
+LICENCE-CONTENT.md
+CODE_OF_CONDUCT.md

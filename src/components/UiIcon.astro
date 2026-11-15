@@ -18,4 +18,6 @@ interface Props {
 const { name, ...rest } = Astro.props;
 ---
 
-<svg viewBox="0 0 24 24" aria-hidden="true" {...rest}><path d={icons[name]}></path></svg>
+<svg viewBox="0 0 24 24" aria-hidden="true" {...rest}>
+  <path d={icons[name]}></path>
+</svg>

@@ -38,7 +38,11 @@ describe('chapters of the manual', () => {
 
   test.each(locales)('%s: the last chapter lists each link of the other chapters', (locale) => {
     const sources = new Set(links(chapters[locale].at(-1)?.body ?? ''));
-    const missing = chapters[locale].slice(0, -1).flatMap(({ name, body }) => links(body).filter((link) => !sources.has(link)).map((link) => `${name}: ${link}`));
+    const missing = chapters[locale].slice(0, -1).flatMap(({ name, body }) =>
+      links(body)
+        .filter((link) => !sources.has(link))
+        .map((link) => `${name}: ${link}`),
+    );
     expect(missing).toEqual([]);
   });
 
@@ -49,7 +53,7 @@ describe('chapters of the manual', () => {
   test.each(locales)('%s: the text has no characters that the writer must not type', (locale) => {
     const source = text(locale);
     // The typeset function adds non-breaking spaces. The font has no arrows, subscripts or comparison signs.
-    expect(source).not.toMatch(/[  →←↔≥≤₂]/);
+    expect(source).not.toMatch(/[\u00a0\u202f→←↔≥≤₂]/);
     expect(source).not.toContain('embedded content');
     expect(source).not.toMatch(/^- \[[ x]\]/m);
   });
@@ -73,9 +77,9 @@ describe('numbers of the deck in the manual', () => {
   ];
 
   test.each(locales)('%s: the manual gives each number with the same value as the deck', (locale) => {
-    const source = text(locale).replaceAll(' ', ' ');
+    const source = text(locale).replaceAll('\u00a0', ' ');
     const missing = shared
-      .map(([key, kind]) => [key, format(numbers[key].value, kind, locale).replaceAll(' ', ' ')] as const)
+      .map(([key, kind]) => [key, format(numbers[key].value, kind, locale).replaceAll('\u00a0', ' ')] as const)
       .filter(([, shown]) => !source.includes(shown))
       .map(([key, shown]) => `${key}: ${shown}`);
     expect(missing).toEqual([]);
@@ -83,6 +87,6 @@ describe('numbers of the deck in the manual', () => {
 
   test('the number formats are those that the test expects', () => {
     expect(formatNumber(258_764, 'en')).toBe('258,764');
-    expect(formatNumber(258_764, 'cs').replaceAll(' ', ' ')).toBe('258 764');
+    expect(formatNumber(258_764, 'cs').replaceAll('\u00a0', ' ')).toBe('258 764');
   });
 });

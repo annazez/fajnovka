@@ -1,7 +1,17 @@
 /** Shared helpers of the end-to-end tests. */
 import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 
-export const SLIDES = ['title', 'paradox', 'leak', 'product', 'journey', 'evidence', 'spread', 'economics', 'ask'] as const;
+export const SLIDES = [
+  'title',
+  'paradox',
+  'leak',
+  'product',
+  'journey',
+  'evidence',
+  'spread',
+  'economics',
+  'ask',
+] as const;
 export const LOCALES = ['en', 'cs'] as const;
 export type Locale = (typeof LOCALES)[number];
 
@@ -11,7 +21,14 @@ export const home = (locale: Locale): string => (locale === 'en' ? '/' : `/${loc
 export const isPhone = (info: TestInfo): boolean => info.project.name.startsWith('phone');
 
 /** The answer of the server function with the live data of DPO. The default has the numbers of the stored snapshot. */
-export const USUAL_READING = { live: true, time: '2026-11-15T13:07:00.000Z', vehicles: 224, counted: 204, passengers: 2908, places: 24_758 };
+export const USUAL_READING = {
+  live: true,
+  time: '2026-11-15T13:07:00.000Z',
+  vehicles: 224,
+  counted: 204,
+  passengers: 2908,
+  places: 24_758,
+};
 export const LIVE_DATA = '**/api/occupancy';
 
 interface OpenOptions {
@@ -24,8 +41,13 @@ interface OpenOptions {
 }
 
 /** Opens the deck and waits until the script has taken control. The tests run without a network: the page gets its live data here. */
-export async function openDeck(page: Page, { locale = 'en', slide = 1, motion = false, reading = USUAL_READING }: OpenOptions = {}): Promise<void> {
-  await page.route(LIVE_DATA, (route) => (reading ? route.fulfill({ json: reading }) : route.fulfill({ status: 503, body: 'no data' })));
+export async function openDeck(
+  page: Page,
+  { locale = 'en', slide = 1, motion = false, reading = USUAL_READING }: OpenOptions = {},
+): Promise<void> {
+  await page.route(LIVE_DATA, (route) =>
+    reading ? route.fulfill({ json: reading }) : route.fulfill({ status: 503, body: 'no data' }),
+  );
   await page.emulateMedia({ reducedMotion: motion ? 'no-preference' : 'reduce' });
   await page.goto(`${home(locale)}${slide === 1 ? '' : `#${slide}`}`);
   await expect(page.locator('.deck.is-live')).toBeVisible();

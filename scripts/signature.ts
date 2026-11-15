@@ -12,7 +12,7 @@ export async function manualSignature(page: Page): Promise<string> {
     const copy = main.cloneNode(true) as HTMLElement;
     // The page numbers in the contents exist only in the PDF.
     for (const number of copy.querySelectorAll('[data-page-of]')) number.textContent = '';
-    const text = (copy.textContent ?? '').replace(/\s+/g, ' ').trim();
+    const text = copy.textContent.replace(/\s+/g, ' ').trim();
     const shapes = [...copy.querySelectorAll('.chart path')].map((path) => path.getAttribute('d')).join('|');
     return `${text}\n${shapes}`;
   });

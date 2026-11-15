@@ -26,7 +26,7 @@ Ostrava loses about 1% of its passengers each year. A loss this slow does not ne
 - Speak about time, money and experiences. Emissions come second.
 - Never moralise to drivers.
 - Give exact numbers, not adjectives ("250 points at once").
-- Use the identity of Ostrava (*fajne*, *Fajnovák*).
+- Use the identity of Ostrava (_fajne_, _Fajnovák_).
 - After each gain of points, say how many points remain to the next reward.
 - Do not promise speed where public transport is slower.
 

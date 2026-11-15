@@ -27,7 +27,9 @@ test.describe('motion switch', () => {
   /** Play states of the animations that the scene of the title slide made. */
   const sceneStates = (page: Page): Promise<string[]> =>
     page.evaluate(() =>
-      [...document.querySelectorAll('#title [data-built]')].flatMap((node) => node.getAnimations().map((animation) => animation.playState)),
+      [...document.querySelectorAll('#title [data-built]')].flatMap((node) =>
+        node.getAnimations().map((animation) => animation.playState),
+      ),
     );
 
   test('the deck starts paused when the system asks for reduced motion', async ({ page }) => {
@@ -82,7 +84,10 @@ test.describe('full screen', () => {
     await expect(deck(page)).toHaveClass(/is-fullscreen/);
     await page.keyboard.press('f');
     await expect(deck(page)).not.toHaveClass(/is-fullscreen/);
-    expect(await page.evaluate(() => (window as unknown as { wakeLockCalls: string[] }).wakeLockCalls)).toEqual(['screen', 'released']);
+    expect(await page.evaluate(() => (window as unknown as { wakeLockCalls: string[] }).wakeLockCalls)).toEqual([
+      'screen',
+      'released',
+    ]);
   });
 });
 
@@ -112,7 +117,9 @@ test.describe('speaker notes', () => {
 
   test('each slide has speaker text and all of it fits in three minutes', async ({ page }) => {
     await openDeck(page);
-    const notes = await page.locator('[data-slide]').evaluateAll((slides) => slides.map((slide) => slide.getAttribute('data-notes') ?? ''));
+    const notes = await page
+      .locator('[data-slide]')
+      .evaluateAll((slides) => slides.map((slide) => slide.getAttribute('data-notes') ?? ''));
     expect(notes).toHaveLength(9);
     for (const text of notes) expect(text.length).toBeGreaterThan(40);
     // A calm speaker says about 140 words in a minute.
@@ -201,9 +208,9 @@ test.describe('languages', () => {
   test('each page names its other language versions', async ({ page }) => {
     for (const locale of ['en', 'cs'] as const) {
       await page.goto(home(locale));
-      const links = await page.locator('link[rel="alternate"][hreflang]').evaluateAll((nodes) =>
-        nodes.map((node) => `${node.getAttribute('hreflang')} ${node.getAttribute('href')}`),
-      );
+      const links = await page
+        .locator('link[rel="alternate"][hreflang]')
+        .evaluateAll((nodes) => nodes.map((node) => `${node.getAttribute('hreflang')} ${node.getAttribute('href')}`));
       expect(links).toEqual([
         'en https://fajnovka.zezulka.me/',
         'cs https://fajnovka.zezulka.me/cs/',

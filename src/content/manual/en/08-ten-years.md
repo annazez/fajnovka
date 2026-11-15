@@ -28,14 +28,14 @@ The first years are the most expensive (the investment, and the effect only star
 
 The benefit divides into about three equal parts between the new, the returned and the kept passengers. But returns and retention cost a fraction of acquisition.
 
-| In 10 years (2027–2036), CZK million | Pessimistic | Base | Optimistic |
-| --- | --- | --- | --- |
-| Extra revenue for DPO | 53 | 131 | 215 |
-| Cost of the programme | 123 | 113 | 113 |
-| **Net benefit for DPO and the city** | **−70** | **+18** | **+102** |
-| Net present value (4%) | −59 | +9 | +74 |
-| Payback | not by 2036 | 2034 | 2030 |
-| Extra passengers in 2036 | 2,400 | 6,200 | 10,200 |
+| In 10 years (2027–2036), CZK million | Pessimistic | Base    | Optimistic |
+| ------------------------------------ | ----------- | ------- | ---------- |
+| Extra revenue for DPO                | 53          | 131     | 215        |
+| Cost of the programme                | 123         | 113     | 113        |
+| **Net benefit for DPO and the city** | **−70**     | **+18** | **+102**   |
+| Net present value (4%)               | −59         | +9      | +74        |
+| Payback                              | not by 2036 | 2034    | 2030       |
+| Extra passengers in 2036             | 2,400       | 6,200   | 10,200     |
 
 ### Wider benefits: KODIS, partners and fewer cars
 
@@ -48,13 +48,13 @@ The DPO model counts only the revenue of DPO. But Fajnovka brings money to other
 
 ![Benefit for the region in 10 years, by part and by scenario, CZK million. Rough estimate. External costs follow the Handbook on the external costs of transport (2019).](figure:region)
 
-| In 10 years, CZK million | Pessimistic | Base | Optimistic |
-| --- | --- | --- | --- |
-| Net benefit for DPO and the city | −70 | +18 | +102 |
-| Extra revenue of KODIS | +21 | +42 | +74 |
-| Extra income of partners | +34 | +34 | +34 |
-| Saved external costs of cars | +72 | +162 | +257 |
-| **Total benefit for the region** | **+56** | **+256** | **+468** |
+| In 10 years, CZK million         | Pessimistic | Base     | Optimistic |
+| -------------------------------- | ----------- | -------- | ---------- |
+| Net benefit for DPO and the city | −70         | +18      | +102       |
+| Extra revenue of KODIS           | +21         | +42      | +74        |
+| Extra income of partners         | +34         | +34      | +34        |
+| Saved external costs of cars     | +72         | +162     | +257       |
+| **Total benefit for the region** | **+56**     | **+256** | **+468**   |
 
 - **Extra revenue decreases the compensation** that the city pays to DPO. The net benefit of DPO is a saving for the city budget.
 - **The pessimistic scenario is also positive for the region,** but not for the city budget. The region and KODIS are therefore natural partners for the financing.

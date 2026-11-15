@@ -29,7 +29,8 @@ const SUMMARY =
 
 /** The guide to the site for language models (https://llmstxt.org): one title, one summary, lists of links. */
 export function llmsText(chapters: readonly ChapterText[]): string {
-  const link = (name: string, path: string, note = ''): string => `- [${name}](${path.startsWith('http') ? path : absolute(path)})${note && `: ${note}`}`;
+  const link = (name: string, path: string, note = ''): string =>
+    `- [${name}](${path.startsWith('http') ? path : absolute(path)})${note && `: ${note}`}`;
   const title = plain(useDictionary('en').manual.title);
 
   return [
@@ -53,7 +54,11 @@ export function llmsText(chapters: readonly ChapterText[]): string {
     '',
     '## Data',
     '',
-    link('Live occupancy of DPO vehicles', '/api/occupancy', 'JSON; how many vehicles are on the road in Ostrava and how full they are, one reading a minute'),
+    link(
+      'Live occupancy of DPO vehicles',
+      '/api/occupancy',
+      'JSON; how many vehicles are on the road in Ostrava and how full they are, one reading a minute',
+    ),
     link('OpenAPI description of the live data', '/openapi.json'),
     '',
     '## Optional',
@@ -80,7 +85,13 @@ function figureText(caption: string, name: string, locale: Locale): string {
 /** The full manual of one language as one Markdown text. */
 export function manualText(locale: Locale, chapters: readonly ChapterText[]): string {
   const t = useDictionary(locale).manual;
-  const head = [`# Fajnovka: ${plain(t.title)}`, '', `> ${plain(t.lead)}`, '', `${manual.authors.join(', ')} · ${manual.team} · ${manual.published}`];
+  const head = [
+    `# Fajnovka: ${plain(t.title)}`,
+    '',
+    `> ${plain(t.lead)}`,
+    '',
+    `${manual.authors.join(', ')} · ${manual.team} · ${manual.published}`,
+  ];
   const parts = chapters.map(({ number, title, body }) => {
     const text = body
       .trim()
@@ -118,7 +129,8 @@ export function catalogEntries(): CatalogEntry[] {
       displayName: 'Live occupancy of public transport vehicles in Ostrava',
       type: 'application/openapi+json',
       url: absolute('/openapi.json'),
-      description: 'One reading a minute: the vehicles of DPO on the road, their passengers and their places. Source: the public dashboard of DPO.',
+      description:
+        'One reading a minute: the vehicles of DPO on the road, their passengers and their places. Source: the public dashboard of DPO.',
       representativeQueries: [
         'How full are the trams and buses in Ostrava now?',
         'How many public transport vehicles are on the road in Ostrava?',
@@ -142,8 +154,13 @@ export function catalogEntries(): CatalogEntry[] {
       displayName: 'Fajnovka: kompletní manuál (česky)',
       type: 'application/pdf',
       url: absolute(manualPdf('cs')),
-      description: 'Návrh věrnostního programu MHD pro Ostravu: zákazníci, systém odměn, důkazy, byznys model, pilot a zdroje. Návrh studentského týmu, ne oficiální produkt města, DPO ani KODIS.',
-      representativeQueries: ['Co je věrnostní program Fajnovka pro MHD v Ostravě?', 'Kolik program Fajnovka stojí a kdy se vrátí?', 'Jak pilot Fajnovky v Porubě měří svůj efekt?'],
+      description:
+        'Návrh věrnostního programu MHD pro Ostravu: zákazníci, systém odměn, důkazy, byznys model, pilot a zdroje. Návrh studentského týmu, ne oficiální produkt města, DPO ani KODIS.',
+      representativeQueries: [
+        'Co je věrnostní program Fajnovka pro MHD v Ostravě?',
+        'Kolik program Fajnovka stojí a kdy se vrátí?',
+        'Jak pilot Fajnovky v Porubě měří svůj efekt?',
+      ],
     },
   ];
 }
@@ -160,7 +177,11 @@ export const aiCatalog = (): { specVersion: string; host: { displayName: string 
 
 // OpenAPI description of the server function
 
-const count = (description: string): { type: 'integer'; minimum: 0; description: string } => ({ type: 'integer', minimum: 0, description });
+const count = (description: string): { type: 'integer'; minimum: 0; description: string } => ({
+  type: 'integer',
+  minimum: 0,
+  description,
+});
 
 export function openApi(): object {
   return {

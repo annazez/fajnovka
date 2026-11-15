@@ -27,23 +27,35 @@ async function withModelContext(page: Page, place: 'document' | 'navigator' = 'd
 }
 
 const toolNames = (page: Page): Promise<string[]> =>
-  page.evaluate(() => (document as unknown as { modelContext?: { tools: Registered[] } }).modelContext?.tools.map((tool) => tool.name) ?? []);
+  page.evaluate(
+    () =>
+      (document as unknown as { modelContext?: { tools: Registered[] } }).modelContext?.tools.map(
+        (tool) => tool.name,
+      ) ?? [],
+  );
 
 /** Calls a tool as an agent does and reads its answer. An error of the tool comes back as `{ error }`. */
-const call = <Answer>(page: Page, name: string, input: unknown = {}, place: 'document' | 'navigator' = 'document'): Promise<Answer & { error?: string }> =>
+const call = <Answer>(
+  page: Page,
+  name: string,
+  input: unknown = {},
+  place: 'document' | 'navigator' = 'document',
+): Promise<Answer & { error?: string }> =>
   page.evaluate(
     async ([tool, argument, owner]) => {
-      const host = (owner === 'document' ? document : navigator) as unknown as { modelContext: { tools: Registered[] } };
+      const host = (owner === 'document' ? document : navigator) as unknown as {
+        modelContext: { tools: Registered[] };
+      };
       const found = host.modelContext.tools.find((item) => item.name === tool);
-      if (!found) return { error: `no tool ${String(tool)}` };
+      if (!found) return { error: `no tool ${tool}` };
       try {
-        return JSON.parse(await found.execute(argument));
+        return JSON.parse(await found.execute(argument)) as unknown;
       } catch (error) {
         return { error: error instanceof Error ? error.message : String(error) };
       }
     },
     [name, input, place] as const,
-  );
+  ) as Promise<Answer & { error?: string }>;
 
 test.describe('files for AI agents', () => {
   test('llms.txt is a text file with one title, and each of its links opens', async ({ request }) => {
@@ -56,7 +68,13 @@ test.describe('files for AI agents', () => {
     const links = [...text.matchAll(/\]\((https:\/\/[^)\s]+)\)/g)].map((match) => match[1] ?? '');
     expect(links.length).toBeGreaterThan(20);
     // The server function and the source code are not on the test server.
-    const pages = [...new Set(links.filter((link) => link.startsWith(SITE) && !link.includes('/api/')).map((link) => link.split('#')[0] ?? ''))];
+    const pages = [
+      ...new Set(
+        links
+          .filter((link) => link.startsWith(SITE) && !link.includes('/api/'))
+          .map((link) => link.split('#')[0] ?? ''),
+      ),
+    ];
     for (const address of pages) expect((await request.get(local(address))).status(), address).toBe(200);
 
     // A link to a chapter points to a heading that exists.
@@ -85,7 +103,7 @@ test.describe('files for AI agents', () => {
       expect(response.headers()['content-type']).toContain('application/json');
     }
     const { entries } = (await manifest.json()) as { entries: { url: string; identifier: string }[] };
-    expect(Object.keys(await manifest.json())).toEqual(['entries']);
+    expect(Object.keys((await manifest.json()) as object)).toEqual(['entries']);
     expect(await older.json()).toMatchObject({ specVersion: '1.0', entries });
     expect(entries.length).toBeGreaterThan(0);
     for (const { url, identifier } of entries) expect((await request.get(local(url))).status(), identifier).toBe(200);
@@ -95,11 +113,17 @@ test.describe('files for AI agents', () => {
     const response = await request.get('/openapi.json');
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('application/json');
-    expect(await response.json()).toMatchObject({ openapi: '3.1.0', paths: { '/api/occupancy': { get: { operationId: 'getOccupancy' } } } });
+    expect(await response.json()).toMatchObject({
+      openapi: '3.1.0',
+      paths: { '/api/occupancy': { get: { operationId: 'getOccupancy' } } },
+    });
   });
 
   for (const locale of LOCALES) {
-    for (const [name, path] of [['deck', home(locale)], ['manual', manual(locale)]] as const) {
+    for (const [name, path] of [
+      ['deck', home(locale)],
+      ['manual', manual(locale)],
+    ] as const) {
       test(`the ${name} (${locale}) points to the catalogue and says what it is`, async ({ page }) => {
         await page.goto(path);
         await expect(page.locator('link[rel="ard"]')).toHaveAttribute('href', '/.well-known/ard.json');
@@ -128,7 +152,9 @@ test.describe('tools of the deck for an AI agent', () => {
     expect(await toolNames(page)).toEqual(['list_slides', 'go_to_slide', 'get_live_occupancy']);
 
     const schemas = await page.evaluate(() =>
-      (document as unknown as { modelContext: { tools: Registered[] } }).modelContext.tools.map(({ name, description, inputSchema, annotations }) => ({ name, description, inputSchema, annotations })),
+      (document as unknown as { modelContext: { tools: Registered[] } }).modelContext.tools.map(
+        ({ name, description, inputSchema, annotations }) => ({ name, description, inputSchema, annotations }),
+      ),
     );
     for (const { name, description, inputSchema, annotations } of schemas) {
       expect(description.length, name).toBeGreaterThan(40);
@@ -142,14 +168,17 @@ test.describe('tools of the deck for an AI agent', () => {
     test(`list_slides gives the title and the speaker text of each slide (${locale})`, async ({ page }) => {
       await withModelContext(page);
       await openDeck(page, { locale, slide: 3 });
-      const answer = await call<{ current: number; slides: { number: number; title: string; speakerText: string }[] }>(page, 'list_slides');
+      const answer = await call<{ current: number; slides: { number: number; title: string; speakerText: string }[] }>(
+        page,
+        'list_slides',
+      );
 
       expect(answer.current).toBe(3);
       expect(answer.slides.map(({ number }) => number)).toEqual(SLIDES.map((_, index) => index + 1));
       for (const { number, title, speakerText } of answer.slides) {
         expect(title.length, `slide ${number}`).toBeGreaterThan(3);
         expect(speakerText.length, `slide ${number}`).toBeGreaterThan(20);
-        expect(`${title}${speakerText}`, `slide ${number}`).not.toMatch(/ |\n/);
+        expect(`${title}${speakerText}`, `slide ${number}`).not.toMatch(/\u00a0|\n/);
       }
       // The tool gives the title as a viewer reads it: one line of text, with a space where the title has a line break.
       await expect(page.locator('#leak-title')).toHaveText(answer.slides[2]?.title ?? '', { useInnerText: true });
@@ -166,7 +195,9 @@ test.describe('tools of the deck for an AI agent', () => {
     await expectSlide(page, 4);
 
     for (const input of [{ slide: 0 }, { slide: 10 }, { slide: '2' }, {}, undefined]) {
-      expect((await call(page, 'go_to_slide', input)).error, JSON.stringify(input)).toContain('"slide" must be a whole number from 1 to 9.');
+      expect((await call(page, 'go_to_slide', input)).error, JSON.stringify(input)).toContain(
+        '"slide" must be a whole number from 1 to 9.',
+      );
     }
     await expectSlide(page, 4);
   });
@@ -212,19 +243,28 @@ test.describe('tools of the manual for an AI agent', () => {
       await page.goto(manual(locale));
       await expect.poll(() => toolNames(page)).toEqual(['list_chapters', 'get_chapter']);
 
-      const { chapters } = await call<{ chapters: { number: number; title: string; url: string }[] }>(page, 'list_chapters');
+      const { chapters } = await call<{ chapters: { number: number; title: string; url: string }[] }>(
+        page,
+        'list_chapters',
+      );
       expect(chapters.map(({ number }) => number)).toEqual(Array.from({ length: CHAPTERS }, (_, index) => index + 1));
-      const ids = await page.locator('section.chapter').evaluateAll((sections) => sections.map((section) => section.id));
+      const ids = await page
+        .locator('section.chapter')
+        .evaluateAll((sections) => sections.map((section) => section.id));
       expect(chapters.map(({ url }) => new URL(url).hash)).toEqual(ids.map((id) => `#${id}`));
-      for (const { title } of chapters) expect(title).not.toMatch(/ |^\d|^$/);
+      for (const { title } of chapters) expect(title).not.toMatch(/\u00a0|^\d|^$/);
 
-      const second = await call<{ number: number; title: string; url: string; markdown: string }>(page, 'get_chapter', { chapter: 2 });
+      const second = await call<{ number: number; title: string; url: string; markdown: string }>(page, 'get_chapter', {
+        chapter: 2,
+      });
       expect(second).toMatchObject({ number: 2, title: chapters[1]?.title, url: chapters[1]?.url });
       expect(second.markdown.startsWith(`## 2 ${second.title}`)).toBe(true);
       expect(second.markdown).not.toContain('\n## ');
       expect(second.markdown.length).toBeGreaterThan(1000);
 
-      expect((await call(page, 'get_chapter', { chapter: CHAPTERS + 1 })).error).toContain(`"chapter" must be a whole number from 1 to ${CHAPTERS}.`);
+      expect((await call(page, 'get_chapter', { chapter: CHAPTERS + 1 })).error).toContain(
+        `"chapter" must be a whole number from 1 to ${CHAPTERS}.`,
+      );
       expect(problems).toEqual([]);
     });
   }

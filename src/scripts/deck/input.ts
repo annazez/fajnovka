@@ -3,10 +3,10 @@ import type { Deck } from './deck.ts';
 import { isFlowLayout } from './dom.ts';
 
 export interface Actions {
-  motion(): void;
-  fullscreen(): void;
-  notes(): void;
-  resetTimer(): void;
+  readonly motion: () => void;
+  readonly fullscreen: () => void;
+  readonly notes: () => void;
+  readonly resetTimer: () => void;
 }
 
 const IDLE_AFTER = 2500;

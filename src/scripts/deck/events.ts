@@ -20,6 +20,6 @@ declare global {
   }
 }
 
-export function emit<T>(target: HTMLElement, type: string, detail?: T): void {
+export function emit(target: HTMLElement, type: string, detail?: unknown): void {
   target.dispatchEvent(new CustomEvent(type, { detail }));
 }

@@ -9,8 +9,17 @@ import { element, join, text } from '../../src/lib/svg.ts';
 const chapter = (locale: string): URL => pathToFileURL(`/project/src/content/manual/${locale}/02-problem.md`);
 /** Renders Markdown as Astro does: with the plugin and with the front matter of the chapter. */
 async function render(source: string, fileURL: URL | undefined, title = 'The problem'): Promise<string> {
-  const astro = { frontmatter: { title }, headings: [], localImagePaths: new Set<string>(), remoteImagePaths: new Set<string>() };
-  const { html } = await markdownToHtml(source, { fileURL, hastPlugins: [manualMarkdown], data: { astro } });
+  const astro = {
+    frontmatter: { title },
+    headings: [],
+    localImagePaths: new Set<string>(),
+    remoteImagePaths: new Set<string>(),
+  };
+  const { html } = await markdownToHtml(source, {
+    ...(fileURL && { fileURL }),
+    hastPlugins: [manualMarkdown],
+    data: { astro },
+  });
   return html.trim();
 }
 
@@ -37,7 +46,9 @@ describe('Markdown rules of the manual', () => {
 
   test('a chart image becomes a figure with a caption and a table of values', async () => {
     const html = await render('![Passengers carried each year.](figure:passengers)', chapter('en'));
-    expect(html).toMatch(/^<figure class="figure"><div class="scroll" role="group" aria-label="Figure: Passengers carried each year\. Scroll sideways[^"]*" tabindex="0"><svg class="chart"/);
+    expect(html).toMatch(
+      /^<figure class="figure"><div class="scroll" role="group" aria-label="Figure: Passengers carried each year\. Scroll sideways[^"]*" tabindex="0"><svg class="chart"/,
+    );
     expect(html).toContain('<figcaption>Passengers carried each year.</figcaption>');
     expect(html).toContain('<div class="sr-only"><table aria-label="Passengers carried each year.">');
     expect(html).not.toContain('<img');
@@ -49,14 +60,18 @@ describe('Markdown rules of the manual', () => {
   });
 
   test('other images and paragraphs stay', async () => {
-    expect(await render('![Photo](https://example.com/a.png)', chapter('en'))).toContain('<img src="https://example.com/a.png" alt="Photo"');
+    expect(await render('![Photo](https://example.com/a.png)', chapter('en'))).toContain(
+      '<img src="https://example.com/a.png" alt="Photo"',
+    );
     expect(await render('Text ![Chart](figure:passengers)', chapter('en'))).toContain('<img');
   });
 
   test('a table gets a scroll frame with the name of the heading above it', async () => {
     const table = '| A | B |\n| --- | --- |\n| 1 | 2 |';
     const html = await render(`### Input data\n\nText.\n\n${table}`, chapter('en'));
-    expect(html).toContain('<div class="scroll" role="group" aria-label="Table: Input data. Scroll sideways to see all columns." tabindex="0"><table>');
+    expect(html).toContain(
+      '<div class="scroll" role="group" aria-label="Table: Input data. Scroll sideways to see all columns." tabindex="0"><table>',
+    );
     expect(html).toContain('</table></div>');
   });
 
@@ -78,7 +93,9 @@ describe('Markdown rules of the manual', () => {
 describe('markup builder', () => {
   test('text and attribute values are escaped', () => {
     expect(text('a < b & "c"')).toBe('a &lt; b &amp; &quot;c&quot;');
-    expect(element('a', { href: '/?a=1&b="2"', hidden: undefined }, text('x > y'))).toBe('<a href="/?a=1&amp;b=&quot;2&quot;">x &gt; y</a>');
+    expect(element('a', { href: '/?a=1&b="2"', hidden: undefined }, text('x > y'))).toBe(
+      '<a href="/?a=1&amp;b=&quot;2&quot;">x &gt; y</a>',
+    );
   });
 
   test('elements nest and join', () => {

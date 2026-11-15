@@ -29,17 +29,25 @@ const lanes = {
         <path class="leak__arrow" d="m852 417-15.5 15.5L852 448"></path>
       </svg>
       <div class="leak__dots" data-dots></div>
-      <div class="leak__node leak__node--car"><Icon name="car" /></div>
-      <div class="leak__node leak__node--tram"><Icon name="tram" /></div>
+      <div class="leak__node leak__node--car">
+        <Icon name="car" />
+      </div>
+      <div class="leak__node leak__node--tram">
+        <Icon name="tram" />
+      </div>
     </div>
 
     <figure class="leak__number" data-in="5">
-      <p class="t-hero" data-count={numbers.nonRenewals.value}>{formatNumber(numbers.nonRenewals.value, locale)}</p>
+      <p class="t-hero" data-count={numbers.nonRenewals.value}>
+        {formatNumber(numbers.nonRenewals.value, locale)}
+      </p>
       <figcaption class="t-body">{t.caption}</figcaption>
     </figure>
   </div>
 
-  <p class="slide__source t-small" data-in="8">{t.source}</p>
+  <p class="slide__source t-small" data-in="8">
+    {t.source}
+  </p>
 </Slide>
 
 <script>

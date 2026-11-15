@@ -63,37 +63,37 @@ The prize draw replaces ceremonies: one main prize motivates thousands of people
 
 **How many people will be at which level (estimate for the first year).** Holders of a long-term pass collect levels, seniors included: about 49,000 members. About 31,850 of them have at least bronze. The other members (occasional passengers, newcomers, holders for less than a year) are "Fajnováci", the base level. Few people get to the top: the history of passes on the card does not always go back 10 years, and there are gaps between the years.
 
-| Level | Condition (months with a pass in total) | Members (estimate) | Share | Moves to the level in a year |
-| --- | --- | --- | --- | --- |
-| Fajnovák | registration | 48,560 | 60% | – |
-| Bronze | 12 | 14,700 | 18% | 6,100 |
-| Silver | 36 (3 years) | 9,800 | 12% | 3,100 |
-| Gold | 60 (5 years) | 5,390 | 7% | 1,450 |
-| Diamond | 120 (10 years) | 1,960 | 3% | 350 |
-| **Total** |  | **80,410** | **100%** | **11,000** |
+| Level     | Condition (months with a pass in total) | Members (estimate) | Share    | Moves to the level in a year |
+| --------- | --------------------------------------- | ------------------ | -------- | ---------------------------- |
+| Fajnovák  | registration                            | 48,560             | 60%      | –                            |
+| Bronze    | 12                                      | 14,700             | 18%      | 6,100                        |
+| Silver    | 36 (3 years)                            | 9,800              | 12%      | 3,100                        |
+| Gold      | 60 (5 years)                            | 5,390              | 7%       | 1,450                        |
+| Diamond   | 120 (10 years)                          | 1,960              | 3%       | 350                          |
+| **Total** |                                         | **80,410**         | **100%** | **11,000**                   |
 
 **The prize draw follows the number of people at a level.** Each level has its own monthly draw, and the rule is **number of prizes = number of members × target chance**. When more people come, more prizes come, and the chance of one person stays the same. One common drum would not work: 48,000 Fajnováci would outvote 2,000 Diamond members.
 
-| Level | Chance to win in a year | Prizes a month | Value of a prize | Nominal value a year |
-| --- | --- | --- | --- | --- |
-| Fajnovák | 0.9% (1 in 111) | 38 | CZK 300 | CZK 136,000 |
-| Bronze | 1.5% (1 in 67) | 18 | CZK 500 | CZK 110,000 |
-| Silver | 2.3% (1 in 44) | 19 | CZK 800 | CZK 180,000 |
-| Gold | 4.1% (1 in 24) | 18 | CZK 1,500 | CZK 331,000 |
-| Diamond | 11% (1 in 9) | 18 | CZK 3,000 | CZK 647,000 |
-| Diamond draw (yearly) | 1 in 980 | 2 main prizes | CZK 100,000 | CZK 200,000 |
+| Level                 | Chance to win in a year | Prizes a month | Value of a prize | Nominal value a year |
+| --------------------- | ----------------------- | -------------- | ---------------- | -------------------- |
+| Fajnovák              | 0.9% (1 in 111)         | 38             | CZK 300          | CZK 136,000          |
+| Bronze                | 1.5% (1 in 67)          | 18             | CZK 500          | CZK 110,000          |
+| Silver                | 2.3% (1 in 44)          | 19             | CZK 800          | CZK 180,000          |
+| Gold                  | 4.1% (1 in 24)          | 18             | CZK 1,500        | CZK 331,000          |
+| Diamond               | 11% (1 in 9)            | 18             | CZK 3,000        | CZK 647,000          |
+| Diamond draw (yearly) | 1 in 980                | 2 main prizes  | CZK 100,000      | CZK 200,000          |
 
 Usual prizes are tickets and vouchers from free capacity and from partners. The real cost is half of the nominal value, and about 85% of the prizes are collected. Main prizes are paid in full. The prize draw therefore costs about **CZK 0.8 million a year**.
 
 **Reward at the move to a higher level:**
 
-| Move to | Reward | Moves in a year | Cost for the city at full use |
-| --- | --- | --- | --- |
-| Bronze | 200 points | 6,100 | CZK 92,000 |
-| Silver | 50% discount on 2 tickets for culture or sport | 3,100 | CZK 140,000 |
-| Gold | 50% discount on a family day | 1,450 | CZK 174,000 |
-| Diamond | experience package from partners at half price | 350 | CZK 166,000 |
-| **Total** |  | **11,000** | **CZK 572,000** |
+| Move to   | Reward                                         | Moves in a year | Cost for the city at full use |
+| --------- | ---------------------------------------------- | --------------- | ----------------------------- |
+| Bronze    | 200 points                                     | 6,100           | CZK 92,000                    |
+| Silver    | 50% discount on 2 tickets for culture or sport | 3,100           | CZK 140,000                   |
+| Gold      | 50% discount on a family day                   | 1,450           | CZK 174,000                   |
+| Diamond   | experience package from partners at half price | 350             | CZK 166,000                   |
+| **Total** |                                                | **11,000**      | **CZK 572,000**               |
 
 At a use of 45%, the rewards for moves cost about CZK 0.26 million a year. When the data show a different distribution of members, the numbers of prizes change, not the thresholds of the levels.
 
@@ -115,11 +115,11 @@ A person who stops riding does not fall down at once. The level fades step by st
 
 1. **Find the reason:** on day 30 after the pass ends, one question: "What changed?" (a move, a car, a new job or school, the price, the connections, a pause).
 2. **An offer that fits the reason:**
-   - *Moved out of the city* (51% of those who move out stay in the hinterland): the regional ODIS pass, park and ride, and points for park and ride.
-   - *Bought a car:* "car and public transport": points for park and ride, offers in Advent and during road closures.
-   - *New job or school:* a trip planner, a return month, a company challenge.
-   - *Price:* the 10+2 programme and an annual pass in instalments (to verify with DPO).
-   - *Connections or quality:* pass it on to DPO; write again when something on the route improves.
+   - _Moved out of the city_ (51% of those who move out stay in the hinterland): the regional ODIS pass, park and ride, and points for park and ride.
+   - _Bought a car:_ "car and public transport": points for park and ride, offers in Advent and during road closures.
+   - _New job or school:_ a trip planner, a return month, a company challenge.
+   - _Price:_ the 10+2 programme and an annual pass in instalments (to verify with DPO).
+   - _Connections or quality:_ pass it on to DPO; write again when something on the route improves.
 3. **Contact calendar:** months 1, 3 and 6 after the departure, then in January, in September, on the anniversary of the first pass, and during a closure on the member's route. At most 6 messages a year for 24 months, then once a year, always with consent.
 4. **A win-back offer costs at most the value of one month of fares.** A return is the cheapest way to win a passenger (CZK 95 for a passenger-year, see Business model).
 

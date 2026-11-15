@@ -16,15 +16,15 @@ Fajnovka is a loyalty programme of the City of Ostrava on the personal ODISka ca
 
 **Key numbers** (base scenario, rough estimate):
 
-| Indicator | Value |
-| --- | --- |
-| Members in year 1 | about 80,000 |
-| Cost of the programme | CZK 11.6 million a year (0.55% of the compensation to DPO) |
-| Pilot (6 months, Poruba) | CZK 3.4 million |
-| Truly new passengers | 410 a year (280–600) |
-| Regular passengers kept thanks to lower churn | 370 a year (0–735) |
-| Former passengers who return | 540 a year (360–790) |
-| Cost of one net passenger-year | win-back CZK 95, loyalty CZK 510, acquisition CZK 2,220 |
-| Cost of one extra public transport trip | about CZK 10 in year 2, CZK 3 in 2036 |
-| Payback for DPO and the city | 2034 (CZK +18 million in 10 years) |
-| Benefit for the region in 10 years | about CZK +256 million |
+| Indicator                                     | Value                                                      |
+| --------------------------------------------- | ---------------------------------------------------------- |
+| Members in year 1                             | about 80,000                                               |
+| Cost of the programme                         | CZK 11.6 million a year (0.55% of the compensation to DPO) |
+| Pilot (6 months, Poruba)                      | CZK 3.4 million                                            |
+| Truly new passengers                          | 410 a year (280–600)                                       |
+| Regular passengers kept thanks to lower churn | 370 a year (0–735)                                         |
+| Former passengers who return                  | 540 a year (360–790)                                       |
+| Cost of one net passenger-year                | win-back CZK 95, loyalty CZK 510, acquisition CZK 2,220    |
+| Cost of one extra public transport trip       | about CZK 10 in year 2, CZK 3 in 2036                      |
+| Payback for DPO and the city                  | 2034 (CZK +18 million in 10 years)                         |
+| Benefit for the region in 10 years            | about CZK +256 million                                     |

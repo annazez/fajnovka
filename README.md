@@ -30,14 +30,14 @@ The page needs the network only for the first load. Open it before the pitch sta
 
 A program gets the same content as a person, in a form that it can read without the layout.
 
-| What                                  | Address                                                                                          |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Guide to the site (llms.txt)          | `/llms.txt`                                                                                      |
-| The manual as one Markdown text       | `/manual.md`, `/cs/manual.md`                                                                    |
-| Live data of DPO, and its description | `/api/occupancy`, `/openapi.json`                                                                |
-| Catalogue of resources (ARD)          | `/.well-known/ard.json`; `/.well-known/ai-catalog.json` is the older form                        |
-| What each page is (JSON-LD)           | a `script` element of the type `application/ld+json` in each page                                |
-| Tools in the browser (WebMCP)         | deck: `list_slides`, `go_to_slide`, `get_live_occupancy`; manual: `list_chapters`, `get_chapter` |
+| What | Address |
+| --- | --- |
+| Guide to the site (llms.txt) | `/llms.txt` |
+| The manual as one Markdown text | `/manual.md`, `/cs/manual.md` |
+| Live data of DPO, and its description | `/api/occupancy`, `/openapi.json` |
+| Catalogue of resources (ARD) | `/.well-known/ard.json`; `/.well-known/ai-catalog.json` is the older form |
+| What each page is (JSON-LD) | a `script` element of the type `application/ld+json` in each page |
+| Tools in the browser (WebMCP) | deck: `list_slides`, `go_to_slide`, `get_live_occupancy`; manual: `list_chapters`, `get_chapter` |
 
 A browser gives the tools to its agent only if it has WebMCP (`document.modelContext`). In November 2026, Chrome has WebMCP as an origin trial: a site needs a token from Google, sent in the `Origin-Trial` header. This site has no token yet. Without WebMCP, the pages work as before.
 

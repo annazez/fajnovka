@@ -37,13 +37,13 @@ Stálý cestující body za běžné jízdy nedostává. Má úroveň, losován�
 
 Body se nemění za vstupy zdarma, ale za **50% slevy**. Člověk zbytek doplatí, takže partner nedostane jen náklad, ale platícího zákazníka. Pro člověka je to odměna v plné hodnotě slevy, město platí jen zlomek.
 
-| Body | Příklad odměny | Proč tato úroveň |
-| --- | --- | --- |
-| 100 | 50% sleva na koupaliště nebo dětské vstupné do muzea | první odměna do 2 týdnů od registrace |
-| 250 | 50% sleva na ZOO, muzeum nebo kino | cíl prvních 3 měsíců |
-| 500 | 50% sleva na divadlo nebo koncert | cíl prvního roku |
-| 1 000 | 50% sleva na rodinný den (ZOO pro 2 + 2, wellness, zábavní park) | cíl rodin |
-| libovolně | darovat body na stromy ve městě | pro ty, kdo nic nepotřebují |
+| Body      | Příklad odměny                                                   | Proč tato úroveň                      |
+| --------- | ---------------------------------------------------------------- | ------------------------------------- |
+| 100       | 50% sleva na koupaliště nebo dětské vstupné do muzea             | první odměna do 2 týdnů od registrace |
+| 250       | 50% sleva na ZOO, muzeum nebo kino                               | cíl prvních 3 měsíců                  |
+| 500       | 50% sleva na divadlo nebo koncert                                | cíl prvního roku                      |
+| 1 000     | 50% sleva na rodinný den (ZOO pro 2 + 2, wellness, zábavní park) | cíl rodin                             |
+| libovolně | darovat body na stromy ve městě                                  | pro ty, kdo nic nepotřebují           |
 
 **Kdo slevu platí:** městské instituce ji dávají z volné kapacity, takže je pro ně příjmem navíc. Soukromí partneři ji berou jako marketing. Město přispívá partnerům v průměru asi 15 % hodnoty slevy (odhad, dohodnout s partnery). **1 bod odpovídá asi 0,5 Kč slevy**, městu tedy jeden uplatněný bod stojí asi 0,075 Kč.
 
@@ -63,37 +63,37 @@ Losování nahrazuje obřady a sváteční předávání: jedna hlavní cena mot
 
 **Kolik lidí bude v které úrovni (odhad pro první rok).** Úrovně získávají držitelé dlouhodobé jízdenky včetně seniorů, tedy asi 49 000 členů. Aspoň bronz z nich má asi 31 850. Ostatní členové (příležitostní cestující, nováčci, držitelé kratší než rok) jsou Fajnováci. Nahoru se dostane málo lidí: historie jízdenek na kartě nemusí sahat 10 let zpět a mezi roky bývají mezery.
 
-| Úroveň | Podmínka (měsíce s jízdenkou celkem) | Členů (odhad) | Podíl | Přechodů do úrovně za rok |
-| --- | --- | --- | --- | --- |
-| Fajnovák | registrace | 48 560 | 60 % | – |
-| Bronzová | 12 | 14 700 | 18 % | 6 100 |
-| Stříbrná | 36 (3 roky) | 9 800 | 12 % | 3 100 |
-| Zlatá | 60 (5 let) | 5 390 | 7 % | 1 450 |
-| Diamantová | 120 (10 let) | 1 960 | 3 % | 350 |
-| **Celkem** |  | **80 410** | **100 %** | **11 000** |
+| Úroveň     | Podmínka (měsíce s jízdenkou celkem) | Členů (odhad) | Podíl     | Přechodů do úrovně za rok |
+| ---------- | ------------------------------------ | ------------- | --------- | ------------------------- |
+| Fajnovák   | registrace                           | 48 560        | 60 %      | –                         |
+| Bronzová   | 12                                   | 14 700        | 18 %      | 6 100                     |
+| Stříbrná   | 36 (3 roky)                          | 9 800         | 12 %      | 3 100                     |
+| Zlatá      | 60 (5 let)                           | 5 390         | 7 %       | 1 450                     |
+| Diamantová | 120 (10 let)                         | 1 960         | 3 %       | 350                       |
+| **Celkem** |                                      | **80 410**    | **100 %** | **11 000**                |
 
 **Losování podle počtu lidí v úrovni.** Každá úroveň má vlastní měsíční losování a platí **počet cen = počet členů × cílová šance**. Když lidí přibude, přibude cen a šance jednoho člověka zůstane. Společný buben by nefungoval: 48 000 Fajnováků by přehlasovalo 2 000 diamantových.
 
-| Úroveň | Šance vyhrát za rok | Cen za měsíc | Hodnota ceny | Nominál za rok |
-| --- | --- | --- | --- | --- |
-| Fajnovák | 0,9 % (1 ze 111) | 38 | 300 Kč | 136 000 Kč |
-| Bronzová | 1,5 % (1 ze 67) | 18 | 500 Kč | 110 000 Kč |
-| Stříbrná | 2,3 % (1 ze 44) | 19 | 800 Kč | 180 000 Kč |
-| Zlatá | 4,1 % (1 z 24) | 18 | 1 500 Kč | 331 000 Kč |
-| Diamantová | 11 % (1 z 9) | 18 | 3 000 Kč | 647 000 Kč |
-| Diamantové losování (ročně) | 1 z 980 | 2 hlavní ceny | 100 000 Kč | 200 000 Kč |
+| Úroveň                      | Šance vyhrát za rok | Cen za měsíc  | Hodnota ceny | Nominál za rok |
+| --------------------------- | ------------------- | ------------- | ------------ | -------------- |
+| Fajnovák                    | 0,9 % (1 ze 111)    | 38            | 300 Kč       | 136 000 Kč     |
+| Bronzová                    | 1,5 % (1 ze 67)     | 18            | 500 Kč       | 110 000 Kč     |
+| Stříbrná                    | 2,3 % (1 ze 44)     | 19            | 800 Kč       | 180 000 Kč     |
+| Zlatá                       | 4,1 % (1 z 24)      | 18            | 1 500 Kč     | 331 000 Kč     |
+| Diamantová                  | 11 % (1 z 9)        | 18            | 3 000 Kč     | 647 000 Kč     |
+| Diamantové losování (ročně) | 1 z 980             | 2 hlavní ceny | 100 000 Kč   | 200 000 Kč     |
 
 Běžné ceny jsou vstupenky a poukazy z volné kapacity a od partnerů, skutečný náklad je polovina nominálu a vyzvedne se asi 85 % výher. Hlavní ceny se platí celé. Losování tak stojí asi **0,8 mil. Kč ročně**.
 
 **Odměna při přechodu na vyšší úroveň:**
 
-| Přechod | Odměna | Přechodů za rok | Náklad města při plném čerpání |
-| --- | --- | --- | --- |
-| Bronzová | 200 bodů | 6 100 | 92 000 Kč |
-| Stříbrná | 50% sleva na 2 vstupenky na kulturu nebo sport | 3 100 | 140 000 Kč |
-| Zlatá | 50% sleva na rodinný den | 1 450 | 174 000 Kč |
-| Diamantová | zážitkový balíček od partnerů za polovinu | 350 | 166 000 Kč |
-| **Celkem** |  | **11 000** | **572 000 Kč** |
+| Přechod    | Odměna                                         | Přechodů za rok | Náklad města při plném čerpání |
+| ---------- | ---------------------------------------------- | --------------- | ------------------------------ |
+| Bronzová   | 200 bodů                                       | 6 100           | 92 000 Kč                      |
+| Stříbrná   | 50% sleva na 2 vstupenky na kulturu nebo sport | 3 100           | 140 000 Kč                     |
+| Zlatá      | 50% sleva na rodinný den                       | 1 450           | 174 000 Kč                     |
+| Diamantová | zážitkový balíček od partnerů za polovinu      | 350             | 166 000 Kč                     |
+| **Celkem** |                                                | **11 000**      | **572 000 Kč**                 |
 
 Při čerpání 45 % stojí odměny za přechody asi 0,26 mil. Kč ročně. Když data ukážou jiné rozložení členů, přenastaví se počty cen, ne prahy úrovní.
 
@@ -115,11 +115,11 @@ Při čerpání 45 % stojí odměny za přechody asi 0,26 mil. Kč ročně. Kdy�
 
 1. **Zjistit důvod:** 30. den po konci jízdenky jedna otázka „Co se změnilo?“ (stěhování, auto, nová práce nebo škola, cena, spoje, pauza).
 2. **Nabídka podle důvodu:**
-   - *Přestěhoval se za město* (51 % odstěhovaných zůstává v zázemí): regionální jízdenka ODIS, P+R a body za P+R.
-   - *Koupil auto:* „auto i MHD“: body za P+R, nabídky v adventu a při uzavírkách.
-   - *Nová práce nebo škola:* plánovač cesty, návratový měsíc, firemní výzva.
-   - *Cena:* program 10+2 a roční jízdenka na splátky (ověřit s DPO).
-   - *Spoje nebo kvalita:* předat DPO; ozvat se, až se na trase něco zlepší.
+   - _Přestěhoval se za město_ (51 % odstěhovaných zůstává v zázemí): regionální jízdenka ODIS, P+R a body za P+R.
+   - _Koupil auto:_ „auto i MHD“: body za P+R, nabídky v adventu a při uzavírkách.
+   - _Nová práce nebo škola:_ plánovač cesty, návratový měsíc, firemní výzva.
+   - _Cena:_ program 10+2 a roční jízdenka na splátky (ověřit s DPO).
+   - _Spoje nebo kvalita:_ předat DPO; ozvat se, až se na trase něco zlepší.
 3. **Kalendář kontaktu:** 1., 3. a 6. měsíc po odchodu, pak v lednu, září, při výročí první jízdenky a při uzavírce na jeho trase. Nejvýš 6 zpráv ročně po dobu 24 měsíců, pak jednou ročně, vždy se souhlasem.
 4. **Nabídka návratu stojí nejvýš hodnotu jednoho měsíce jízdného.** Návrat je nejlevnější způsob, jak získat cestujícího (95 Kč za cestující-rok, viz Byznys model).
 

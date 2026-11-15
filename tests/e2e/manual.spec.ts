@@ -20,8 +20,12 @@ for (const locale of LOCALES) {
       await expect(page.locator('.contents__list a')).toHaveCount(CHAPTERS);
       await expect(page.locator('section.chapter')).toHaveCount(CHAPTERS);
 
-      const anchors = await page.locator('.contents__list a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-      const chapters = await page.locator('section.chapter').evaluateAll((sections) => sections.map((section) => `#${section.id}`));
+      const anchors = await page
+        .locator('.contents__list a')
+        .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+      const chapters = await page
+        .locator('section.chapter')
+        .evaluateAll((sections) => sections.map((section) => `#${section.id}`));
       expect(anchors).toEqual(chapters);
       expect(problems).toEqual([]);
     });
@@ -35,7 +39,9 @@ for (const locale of LOCALES) {
 
     test('the page is not wider than the screen', async ({ page }) => {
       await page.goto(manual(locale));
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
       expect(overflow).toBe(0);
     });
 
@@ -55,7 +61,11 @@ for (const locale of LOCALES) {
     test('a table or chart is a tab stop only while it scrolls sideways', async ({ page }, info) => {
       await page.goto(manual(locale));
       const frames = await page.locator('.scroll').evaluateAll((nodes) =>
-        nodes.map((node) => ({ scrolls: node.scrollWidth > node.clientWidth, stop: node.getAttribute('tabindex') === '0', name: node.getAttribute('aria-label') })),
+        nodes.map((node) => ({
+          scrolls: node.scrollWidth > node.clientWidth,
+          stop: node.getAttribute('tabindex') === '0',
+          name: node.getAttribute('aria-label'),
+        })),
       );
       expect(frames.length).toBeGreaterThan(40);
       for (const frame of frames) {

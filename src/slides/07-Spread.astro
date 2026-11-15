@@ -19,18 +19,16 @@ const channels = [
   <Headline id="spread-title" lines={t.title} />
 
   <ul class="spread__list">
-    {
-      channels.map(({ icon, lead, text }, index) => (
-        <li data-in={index * 3 + 3}>
-          <span class="spread__node">
-            <Icon name={icon} />
-          </span>
-          <p class="t-body">
-            <strong>{lead}</strong> {text}
-          </p>
-        </li>
-      ))
-    }
+    {channels.map(({ icon, lead, text }, index) => (
+      <li data-in={index * 3 + 3}>
+        <span class="spread__node">
+          <Icon name={icon} />
+        </span>
+        <p class="t-body">
+          <strong>{lead}</strong> {text}
+        </p>
+      </li>
+    ))}
   </ul>
 </Slide>
 
@@ -87,10 +85,7 @@ const channels = [
     }
 
     .spread__list::before {
-      top: 0;
-      right: auto;
-      bottom: 0;
-      left: 8rem;
+      inset: 0 auto 0 8rem;
       width: var(--track);
       height: auto;
       margin: 0 0 0 calc(var(--track) / -2);

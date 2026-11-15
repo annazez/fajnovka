@@ -20,17 +20,15 @@ const evidence = [
   <Headline id="evidence-title" lines={t.title} />
 
   <ul class="evidence__list">
-    {
-      evidence.map(({ icon, lead, text, source }, index) => (
-        <li data-in={index * 3 + 3}>
-          <Icon name={icon} />
-          <p class="t-body">
-            <strong>{lead}</strong> {text}
-          </p>
-          <p class="evidence__source t-small">{source}</p>
-        </li>
-      ))
-    }
+    {evidence.map(({ icon, lead, text, source }, index) => (
+      <li data-in={index * 3 + 3}>
+        <Icon name={icon} />
+        <p class="t-body">
+          <strong>{lead}</strong> {text}
+        </p>
+        <p class="evidence__source t-small">{source}</p>
+      </li>
+    ))}
   </ul>
 </Slide>
 

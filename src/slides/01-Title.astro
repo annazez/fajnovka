@@ -11,35 +11,33 @@ const layouts = ['stage', 'flow'] as const;
 ---
 
 <Slide id="title" theme="cyan" notes={t.title.notes} {...Astro.props}>
-  {
-    layouts.map((layout) => (
-      <div class="scene" data-scene={layout} aria-hidden="true">
-        <SceneLines layout={layout} />
-      </div>
-    ))
-  }
+  {layouts.map((layout) => (
+    <div class="scene" data-scene={layout} aria-hidden="true">
+      <SceneLines layout={layout} />
+    </div>
+  ))}
 
   <nav class="title__languages t-small" aria-label={t.ui.language}>
-    {
-      locales.map((code) => (
-        <a
-          href={localePath(code)}
-          hreflang={code}
-          lang={code}
-          aria-label={`${code.toUpperCase()} · ${languageName[code]}`}
-          aria-current={code === locale ? 'true' : undefined}
-        >
-          {code.toUpperCase()}
-        </a>
-      ))
-    }
+    {locales.map((code) => (
+      <a
+        href={localePath(code)}
+        hreflang={code}
+        lang={code}
+        aria-label={`${code.toUpperCase()} · ${languageName[code]}`}
+        aria-current={code === locale ? 'true' : undefined}
+      >
+        {code.toUpperCase()}
+      </a>
+    ))}
   </nav>
 
   <h1 class="title__mark" id="title-title" data-in="0">
     <span class="sr-only">Fajnovka</span>
     <Wordmark />
   </h1>
-  <p class="title__slogan t-title" data-in="2">{t.title.slogan}</p>
+  <p class="title__slogan t-title" data-in="2">
+    {t.title.slogan}
+  </p>
 </Slide>
 
 <script>
@@ -190,7 +188,7 @@ const layouts = ['stage', 'flow'] as const;
     width: 1em;
     height: 1em;
     border-radius: 50%;
-    background: currentColor;
+    background: currentcolor;
     opacity: 0;
   }
 

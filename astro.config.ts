@@ -17,7 +17,13 @@ function montserrat(subset: 'latin' | 'latin-ext', name: string, cssVariable: st
       unicodeRange,
     },
   ];
-  return { provider: fontProviders.local(), name, cssVariable, fallbacks: ['system-ui', 'sans-serif'], options: { variants } };
+  return {
+    provider: fontProviders.local(),
+    name,
+    cssVariable,
+    fallbacks: ['system-ui', 'sans-serif'],
+    options: { variants },
+  };
 }
 
 export default defineConfig({

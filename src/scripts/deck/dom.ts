@@ -1,5 +1,6 @@
 /** Small DOM helpers that fail loudly: a missing element is a bug in the page, not a state to handle. */
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- The caller names the type of the element, as with querySelector.
 export function required<T extends Element>(selector: string, root: ParentNode = document): T {
   const element = root.querySelector<T>(selector);
   if (!element) throw new Error(`Deck: ${selector} is missing`);
@@ -17,5 +18,6 @@ export function pageLanguage(): string {
 
 /** True while the page uses the flow layout (see styles/media.css). */
 export function isFlowLayout(): boolean {
-  return matchMedia('(orientation: portrait), ((orientation: landscape) and (max-width: 960px) and (pointer: fine))').matches;
+  return matchMedia('(orientation: portrait), ((orientation: landscape) and (max-width: 960px) and (pointer: fine))')
+    .matches;
 }

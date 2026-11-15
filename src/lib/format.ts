@@ -48,7 +48,8 @@ function isFormat(name: string): name is Format {
 
 /** Replaces each `{key}` or `{key:format}` in a dictionary text with the formatted number. */
 export function fill(text: string, locale: Locale): string {
-  return text.replace(PLACEHOLDER, (_, key: string, kind = 'number') => {
+  return text.replace(PLACEHOLDER, (_, key: string, name?: string) => {
+    const kind = name ?? 'number';
     if (!isNumberKey(key)) throw new Error(`Unknown number "${key}" in text: ${text}`);
     if (!isFormat(kind)) throw new Error(`Unknown format "${kind}" in text: ${text}`);
     return format(numbers[key].value, kind, locale);

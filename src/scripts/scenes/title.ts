@@ -132,8 +132,9 @@ function waypoints(line: SceneLine, path: SVGPathElement, layout: SceneLayout, b
 
   const stops = visited.map(({ visit, stop }, index): Waypoint => {
     const distance = distanceTo(path, stop.x, stop.y);
-    const seconds = index === 0 ? ENTRY_SECONDS : undefined;
-    return { distance, stop: visit.stop, dwell: visit.dwell, alight: visit.alight, seconds };
+    // The move to the first stop has a fixed time. The other moves follow from the distance and the speed.
+    const fixedTime = index === 0 ? { seconds: ENTRY_SECONDS } : {};
+    return { distance, stop: visit.stop, dwell: visit.dwell, alight: visit.alight, ...fixedTime };
   });
   const entry = gate(path, path.getPointAtLength(0), first.stop, layout, band);
   const exit = line.returns ? entry : gate(path, path.getPointAtLength(path.getTotalLength()), last.stop, layout, band);
@@ -162,7 +163,11 @@ function build(root: HTMLElement, layout: SceneLayout, demand: number, origin: C
     return { line, path, spec, length: line.carriages * CAR_LENGTH + (line.carriages - 1) * CAR_GAP };
   });
 
-  const stops: StopSpec[] = layout.stops.map((stop) => ({ id: stop.id, rate: Math.round(stop.rate * demand), hub: stop.hub }));
+  const stops: StopSpec[] = layout.stops.map((stop) => ({
+    id: stop.id,
+    rate: Math.round(stop.rate * demand),
+    hub: stop.hub ?? false,
+  }));
   const { waiting, riding } = simulate(
     CYCLE,
     stops,
@@ -178,17 +183,21 @@ function build(root: HTMLElement, layout: SceneLayout, demand: number, origin: C
     marker.style.top = em(stop.y);
     const covered = trams
       .filter(({ line }) => line.visits.some((visit) => visit.stop === stop.id))
-      .flatMap(({ path, spec, length }) => coverage(spec.journey, spec.offset, CYCLE, distanceTo(path, stop.x, stop.y), length / 2 + radius));
+      .flatMap(({ path, spec, length }) =>
+        coverage(spec.journey, spec.offset, CYCLE, distanceTo(path, stop.x, stop.y), length / 2 + radius),
+      );
     animations.push(presence(marker, covered, MARKER_FADE_SECONDS, true));
 
     const group = element('scene__wait', root);
     group.style.left = em(stop.x + stop.wait[0]);
     group.style.top = em(stop.y + stop.wait[1]);
-    for (const intervals of waiting.get(stop.id) ?? []) animations.push(presence(element('seat', group), intervals, PASSENGER_FADE_SECONDS));
+    for (const intervals of waiting.get(stop.id) ?? [])
+      animations.push(presence(element('seat', group), intervals, PASSENGER_FADE_SECONDS));
   }
 
   // Carriage 0 is the front one. The centre of the tram stops exactly on the stop.
-  const leadOf = (line: SceneLine, index: number): number => ((line.carriages - 1) / 2 - index) * (CAR_LENGTH + CAR_GAP);
+  const leadOf = (line: SceneLine, index: number): number =>
+    ((line.carriages - 1) / 2 - index) * (CAR_LENGTH + CAR_GAP);
 
   // Each carriage has a ring in the colour of the slide. A link joins the rings of two carriages into one shape.
   // The links lie below all carriages.

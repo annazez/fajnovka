@@ -26,35 +26,33 @@ const riders = [
 
   <div class="journey__map">
     <svg viewBox="0 0 1680 560" aria-hidden="true">
-      {
-        riders.map(({ id, path, y }) => (
-          <g class:list={['journey__line', `journey__line--${id}`]}>
-            <path d={path} pathLength="1" />
-            {stopX.map((x) => (
-              <circle cx={x} cy={y} r="17" />
-            ))}
-          </g>
-        ))
-      }
+      {riders.map(({ id, path, y }) => (
+        <g class:list={['journey__line', `journey__line--${id}`]}>
+          <path d={path} pathLength="1" />
+          {stopX.map((x) => (
+            <circle cx={x} cy={y} r="17" />
+          ))}
+        </g>
+      ))}
       <circle class="journey__terminus" cx={merge.x} cy={merge.y} r="30"></circle>
     </svg>
 
-    {
-      riders.map(({ id, name, stops }, line) => (
-        <div class:list={['journey__rider', `journey__rider--${id}`]} role="group" aria-label={name}>
-          <p class="journey__name t-body" data-in={line * 5 + 2}>
-            <strong>{name}</strong>
-          </p>
-          <ol class="journey__stops stops-list t-body">
-            {stops.map((stop, index) => (
-              <li data-in={line * 5 + index * 2 + 4}>{stop}</li>
-            ))}
-          </ol>
-        </div>
-      ))
-    }
+    {riders.map(({ id, name, stops }, line) => (
+      <div class:list={['journey__rider', `journey__rider--${id}`]} role="group" aria-label={name}>
+        <p class="journey__name t-body" data-in={line * 5 + 2}>
+          <strong>{name}</strong>
+        </p>
+        <ol class="journey__stops stops-list t-body">
+          {stops.map((stop, index) => (
+            <li data-in={line * 5 + index * 2 + 4}>{stop}</li>
+          ))}
+        </ol>
+      </div>
+    ))}
 
-    <p class="journey__end t-body" data-in="18"><strong>{t.end}</strong></p>
+    <p class="journey__end t-body" data-in="18">
+      <strong>{t.end}</strong>
+    </p>
   </div>
 </Slide>
 

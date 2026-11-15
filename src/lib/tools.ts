@@ -22,7 +22,7 @@ export interface ToolSpec {
 
 /** A tool with its work. `run` gets the input object and gives a value that JSON can hold. */
 export interface Tool extends ToolSpec {
-  run(input: Record<string, unknown>): unknown;
+  readonly run: (input: Record<string, unknown>) => unknown;
 }
 
 /** The part of the browser that takes the tools. */
@@ -53,7 +53,8 @@ export function deckToolSpecs(slides: number): Record<'listSlides' | 'goToSlide'
     goToSlide: {
       name: 'go_to_slide',
       title: 'Go to a slide',
-      description: 'Shows one slide of the Fajnovka pitch deck on the screen. Call list_slides first to find the number of the slide.',
+      description:
+        'Shows one slide of the Fajnovka pitch deck on the screen. Call list_slides first to find the number of the slide.',
       inputSchema: oneNumber('slide', slides, `Number of the slide, from 1 to ${slides}.`),
       annotations: { readOnlyHint: false },
     },
@@ -81,7 +82,8 @@ export function manualToolSpecs(chapters: number): Record<'listChapters' | 'getC
     getChapter: {
       name: 'get_chapter',
       title: 'Read a chapter',
-      description: 'Gives the full text of one chapter of the Fajnovka manual as Markdown. A chart is given as its caption and a table of its values. Call list_chapters first to find the number of the chapter.',
+      description:
+        'Gives the full text of one chapter of the Fajnovka manual as Markdown. A chart is given as its caption and a table of its values. Call list_chapters first to find the number of the chapter.',
       inputSchema: oneNumber('chapter', chapters, `Number of the chapter, from 1 to ${chapters}.`),
       annotations: { readOnlyHint: true },
     },
@@ -111,12 +113,12 @@ export function chapterOf(markdown: string, chapter: number): string | undefined
  * The answer of a tool goes to the agent as JSON text.
  */
 export function registerTools(context: Partial<ModelContext> | undefined, tools: readonly Tool[]): void {
-  if (typeof context?.registerTool !== 'function') return;
   for (const { run, ...spec } of tools) {
-    const execute = async (input: unknown): Promise<string> => JSON.stringify(await run(typeof input === 'object' && input !== null ? (input as Record<string, unknown>) : {}));
+    const execute = async (input: unknown): Promise<string> =>
+      JSON.stringify(await run(typeof input === 'object' && input !== null ? (input as Record<string, unknown>) : {}));
     try {
-      // New browsers give a promise, the first ones gave nothing.
-      void Promise.resolve(context.registerTool({ ...spec, execute })).catch(() => undefined);
+      // New browsers give a promise, the first ones gave nothing. A browser without WebMCP has nothing to call.
+      void Promise.resolve(context?.registerTool?.({ ...spec, execute })).catch(() => undefined);
     } catch {
       // The page works without the tool.
     }

@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 import { build, preview } from 'astro';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import type { RefProxy } from 'pdfjs-dist/types/src/display/api.js';
 
 import { locales, localePath } from '../src/i18n/locales.ts';
 import { manualSignature } from './signature.ts';
@@ -35,7 +36,8 @@ async function layoutOf(pdf: Uint8Array, anchors: readonly string[]): Promise<La
   for (const anchor of anchors) {
     const destination = await document.getDestination(anchor);
     if (!destination) throw new Error(`The PDF has no destination for the chapter "${anchor}".`);
-    starts[anchor] = (await document.getPageIndex(destination[0])) + 1;
+    const [reference] = destination as [RefProxy];
+    starts[anchor] = (await document.getPageIndex(reference)) + 1;
   }
   const total = document.numPages;
   await task.destroy();
@@ -58,7 +60,9 @@ try {
     const signature = await manualSignature(page);
 
     const numbers = page.locator('[data-page-of]');
-    const anchors = await numbers.evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.pageOf ?? ''));
+    const anchors = await numbers.evaluateAll((nodes) =>
+      nodes.map((node) => (node as HTMLElement).dataset.pageOf ?? ''),
+    );
     const draft = await layoutOf(await page.pdf(PRINT), anchors);
     await numbers.evaluateAll((nodes, starts) => {
       for (const node of nodes) node.textContent = String(starts[(node as HTMLElement).dataset.pageOf ?? '']);

@@ -14,7 +14,11 @@ export function deckTools(root: HTMLElement, deck: Deck): Tool[] {
       ...specs.listSlides,
       run: () => ({
         current: deck.index + 1,
-        slides: slides.map((slide, index) => ({ number: index + 1, title: titleOf(slide), speakerText: plainText(slide.dataset.notes ?? '') })),
+        slides: slides.map((slide, index) => ({
+          number: index + 1,
+          title: titleOf(slide),
+          speakerText: plainText(slide.dataset.notes ?? ''),
+        })),
       }),
     },
     {

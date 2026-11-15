@@ -5,7 +5,9 @@ import { numbers } from '../../src/data/numbers.ts';
 import { snapshot } from '../../src/data/occupancy.ts';
 import { demandOf, isOccupancy, shareOf, summarise, type Occupancy } from '../../src/lib/occupancy.ts';
 
-const vehicle = (inside: unknown, technicalCapacity: unknown, apc: unknown = true) => ({ data: { apc, occupancy: { inside, technicalCapacity } } });
+const vehicle = (inside: unknown, technicalCapacity: unknown, apc: unknown = true) => ({
+  data: { apc, occupancy: { inside, technicalCapacity } },
+});
 const reading = (passengers: number, places: number): Occupancy => ({ ...snapshot, live: true, passengers, places });
 const NOW = new Date('2026-11-15T13:07:00Z');
 
@@ -16,8 +18,27 @@ describe('reading of the network', () => {
   });
 
   test('a summary adds the vehicles that count their passengers', () => {
-    const payload = { status: 'ok', data: [vehicle(35, 119), vehicle(5, 80), vehicle(9, 90, false), { data: { apc: true } }, vehicle(-1, 90), vehicle(3, 0), vehicle('3', 90), null] };
-    expect(summarise(payload, NOW)).toEqual({ live: true, time: '2026-11-15T13:07:00.000Z', vehicles: 8, counted: 2, passengers: 40, places: 199 });
+    const payload = {
+      status: 'ok',
+      data: [
+        vehicle(35, 119),
+        vehicle(5, 80),
+        vehicle(9, 90, false),
+        { data: { apc: true } },
+        vehicle(-1, 90),
+        vehicle(3, 0),
+        vehicle('3', 90),
+        null,
+      ],
+    };
+    expect(summarise(payload, NOW)).toEqual({
+      live: true,
+      time: '2026-11-15T13:07:00.000Z',
+      vehicles: 8,
+      counted: 2,
+      passengers: 40,
+      places: 199,
+    });
   });
 
   test('an empty list is a valid reading of a network at night', () => {
