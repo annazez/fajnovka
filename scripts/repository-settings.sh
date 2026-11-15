@@ -29,6 +29,7 @@ gh api --silent -X PATCH "repos/$repo" --input - <<'JSON'
 JSON
 
 # The rule of the main branch (.github/rulesets/main.json): no deletion, no forced push, a straight history,
+# a pull request for each change, the approval of the owner for the files in CODEOWNERS,
 # and the checks `ci-ok` and `security-ok`. An administrator can go past the rule.
 ruleset=$(gh api "repos/$repo/rulesets" --jq '.[] | select(.name == "main") | .id')
 if [ -n "$ruleset" ]; then

@@ -1,2 +1,10 @@
-# The owner reviews each change.
-* @annazez
+# The owner of the project approves each change of its rules, its legal texts and the settings of the repository.
+/AGENTS.md @annazez
+/CLAUDE.md @annazez
+/LICENCE.md @annazez
+/LICENCE-CONTENT.md @annazez
+/CODE_OF_CONDUCT.md @annazez
+/SECURITY.md @annazez
+/.github/CODEOWNERS @annazez
+/.github/rulesets/ @annazez
+/scripts/repository-settings.sh @annazez
