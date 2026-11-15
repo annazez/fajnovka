@@ -32,7 +32,22 @@ export default defineConfig({
   devToolbar: { enabled: false },
   i18n: { locales: [...locales], defaultLocale },
   build: { inlineStylesheets: 'always' },
-  markdown: { processor: satteri({ hastPlugins: [manualMarkdown] }) },
+  // Each page carries its content policy. The build gives each script and each style of the page a hash,
+  // so the browser runs nothing that the build did not make. `vercel.json` adds the headers that a page cannot set.
+  security: {
+    csp: {
+      directives: [
+        "default-src 'none'",
+        "img-src 'self'",
+        "font-src 'self'",
+        "connect-src 'self'",
+        "base-uri 'none'",
+        "form-action 'none'",
+      ],
+    },
+  },
+  // The manual has no code blocks. The default highlighter writes inline styles, and the content policy forbids them.
+  markdown: { processor: satteri({ hastPlugins: [manualMarkdown] }), syntaxHighlight: false },
   fonts: [
     montserrat('latin', 'Montserrat', '--font-montserrat', [
       'U+0000-00FF',
