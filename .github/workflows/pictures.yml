@@ -1,0 +1,47 @@
+# Draws the reference pictures of the slides again. Run it by hand after a change of the design.
+# The job puts the pictures that changed on a branch. A person opens a pull request from the branch and looks at them.
+name: Update the pictures
+
+on: workflow_dispatch
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  pictures:
+    name: Draw the pictures in Chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write # The job pushes the branch with the new pictures.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The last step needs the credentials for its push. No step sends files of the work folder to another place.
+          persist-credentials: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install the browser
+        run: npx playwright install --with-deps chromium
+      - run: npm run build:test
+      - name: Draw each slide
+        run: npx playwright test tests/e2e/visual.spec.ts --update-snapshots
+      - name: Put the pictures that changed on a branch
+        run: |
+          if [ -z "$(git status --porcelain -- tests/e2e/__snapshots__)" ]; then
+            echo "No picture changed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          branch="pictures/$GITHUB_RUN_ID"
+          git switch --create "$branch"
+          git add tests/e2e/__snapshots__
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit --message "test: update the pictures of the slides"
+          git push origin "$branch"
+          echo "Open a pull request: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/$branch?expand=1" >> "$GITHUB_STEP_SUMMARY"
