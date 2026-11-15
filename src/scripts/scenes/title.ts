@@ -28,6 +28,7 @@ import {
 } from '../../lib/scene.ts';
 import { snapshot } from '../../data/occupancy.ts';
 import { demandOf } from '../../lib/occupancy.ts';
+import { trace, type Point, type Shape } from '../../lib/path.ts';
 import { isFlowLayout } from '../deck/dom.ts';
 import { readOccupancy } from '../deck/live.ts';
 import { scene } from '../deck/scene.ts';
@@ -51,27 +52,12 @@ const STILL_AT_SECONDS = 10.4;
 /** Design units are tenths of a rem; the scene container sets 1em to 1rem. */
 const em = (units: number): string => `${(units / 10).toFixed(3)}em`;
 
-/** Distance along a path that is nearest to a point. */
-function distanceTo(path: SVGPathElement, x: number, y: number): number {
-  const total = path.getTotalLength();
-  let best = 0;
-  let bestGap = Infinity;
-  for (let distance = 0; distance <= total; distance += 2) {
-    const point = path.getPointAtLength(distance);
-    const gap = (point.x - x) ** 2 + (point.y - y) ** 2;
-    if (gap < bestGap) {
-      bestGap = gap;
-      best = distance;
-    }
-  }
-  return best;
-}
-
-function element(className: string, parent: Element): HTMLElement {
+/** Makes an element of the scene. It goes at the end of its parent, or before the node `before`. */
+function element(className: string, parent: Element, before: Element | null = null): HTMLElement {
   const node = document.createElement(className === 'seat' ? 'i' : 'div');
   if (className !== 'seat') node.className = className;
   node.dataset.built = '';
-  parent.append(node);
+  parent.insertBefore(node, before);
   return node;
 }
 
@@ -84,20 +70,15 @@ function presence(node: HTMLElement, intervals: readonly Interval[], fade: numbe
   return node.animate(frames, { duration: CYCLE * 1000, iterations: Infinity });
 }
 
-/** Moves one carriage along the path of its line. `lead` is its place in the tram: positive is in front of the centre. */
-function travel(car: HTMLElement, path: SVGPathElement, journey: Journey, offset: number, lead: number): Animation {
-  const total = path.getTotalLength();
+/** Moves one carriage along the shape of its line. `lead` is its place in the tram: positive is in front of the centre. */
+function travel(car: HTMLElement, shape: Shape, journey: Journey, offset: number, lead: number): Animation {
   const frames = keyTimes(journey, CYCLE, SAMPLES_PER_LEG).map((share) => {
     const centre = distanceAt(journey, share * CYCLE);
     const next = distanceAt(journey, Math.min(share * CYCLE + 0.05, CYCLE));
     // The front carriage is ahead in the direction of travel. A tram that stands keeps its last direction.
     const direction = next < centre ? -1 : 1;
-    const distance = Math.min(Math.max(centre + direction * lead, 0), total);
-    const point = path.getPointAtLength(distance);
-    const ahead = path.getPointAtLength(Math.min(distance + 1, total));
-    const behind = path.getPointAtLength(Math.max(distance - 1, 0));
-    const angle = (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI;
-    return { offset: share, transform: `translate(${em(point.x)}, ${em(point.y)}) rotate(${angle.toFixed(2)}deg)` };
+    const { x, y, angle } = shape.at(centre + direction * lead);
+    return { offset: share, transform: `translate(${em(x)}, ${em(y)}) rotate(${angle.toFixed(2)}deg)` };
   });
   // A negative delay starts the loop in the middle, so the tram is on its way from the first moment.
   return car.animate(frames, { duration: CYCLE * 1000, iterations: Infinity, delay: (offset - CYCLE) * 1000 });
@@ -113,14 +94,14 @@ function sideBand(root: HTMLElement, layout: SceneLayout): number {
  * The point where a tram enters or leaves the picture: on the end of the line that is nearest to `stop`,
  * outside the visible part of the screen. The ends of both lines are horizontal.
  */
-function gate(path: SVGPathElement, end: DOMPoint, stop: SceneStop, layout: SceneLayout, band: number): number {
+function gate(shape: Shape, end: Point, stop: SceneStop, layout: SceneLayout, band: number): number {
   const side = end.x < stop.x ? -1 : 1;
   const edge = side < 0 ? -band : layout.width + band;
   const reach = Math.max(GATE_DISTANCE, Math.abs(edge - stop.x) + GATE_MARGIN);
-  return distanceTo(path, stop.x + side * reach, end.y);
+  return shape.nearest(stop.x + side * reach, end.y);
 }
 
-function waypoints(line: SceneLine, path: SVGPathElement, layout: SceneLayout, band: number): Waypoint[] {
+function waypoints(line: SceneLine, shape: Shape, layout: SceneLayout, band: number): Waypoint[] {
   const visited = line.visits.map((visit) => {
     const stop = layout.stops.find(({ id }) => id === visit.stop);
     if (!stop) throw new Error(`Scene: stop ${visit.stop} is missing`);
@@ -131,136 +112,195 @@ function waypoints(line: SceneLine, path: SVGPathElement, layout: SceneLayout, b
   if (!first || !last) throw new Error(`Scene: line ${line.id} has no stops`);
 
   const stops = visited.map(({ visit, stop }, index): Waypoint => {
-    const distance = distanceTo(path, stop.x, stop.y);
+    const distance = shape.nearest(stop.x, stop.y);
     // The move to the first stop has a fixed time. The other moves follow from the distance and the speed.
     const fixedTime = index === 0 ? { seconds: ENTRY_SECONDS } : {};
     return { distance, stop: visit.stop, dwell: visit.dwell, alight: visit.alight, ...fixedTime };
   });
-  const entry = gate(path, path.getPointAtLength(0), first.stop, layout, band);
-  const exit = line.returns ? entry : gate(path, path.getPointAtLength(path.getTotalLength()), last.stop, layout, band);
+  const entry = gate(shape, shape.at(0), first.stop, layout, band);
+  const exit = line.returns ? entry : gate(shape, shape.at(shape.length), last.stop, layout, band);
   return [{ distance: entry }, ...stops, { distance: exit, seconds: EXIT_SECONDS }];
 }
 
+/** Runs the steps in order, each in its own task of the browser. The page can paint and answer between two steps. */
+function inTurns(steps: readonly (() => void)[]): () => void {
+  let timer = 0;
+  const run = (index: number): void => {
+    steps[index]?.();
+    if (index + 1 < steps.length) timer = window.setTimeout(run, 0, index + 1);
+  };
+  run(0);
+  return () => {
+    clearTimeout(timer);
+  };
+}
+
+/** One picture of the scene in one layout container. */
+interface Picture {
+  /** The animations of the picture. The list grows while the picture builds. */
+  readonly animations: readonly Animation[];
+  /** The moment at which the loop started. */
+  readonly origin: CSSNumberish | null;
+  /** Stops a build that has not finished. */
+  readonly cancel: () => void;
+}
+
 /**
- * Builds the scene inside one layout container and returns its animations.
+ * Builds the scene inside one layout container in three short steps: the plan, the trams, and the stops.
+ * A short step does not hold the page. Each part of an older picture stays until its new part is ready.
  * `origin` is the moment at which the loop started. A new picture with the same origin continues without a jump.
+ * `settle` gives each new animation its state (it runs, or it shows the still picture) in the task that makes it.
  */
-function build(root: HTMLElement, layout: SceneLayout, demand: number, origin: CSSNumberish | null): Animation[] {
-  root.querySelectorAll('[data-built]').forEach((node) => node.remove());
-  const band = sideBand(root, layout);
-
-  const trams = layout.lines.map((line) => {
-    const path = root.querySelector<SVGPathElement>(`[data-line="${line.id}"]`);
-    if (!path) throw new Error(`Scene: line ${line.id} is missing`);
-    const capacity = line.carriages * SEATS_PER_CARRIAGE;
-    const spec: TramSpec = {
-      id: line.id,
-      capacity,
-      load: Math.round(line.load * capacity * demand),
-      offset: line.offset,
-      journey: planJourney(waypoints(line, path, layout, band), SPEED),
-    };
-    return { line, path, spec, length: line.carriages * CAR_LENGTH + (line.carriages - 1) * CAR_GAP };
-  });
-
-  const stops: StopSpec[] = layout.stops.map((stop) => ({
-    id: stop.id,
-    rate: Math.round(stop.rate * demand),
-    hub: stop.hub ?? false,
-  }));
-  const { waiting, riding } = simulate(
-    CYCLE,
-    stops,
-    trams.map(({ spec }) => spec),
-  );
+function build(
+  root: HTMLElement,
+  layout: SceneLayout,
+  demand: number,
+  origin: CSSNumberish | null,
+  settle: (animation: Animation) => void,
+): Picture {
+  const older = [...root.querySelectorAll('[data-built]')];
+  const isTram = (node: Element): boolean => node.matches('.scene__car, .scene__link');
   const animations: Animation[] = [];
-
-  for (const stop of layout.stops) {
-    // A stop marker leaves while a tram stands on it, so the two never overlap.
-    const radius = stop.hub ? HUB_RADIUS : STOP_RADIUS;
-    const marker = element(stop.hub ? 'scene__stop is-hub' : 'scene__stop', root);
-    marker.style.left = em(stop.x);
-    marker.style.top = em(stop.y);
-    const covered = trams
-      .filter(({ line }) => line.visits.some((visit) => visit.stop === stop.id))
-      .flatMap(({ path, spec, length }) =>
-        coverage(spec.journey, spec.offset, CYCLE, distanceTo(path, stop.x, stop.y), length / 2 + radius),
-      );
-    animations.push(presence(marker, covered, MARKER_FADE_SECONDS, true));
-
-    const group = element('scene__wait', root);
-    group.style.left = em(stop.x + stop.wait[0]);
-    group.style.top = em(stop.y + stop.wait[1]);
-    for (const intervals of waiting.get(stop.id) ?? [])
-      animations.push(presence(element('seat', group), intervals, PASSENGER_FADE_SECONDS));
-  }
-
-  // Carriage 0 is the front one. The centre of the tram stops exactly on the stop.
-  const leadOf = (line: SceneLine, index: number): number =>
-    ((line.carriages - 1) / 2 - index) * (CAR_LENGTH + CAR_GAP);
-
-  // Each carriage has a ring in the colour of the slide. A link joins the rings of two carriages into one shape.
-  // The links lie below all carriages.
-  for (const { line, path, spec } of trams) {
-    for (let index = 1; index < line.carriages; index += 1) {
-      const link = element('scene__link', root);
-      animations.push(travel(link, path, spec.journey, spec.offset, leadOf(line, index - 0.5)));
-      link.classList.add('is-ready');
-    }
-  }
-
-  for (const { line, path, spec } of trams) {
-    const seats = riding.get(spec.id) ?? [];
-    for (let index = 0; index < line.carriages; index += 1) {
-      const car = element('scene__car', root);
-      car.dataset.line = line.id;
-      car.dataset.tone = line.tone;
-      animations.push(travel(car, path, spec.journey, spec.offset, leadOf(line, index)));
-      for (const intervals of seats.slice(index * SEATS_PER_CARRIAGE, (index + 1) * SEATS_PER_CARRIAGE)) {
-        animations.push(presence(element('seat', car), intervals, PASSENGER_FADE_SECONDS));
-      }
-      car.classList.add('is-ready');
-    }
-  }
-
   const start = origin ?? document.timeline.currentTime;
-  for (const animation of animations) animation.startTime = start;
-  root.classList.add('is-built');
-  // For tests and for the curious: how busy this picture is.
-  root.dataset.demand = demand.toFixed(2);
-  return animations;
+  /** All animations share one clock, so the trams and the passengers stay together. */
+  const add = (animation: Animation): void => {
+    animation.startTime = start;
+    settle(animation);
+    animations.push(animation);
+  };
+  /** A seat or a waiting place. A place that no passenger takes stays hidden and needs no animation. */
+  const passenger = (parent: Element, intervals: readonly Interval[]): void => {
+    const dot = element('seat', parent);
+    if (intervals.length > 0) add(presence(dot, intervals, PASSENGER_FADE_SECONDS));
+  };
+
+  let trams: { line: SceneLine; shape: Shape; spec: TramSpec; length: number }[] = [];
+  let people: ReturnType<typeof simulate> = { waiting: new Map(), riding: new Map() };
+
+  /** Step 1: where each tram is at each moment, and who stands and sits where. */
+  const plan = (): void => {
+    const band = sideBand(root, layout);
+    trams = layout.lines.map((line) => {
+      // The shape comes from the same data as the line on the page (see SceneLines.astro).
+      const shape = trace(line.d);
+      const capacity = line.carriages * SEATS_PER_CARRIAGE;
+      const spec: TramSpec = {
+        id: line.id,
+        capacity,
+        load: Math.round(line.load * capacity * demand),
+        offset: line.offset,
+        journey: planJourney(waypoints(line, shape, layout, band), SPEED),
+      };
+      return { line, shape, spec, length: line.carriages * CAR_LENGTH + (line.carriages - 1) * CAR_GAP };
+    });
+    const stops: StopSpec[] = layout.stops.map((stop) => ({
+      id: stop.id,
+      rate: Math.round(stop.rate * demand),
+      hub: stop.hub ?? false,
+    }));
+    people = simulate(
+      CYCLE,
+      stops,
+      trams.map(({ spec }) => spec),
+    );
+  };
+
+  /** Step 2: the trams with their passengers. */
+  const drawTrams = (): void => {
+    for (const node of older.filter(isTram)) node.remove();
+    // Carriage 0 is the front one. The centre of the tram stops exactly on the stop.
+    const leadOf = (line: SceneLine, index: number): number =>
+      ((line.carriages - 1) / 2 - index) * (CAR_LENGTH + CAR_GAP);
+
+    // Each carriage has a ring in the colour of the slide. A link joins the rings of two carriages into one shape.
+    // The links lie below all carriages.
+    for (const { line, shape, spec } of trams) {
+      for (let index = 1; index < line.carriages; index += 1) {
+        const link = element('scene__link', root);
+        add(travel(link, shape, spec.journey, spec.offset, leadOf(line, index - 0.5)));
+        link.classList.add('is-ready');
+      }
+    }
+
+    for (const { line, shape, spec } of trams) {
+      const seats = people.riding.get(spec.id) ?? [];
+      for (let index = 0; index < line.carriages; index += 1) {
+        const car = element('scene__car', root);
+        car.dataset.line = line.id;
+        car.dataset.tone = line.tone;
+        add(travel(car, shape, spec.journey, spec.offset, leadOf(line, index)));
+        for (const intervals of seats.slice(index * SEATS_PER_CARRIAGE, (index + 1) * SEATS_PER_CARRIAGE)) {
+          passenger(car, intervals);
+        }
+        car.classList.add('is-ready');
+      }
+    }
+  };
+
+  /** Step 3: the stops with the passengers who wait. The stops lie below the trams. */
+  const drawStops = (): void => {
+    for (const node of older.filter((item) => !isTram(item))) node.remove();
+    const firstTram = root.querySelector('.scene__link, .scene__car');
+
+    for (const stop of layout.stops) {
+      // A stop marker leaves while a tram stands on it, so the two never overlap.
+      const radius = stop.hub ? HUB_RADIUS : STOP_RADIUS;
+      const marker = element(stop.hub ? 'scene__stop is-hub' : 'scene__stop', root, firstTram);
+      marker.style.left = em(stop.x);
+      marker.style.top = em(stop.y);
+      const covered = trams
+        .filter(({ line }) => line.visits.some((visit) => visit.stop === stop.id))
+        .flatMap(({ shape, spec, length }) =>
+          coverage(spec.journey, spec.offset, CYCLE, shape.nearest(stop.x, stop.y), length / 2 + radius),
+        );
+      add(presence(marker, covered, MARKER_FADE_SECONDS, true));
+
+      const group = element('scene__wait', root, firstTram);
+      group.style.left = em(stop.x + stop.wait[0]);
+      group.style.top = em(stop.y + stop.wait[1]);
+      for (const intervals of people.waiting.get(stop.id) ?? []) passenger(group, intervals);
+    }
+
+    root.classList.add('is-built');
+    // For tests and for the curious: how busy this picture is.
+    root.dataset.demand = demand.toFixed(2);
+  };
+
+  return { animations, origin: start, cancel: inTurns([plan, drawTrams, drawStops]) };
 }
 
 scene('title', (context) => {
   const deck = context.slide.closest<HTMLElement>('[data-deck]');
-  let animations: Animation[] = [];
+  let picture: Picture | undefined;
   let built: string | null = null;
-  let origin: CSSNumberish | null = null;
   // The trams are as full as the real vehicles: the reading sets how busy the scene is.
   let reading = snapshot;
   let asked = false;
 
-  const apply = (): void => {
-    for (const animation of animations) {
-      if (context.running && context.active) {
-        animation.play();
-      } else {
-        animation.pause();
-        if (!context.running) animation.currentTime = STILL_AT_SECONDS * 1000;
-      }
+  /** An animation runs while the slide is visible and motion is on. Without motion, it shows the still picture. */
+  const settle = (animation: Animation): void => {
+    if (context.running && context.active) {
+      animation.play();
+    } else {
+      animation.pause();
+      if (!context.running) animation.currentTime = STILL_AT_SECONDS * 1000;
     }
+  };
+  const apply = (): void => {
+    picture?.animations.forEach(settle);
   };
 
   const refresh = (force = false): void => {
     const name = isFlowLayout() ? 'flow' : 'stage';
     const root = context.slide.querySelector<HTMLElement>(`[data-scene="${name}"]`);
     if (!root || (built === name && !force)) return;
-    const start = built === name ? origin : null;
-    for (const animation of animations) animation.cancel();
-    animations = build(root, layouts[name], demandOf(reading, snapshot), start);
-    origin = animations[0]?.startTime ?? null;
+
+    picture?.cancel();
+    // A new picture of the same layout continues the loop of the old one. The picture of the other layout stops.
+    const origin = built === name ? (picture?.origin ?? null) : null;
+    if (built !== name) for (const animation of picture?.animations ?? []) animation.cancel();
+    picture = build(root, layouts[name], demandOf(reading, snapshot), origin, settle);
     built = name;
-    apply();
   };
 
   /** Asks for the live reading one time. The stored snapshot stays if no answer comes. */
