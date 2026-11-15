@@ -1,0 +1,3 @@
+# Findings of the ZAP baseline scan that are decisions of the project. Columns: rule, action, reason. The separator is a tab.
+10055	IGNORE	(The header has the rules that a page cannot set. Each page has the rules for scripts and styles, with a hash for each of them.)
+90004	IGNORE	(The site sets COOP and CORP. It does not need COEP, because it loads nothing from another site.)

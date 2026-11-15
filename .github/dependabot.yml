@@ -1,0 +1,40 @@
+# Dependabot asks for new versions once a week. A version must be seven days old: a bad release is often
+# found and removed in that time. Patch and minor versions come in one pull request that merges itself
+# when all checks pass (see workflows/dependabot-merge.yml). A major version waits for a person.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Prague
+    cooldown:
+      default-days: 7
+    groups:
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+      npm-major:
+        update-types: [major]
+    commit-message:
+      prefix: chore(deps)
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Prague
+    cooldown:
+      default-days: 7
+    groups:
+      actions-minor-and-patch:
+        update-types: [minor, patch]
+      actions-major:
+        update-types: [major]
+    commit-message:
+      prefix: ci(deps)
+    open-pull-requests-limit: 5
