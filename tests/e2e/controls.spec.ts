@@ -39,6 +39,16 @@ test.describe('motion switch', () => {
     await expect.poll(async () => [...new Set(await sceneStates(page))]).toEqual(['paused']);
   });
 
+  test('no transition starts when the system asks for reduced motion', async ({ page }) => {
+    await openDeck(page, { motion: false });
+    const transitions = await page.evaluate(() => {
+      // A new unit of length changes almost each size on the page.
+      document.documentElement.style.fontSize = '7px';
+      return document.getAnimations().filter((animation) => animation instanceof CSSTransition).length;
+    });
+    expect(transitions).toBe(0);
+  });
+
   test('the scene of a slide stops when the slide leaves', async ({ page }) => {
     await openDeck(page, { motion: true });
     await expect.poll(async () => [...new Set(await sceneStates(page))]).toEqual(['running']);

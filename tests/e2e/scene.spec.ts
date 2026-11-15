@@ -78,6 +78,26 @@ function stays(frames: readonly Frame[], line: string): number[][] {
 }
 
 test.describe('the tram scene of the first slide', () => {
+  test('the still picture shows a tram at the hub', async ({ page }) => {
+    // Without motion, the scene shows one moment of the loop.
+    await openDeck(page, { motion: false });
+    const distance = await page.locator('#title [data-scene].is-built').evaluate((root) => {
+      const centre = (node: Element): { x: number; y: number } => {
+        const box = node.getBoundingClientRect();
+        return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      };
+      const hub = root.querySelector('.scene__stop.is-hub');
+      if (!hub) throw new Error('The scene has no hub.');
+      const { x, y } = centre(hub);
+      const cars = Array.from(root.querySelectorAll('.scene__car'), centre);
+      // The scene measures in `em`: the font size of its container is the unit.
+      const unit = Number.parseFloat(getComputedStyle(root).fontSize);
+      return Math.min(...cars.map((car) => Math.hypot(car.x - x, car.y - y))) / unit;
+    });
+    // The centre of the tram is on the hub, so the nearest carriage is less than one carriage away.
+    expect(distance).toBeLessThan(8.6);
+  });
+
   test('passengers leave a tram one at a time, and only then the passengers at the stop board one at a time', async ({
     page,
   }) => {

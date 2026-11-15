@@ -63,13 +63,18 @@ svg {
   white-space: nowrap;
 }
 
+/*
+ * People who ask for less motion get each change at once.
+ * Transitions are off. A very short transition is not the same: it runs for each property of each element.
+ * An inherited value, such as the font size, then arrives one frame later at each level of the page.
+ * Safari keeps the `em` lengths of a script animation that starts in such a moment at the old font size.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-delay: 0s !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0s !important;
+    transition: none !important;
   }
 }
