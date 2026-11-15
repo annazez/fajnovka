@@ -5,5 +5,10 @@
     "env": {
       "PUBLIC_LIVE_DATA": "/api/occupancy"
     }
+  },
+  "functions": {
+    "api/occupancy.ts": {
+      "includeFiles": "src/{data,lib}/occupancy.ts"
+    }
   }
 }
