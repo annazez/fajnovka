@@ -47,5 +47,6 @@ The site also gives its content to programs: `llms.txt`, the manual as Markdown,
 - `npm run check`, `npm run build` and `npm run test:unit` are successful.
 - Each slide is correct at 1920 × 1080. Look at a screenshot, not only at the code.
 - `npm run build:test` and then `npm run test:e2e` are successful in all three browser engines.
+- `npm run test:lighthouse` is successful after a change of a page, a style or a script.
 - The browser console shows no errors.
 - Commit messages follow Conventional Commits.

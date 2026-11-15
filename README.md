@@ -46,11 +46,12 @@ A browser gives the tools to its agent only if it has WebMCP (`document.modelCon
 ```sh
 npm install
 npm run dev        # http://localhost:4321
-npm run check      # types
+npm run check      # format, types, code, styles, writing rules and licences
 npm run build      # static site in dist/
 npm run test:unit  # tests of the pure code, the texts and the PDF files
 npm run build:test # the same site for the browser tests: it asks for live data, and each test gives the answer
 npm run test:e2e   # browser tests (Chromium, Firefox, WebKit); run build:test first
+npm run test:lighthouse # Lighthouse scores of each page, as a phone and as a desktop computer
 npm run manual:pdf # print the manual to public/manual/*.pdf
 ```
 
