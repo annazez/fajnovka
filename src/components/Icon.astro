@@ -2,11 +2,13 @@
 /**
  * Pictograms on a 100 × 100 grid.
  *
- * Rules (a test checks them in the browser):
+ * Rules:
  * - One stroke width (5) with round caps and joins.
  * - Paint order: accent shapes first, then strokes. An accent shape never covers a stroke.
  * - An accent shape either stops 3 units before a stroke, or goes under it and ends flush.
  * - The drawing sits in the centre of the grid.
+ *
+ * A browser test checks the stroke, the paint order and the centre (tests/e2e/design.spec.ts).
  */
 const star =
   '50,27 55.88,41.91 71.87,42.89 59.51,53.09 63.52,68.61 50,60 36.48,68.61 40.49,53.09 28.13,42.89 44.12,41.91';
