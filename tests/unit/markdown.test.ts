@@ -8,9 +8,9 @@ import { element, join, text } from '../../src/lib/svg.ts';
 
 const chapter = (locale: string): URL => pathToFileURL(`/project/src/content/manual/${locale}/02-problem.md`);
 /** Renders Markdown as Astro does: with the plugin and with the front matter of the chapter. */
-async function render(source: string, fileURL: URL | undefined, title = 'The problem'): Promise<string> {
+async function render(source: string, fileURL: URL | undefined, title: string | null = 'The problem'): Promise<string> {
   const astro = {
-    frontmatter: { title },
+    frontmatter: title === null ? {} : { title },
     headings: [],
     localImagePaths: new Set<string>(),
     remoteImagePaths: new Set<string>(),
@@ -54,9 +54,20 @@ describe('Markdown rules of the manual', () => {
     expect(html).not.toContain('<img');
   });
 
+  test('a chart whose text gives its values has no table', async () => {
+    const html = await render('![The budget of the programme.](figure:budget)', chapter('en'));
+    expect(html).toContain('<figcaption>The budget of the programme.</figcaption>');
+    expect(html).not.toContain('<table');
+  });
+
   test('an unknown chart stops the build', async () => {
     await expect(render('![Caption](figure:pie)', chapter('en'))).rejects.toThrow('Unknown chart "pie"');
     expect(() => figureMarkup('pie', 'Caption', 'en')).toThrow('Unknown chart "pie"');
+  });
+
+  test('a chart without a caption stops the build', async () => {
+    await expect(render('![](figure:budget)', chapter('en'))).rejects.toThrow('The chart "budget" has no caption');
+    expect(() => figureMarkup('budget', ' ', 'en')).toThrow('has no caption');
   });
 
   test('other images and paragraphs stay', async () => {
@@ -78,6 +89,13 @@ describe('Markdown rules of the manual', () => {
   test('a table before the first heading takes the title of the chapter', async () => {
     const html = await render('| A | B |\n| --- | --- |\n| 1 | 2 |', chapter('en'), 'Risks');
     expect(html).toContain('aria-label="Table: Risks. Scroll sideways to see all columns."');
+  });
+
+  test('a table in a chapter without a title and without a heading has a frame all the same', async () => {
+    const html = await render('| A | B |\n| --- | --- |\n| 1 | 2 |', chapter('en'), null);
+    expect(html).toContain(
+      '<div class="scroll" role="group" aria-label="Table: . Scroll sideways to see all columns."',
+    );
   });
 
   test('a file that is not a chapter of the manual does not change', async () => {

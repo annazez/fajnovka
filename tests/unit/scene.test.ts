@@ -1,9 +1,15 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  coverage,
+  distanceAt,
   EXCHANGE,
+  keyTimes,
+  merge,
   occupied,
+  opacityFrames,
   planJourney,
+  random,
   simulate,
   WAITING_PLACES,
   type Interval,
@@ -206,5 +212,220 @@ describe('passengers at a stop', () => {
     expect(boarded.length).toBeGreaterThan(0);
     expect((out[1] ?? 0) - (out[0] ?? 0)).toBeLessThan(EXCHANGE.step);
     expect(boarded.at(-1)).toBeLessThanOrEqual(2.4 - EXCHANGE.beforeDeparture + EPSILON);
+  });
+});
+
+/** A trip with a stay of 2 s at 400, a stop without a stay at 600, and a last move with a fixed time. */
+const trip = planJourney(
+  [
+    { distance: 0 },
+    { distance: 400, stop: 'a', dwell: 2, alight: 0.5 },
+    { distance: 600, stop: 'b' },
+    { distance: 1000, seconds: 3 },
+  ],
+  200,
+);
+
+describe('the trip of a tram', () => {
+  test('a trip is a chain of moves and stays', () => {
+    expect(trip.legs).toEqual([
+      { from: 0, to: 400, start: 0, duration: 2, ease: 'out' },
+      // A short move takes the least time of a move, not the time that the speed gives.
+      { from: 400, to: 600, start: 4, duration: 1.4, ease: 'in-out' },
+      { from: 600, to: 1000, start: 5.4, duration: 3, ease: 'in' },
+    ]);
+    expect(trip.dwells).toEqual([
+      { stop: 'a', arrive: 2, depart: 4, alight: 0.5 },
+      // A stop without a stay time: the tram goes on at once, and nobody leaves.
+      { stop: 'b', arrive: 5.4, depart: 5.4, alight: 0 },
+    ]);
+    expect(trip.duration).toBeCloseTo(8.4);
+  });
+
+  test('a trip with one move slows down from the first moment', () => {
+    expect(planJourney([{ distance: 0 }, { distance: 600 }], 200).legs).toEqual([
+      { from: 0, to: 600, start: 0, duration: 3, ease: 'out' },
+    ]);
+  });
+
+  test('no move gives an empty trip', () => {
+    expect(planJourney([], 200)).toEqual({ legs: [], dwells: [], duration: 0 });
+    expect(planJourney([{ distance: 50 }], 200)).toEqual({ legs: [], dwells: [], duration: 0 });
+    expect(distanceAt(planJourney([], 200), 3)).toBe(0);
+  });
+
+  test('the tram slows down before a stop and speeds up after it', () => {
+    expect(distanceAt(trip, -1)).toBe(0);
+    expect(distanceAt(trip, 0)).toBe(0);
+    // Half of the time of the first move: three quarters of the way.
+    expect(distanceAt(trip, 1)).toBeCloseTo(300);
+    // The stay at the stop.
+    expect(distanceAt(trip, 3)).toBe(400);
+    // The move between two stops is slow at its two ends.
+    expect(distanceAt(trip, 4.35)).toBeCloseTo(412.5);
+    expect(distanceAt(trip, 4.7)).toBeCloseTo(500);
+    expect(distanceAt(trip, 5.05)).toBeCloseTo(587.5);
+    // Half of the time of the last move: one quarter of the way.
+    expect(distanceAt(trip, 6.9)).toBeCloseTo(700);
+    // After the trip, the tram stays at the last point.
+    expect(distanceAt(trip, 100)).toBe(1000);
+  });
+
+  test('the key times follow each move, as shares of the cycle from 0 to 1', () => {
+    const times = keyTimes(trip, 24, 2);
+    const expected = [0, 1, 2, 4, 4.7, 5.4, 6.9, 8.4].map((seconds) => seconds / 24);
+    expect(times).toHaveLength(expected.length + 1);
+    expected.forEach((share, index) => expect(times[index]).toBeCloseTo(share));
+    expect(times.at(-1)).toBe(1);
+    // A cycle that is shorter than the trip: no key time is after the end of the cycle.
+    expect(keyTimes(trip, 6, 2).every((share) => share >= 0 && share <= 1)).toBe(true);
+    expect(keyTimes(trip, 6, 2).at(-1)).toBe(1);
+  });
+
+  test('a tram covers a point of its line while it is near', () => {
+    // The tram comes to the stop at 400, stays there, and goes on.
+    const [near, ...others] = coverage(trip, 0, 24, 400, 50);
+    expect(others).toEqual([]);
+    expect(near?.from).toBeCloseTo(1.3);
+    expect(near?.to).toBeCloseTo(4.6);
+    // The same trip later in the cycle: the time goes across the end of the cycle.
+    const [late] = coverage(trip, 22, 24, 400, 50);
+    expect(late?.from).toBeCloseTo(23.3);
+    expect(late?.to).toBeCloseTo(2.6);
+    // The tram is at its last point until the trip ends.
+    const [last] = coverage(trip, 0, 24, 1000, 50);
+    expect(last?.to).toBeCloseTo(8.45);
+    expect(coverage(trip, 0, 24, 5000, 50)).toEqual([]);
+  });
+});
+
+describe('times of a place', () => {
+  test('a place is taken from the start of an interval to its end', () => {
+    expect(occupied([{ from: 2, to: 5 }], 2)).toBe(true);
+    expect(occupied([{ from: 2, to: 5 }], 5)).toBe(false);
+    // An interval across the end of the cycle.
+    expect(occupied([{ from: 22, to: 3 }], 23)).toBe(true);
+    expect(occupied([{ from: 22, to: 3 }], 1)).toBe(true);
+    expect(occupied([{ from: 22, to: 3 }], 10)).toBe(false);
+    expect(occupied([], 10)).toBe(false);
+  });
+
+  test('intervals that overlap or touch become one', () => {
+    expect(
+      merge(
+        [
+          { from: 10, to: 11 },
+          { from: 4, to: 7 },
+          { from: 2, to: 5 },
+          { from: 7, to: 8 },
+          { from: 2.5, to: 3 },
+        ],
+        24,
+      ),
+    ).toEqual([
+      { from: 2, to: 8 },
+      { from: 10, to: 11 },
+    ]);
+    expect(merge([], 24)).toEqual([]);
+  });
+
+  test('an interval across the end of the cycle becomes two', () => {
+    expect(merge([{ from: 22, to: 3 }], 24)).toEqual([
+      { from: 0, to: 3 },
+      { from: 22, to: 24 },
+    ]);
+  });
+
+  /** Frames with times in seconds, which are easier to read than shares of the cycle. */
+  const frames = (intervals: readonly Interval[], fade = 0.3): [seconds: number, opacity: number][] =>
+    opacityFrames(intervals, 24, fade).map(({ offset, opacity }) => [Number((offset * 24).toFixed(3)), opacity]);
+
+  test('an element comes in and goes out in the fade time', () => {
+    expect(frames([{ from: 6, to: 12 }])).toEqual([
+      [0, 0],
+      [6, 0],
+      [6.3, 1],
+      [12, 1],
+      [12.3, 0],
+      [24, 0],
+    ]);
+  });
+
+  test('an element that is there across the end of the cycle starts visible', () => {
+    expect(frames([{ from: 22, to: 3 }])).toEqual([
+      [0, 1],
+      [3, 1],
+      [3.3, 0],
+      [22, 0],
+      [22.3, 1],
+      [24, 1],
+    ]);
+  });
+
+  test('a change waits until the change before it has ended', () => {
+    expect(frames([{ from: 5, to: 5.1 }])).toEqual([
+      [0, 0],
+      [5, 0],
+      [5.3, 1],
+      [5.3, 1],
+      [5.6, 0],
+      [24, 0],
+    ]);
+  });
+
+  test('an element that is never there, or always there, does not change', () => {
+    expect(frames([])).toEqual([
+      [0, 0],
+      [24, 0],
+    ]);
+    expect(frames([{ from: 0, to: 24 }])).toEqual([
+      [0, 1],
+      [24, 1],
+    ]);
+  });
+
+  test('a change does not go past the end of the cycle', () => {
+    expect(frames([{ from: 23.9, to: 2 }]).every(([seconds]) => seconds <= 24)).toBe(true);
+  });
+});
+
+describe('special cases of the scene', () => {
+  test('the generator gives the same numbers for the same seed, from 0 to 1', () => {
+    const first = random(7);
+    const second = random(7);
+    const values = Array.from({ length: 50 }, () => first());
+    expect(values).toEqual(Array.from({ length: 50 }, () => second()));
+    expect(values.every((value) => value >= 0 && value < 1)).toBe(true);
+    expect(new Set(values).size).toBe(50);
+    expect(random(8)()).not.toBe(random(7)());
+  });
+
+  test('a passenger whom no tram takes stands at the stop for the full cycle', () => {
+    const { waiting, riding } = simulate(CYCLE, [{ id: 'lonely', rate: 2 }], []);
+    expect(riding.size).toBe(0);
+    // The stop fills up and takes no more passengers.
+    expect(waiting.get('lonely')).toEqual(Array.from({ length: WAITING_PLACES }, () => [{ from: 0, to: CYCLE }]));
+  });
+
+  test('at a place that the scene does not show, passengers leave the tram and nobody boards', () => {
+    const { waiting, riding } = simulate(CYCLE, [], [tram('a', 4, 2, 0, [['nowhere', 2.4, 0.5]])]);
+    expect(waiting.size).toBe(0);
+    const [first = [], second = [], ...free] = riding.get('a') ?? [];
+    expect(free).toEqual([[], []]);
+    // One of the two passengers leaves at the place. The other one stays to the end of the trip.
+    expect(second).toHaveLength(1);
+    expect(second[0]?.from).toBe(0);
+    expect(second[0]?.to).toBeCloseTo(2 + EXCHANGE.after);
+    expect(first).toHaveLength(1);
+    expect(first[0]?.from).toBe(0);
+    // The move to the place, the stay there, and the move out of the picture.
+    expect(first[0]?.to).toBeCloseTo(2 + 2.4 + 2);
+  });
+
+  test('two trams that start at the same moment do not disturb each other', () => {
+    const pair = [tram('a', 4, 2, 5, [['west', 2, 0.5]]), tram('b', 4, 4, 5, [['east', 2, 1]])];
+    const { riding } = simulate(CYCLE, stops, pair);
+    expect((riding.get('a') ?? []).filter((seat) => occupied(seat, 5.1))).toHaveLength(2);
+    expect((riding.get('b') ?? []).filter((seat) => occupied(seat, 5.1))).toHaveLength(4);
   });
 });

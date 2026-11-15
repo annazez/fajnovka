@@ -5,7 +5,7 @@
 import { numbers, type NumberKey } from '../data/numbers.ts';
 import { languageTag, type Locale } from '../i18n/locales.ts';
 
-const NBSP = ' ';
+const NBSP = '\u00a0';
 
 export type Format = 'number' | 'percent' | 'czk' | 'mczk' | 'year';
 

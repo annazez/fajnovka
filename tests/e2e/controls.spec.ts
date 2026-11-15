@@ -145,11 +145,11 @@ test.describe('numbers', () => {
 
   test('numbers use the format of the language', async ({ page }) => {
     await openDeck(page, { locale: 'cs', slide: 2 });
-    await expect(active(page).locator('.t-hero').first()).toHaveText('258 764');
-    await expect(active(page).locator('.t-hero').nth(1)).toHaveText('12 %');
+    await expect(active(page).locator('.t-hero').first()).toHaveText('258\u00a0764');
+    await expect(active(page).locator('.t-hero').nth(1)).toHaveText('12\u00a0%');
     await page.keyboard.press('8');
-    await expect(active(page).locator('.t-hero').first()).toHaveText('0,55 %');
-    await expect(active(page).locator('dd strong').last()).toHaveText('2 220 Kč');
+    await expect(active(page).locator('.t-hero').first()).toHaveText('0,55\u00a0%');
+    await expect(active(page).locator('dd strong').last()).toHaveText('2\u00a0220\u00a0Kč');
   });
 });
 

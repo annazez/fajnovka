@@ -125,6 +125,16 @@ describe.each(locales)('the manual as Markdown (%s)', (locale) => {
     }
   });
 
+  test('a chart that the site does not know keeps its caption', () => {
+    const chapter = {
+      slug: 'x',
+      number: 1,
+      title: 'X',
+      body: 'Before.\n\n![A chart of a later version.](figure:later)\n\nAfter.',
+    };
+    expect(manualText(locale, [chapter])).toContain('## 1 X\n\nBefore.\n\n*A chart of a later version.*\n\nAfter.\n');
+  });
+
   test('its address is under the language of the page', () => {
     expect(manualMd(locale)).toBe(locale === 'en' ? '/manual.md' : `/${locale}/manual.md`);
   });

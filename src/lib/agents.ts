@@ -97,8 +97,8 @@ export function manualText(locale: Locale, chapters: readonly ChapterText[]): st
       .trim()
       .split('\n')
       .map((line) => {
-        const figure = FIGURE.exec(line);
-        return figure ? figureText(figure[1] ?? '', figure[2] ?? '', locale) : line;
+        const [, caption, name] = FIGURE.exec(line) ?? [];
+        return caption !== undefined && name !== undefined ? figureText(caption, name, locale) : line;
       })
       .join('\n');
     return `## ${number} ${plain(title)}\n\n${text}`;

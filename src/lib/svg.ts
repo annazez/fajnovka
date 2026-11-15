@@ -7,10 +7,9 @@ export type Markup = string & { readonly [safe]: true };
 
 type Attributes = Readonly<Record<string, string | number | undefined>>;
 
-const ENTITIES: Readonly<Record<string, string>> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
-
+/** The ampersand goes first: the other changes add ampersands. */
 function escape(value: string): string {
-  return value.replace(/[&<>"]/g, (character) => ENTITIES[character] ?? character);
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }
 
 /** Plain text as markup. */

@@ -21,7 +21,7 @@
     "check:code": "eslint .",
     "check:styles": "stylelint \"src/**/*.{css,astro}\"",
     "manual:pdf": "node scripts/manual-pdf.ts",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test"
   },
   "dependencies": {

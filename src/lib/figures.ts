@@ -18,6 +18,7 @@ import { numbers } from '../data/numbers.ts';
 import { useDictionary } from '../i18n/index.ts';
 import type { Locale } from '../i18n/locales.ts';
 import { format, formatNumber, insert } from './format.ts';
+import { need } from './need.ts';
 import { element, join, text, type Markup } from './svg.ts';
 
 export const figureIds = [
@@ -164,11 +165,14 @@ interface Series {
   show: (value: number) => string;
 }
 
+/** The first and the last item of a list. An empty list is a fault in the data. */
+function ends<T>(list: readonly T[], what: string): readonly [first: T, last: T] {
+  return [need(list[0], what), need(list.at(-1), what)];
+}
+
 function lineSummary(t: Chart, series: readonly Series[]): string {
   const parts = series.map(({ name, values, show }) => {
-    const [first] = values;
-    const last = values[values.length - 1];
-    if (!first || !last) throw new Error(`The series "${name}" is empty.`);
+    const [first, last] = ends(values, `A value of the series "${name}"`);
     return insert(t.line, {
       name,
       from: show(first[1]),
@@ -185,13 +189,14 @@ function barSummary(t: Chart, items: readonly { name: string; shown: string }[])
 }
 
 function yearTable(t: Chart, series: readonly Series[]): FigureTable {
-  const [first] = series;
-  if (!first) throw new Error('A table needs one series or more.');
+  const first = need(series[0], 'A series for the table');
   return {
     head: [t.year, ...series.map(({ name }) => name)],
     rows: first.values.map(([year], index) => [
       String(year),
-      ...series.map(({ values, show }) => show(values[index]?.[1] ?? Number.NaN)),
+      ...series.map(({ name, values, show }) =>
+        show(need(values[index], `The year ${year} of the series "${name}"`)[1]),
+      ),
     ]),
   };
 }
@@ -202,10 +207,8 @@ function passengers(locale: Locale): Figure {
   const t = useDictionary(locale).manual.chart;
   const plot: Plot = { left: 48, right: 660, top: 34, bottom: 258 };
   const values = passengersCarried.map(([year, thousands]) => [year, thousands / 1000] as const);
-  const [first] = values;
-  const last = values[values.length - 1];
+  const [first, last] = ends(values, 'A year of the passenger series');
   const lowest = values.reduce((low, value) => (value[1] < low[1] ? value : low));
-  if (!first || !last) throw new Error('The passenger series is empty.');
 
   const show = (value: number): string => formatNumber(round(value), locale);
   const x = linear([first[0], last[0]], [plot.left + 16, plot.right - 16]);
@@ -339,17 +342,14 @@ const YEARS = [2027, 2030, 2033, 2036];
 const TIME_PLOT: Plot = { left: 48, right: 540, top: 34, bottom: 258 };
 
 function timeScale(model: readonly ModelYear[]): Scale {
-  const [first] = model;
-  const last = model[model.length - 1];
-  if (!first || !last) throw new Error('The model is empty.');
+  const [first, last] = ends(model, 'A year of the model');
   return linear([first.year, last.year], [TIME_PLOT.left + 12, TIME_PLOT.right]);
 }
 
-function lastPoint(points: readonly Point[]): Point {
-  const point = points[points.length - 1];
-  if (!point) throw new Error('A line needs one point or more.');
-  return point;
-}
+const lastPoint = (points: readonly Point[]): Point => need(points.at(-1), 'A point of the line');
+/** The last year of a series and its value. */
+const lastValue = ({ name, values }: Series): readonly [year: number, value: number] =>
+  need(values.at(-1), `A value of the series "${name}"`);
 
 function revenue(locale: Locale): Figure {
   const t = useDictionary(locale).manual.chart;
@@ -371,7 +371,7 @@ function revenue(locale: Locale): Figure {
   const upper = points(withProgramme);
   const lower = points(without);
   const ends = [withProgramme, without].map((series) => {
-    const [year, value] = series.values[series.values.length - 1] ?? [0, 0];
+    const [year, value] = lastValue(series);
     return { series, title: `${year}, ${series.name}: ${show(value)} ${t.units.mczk}`, value: show(value) };
   });
 
@@ -411,7 +411,10 @@ function byScenario(
   const y = linear(domain, [plot.bottom, plot.top]);
   const all = scenarios.map((scenario) => {
     const numbersOfYear = value(tenYears[scenario]);
-    const values = tenYears[scenario].map((row, index) => [row.year, numbersOfYear[index] ?? Number.NaN] as const);
+    const values = tenYears[scenario].map(
+      (row, index) =>
+        [row.year, need(numbersOfYear[index], `The year ${row.year} of the scenario "${scenario}"`)] as const,
+    );
     const series: Series = { name: t.scenarios[scenario], values, show };
     return {
       scenario,
@@ -420,11 +423,11 @@ function byScenario(
       marked: mark(scenario, numbersOfYear),
     };
   });
-  const find = (scenario: Scenario) => {
-    const found = all.find((item) => item.scenario === scenario);
-    if (!found) throw new Error(`No scenario "${scenario}".`);
-    return found;
-  };
+  const find = (scenario: Scenario) =>
+    need(
+      all.find((item) => item.scenario === scenario),
+      `The scenario "${scenario}"`,
+    );
 
   return {
     svg: frame(
@@ -439,7 +442,7 @@ function byScenario(
       wash(find('better').points, find('worse').points),
       ...all.map(({ scenario, points }) => line(points, scenario === 'base' ? 'strong' : 'thin')),
       ...all.map(({ series, points, scenario, marked }) => {
-        const [year, amount] = series.values[series.values.length - 1] ?? [0, 0];
+        const [year, amount] = lastValue(series);
         const end = lastPoint(points);
         const markedPoint = marked === undefined ? undefined : points[marked];
         const markedYear = marked === undefined ? undefined : series.values[marked]?.[0];

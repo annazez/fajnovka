@@ -53,6 +53,8 @@ function dataTable(table: NonNullable<Figure['table']>, caption: string): Markup
 /** The markup of one chart with its caption. */
 export function figureMarkup(name: string, caption: string, locale: Locale): Markup {
   if (!isFigureId(name)) throw new Error(`Unknown chart "${name}". The charts are in src/lib/figures.ts.`);
+  // The caption is the name of the chart for a screen reader, so each chart must have one.
+  if (caption.trim() === '') throw new Error(`The chart "${name}" has no caption. Write ![Caption.](figure:${name}).`);
   const figure = drawFigure(name, locale);
   const label = insert(useDictionary(locale).manual.figure, { title: caption.replace(/\.$/, '') });
   return element(
@@ -88,8 +90,8 @@ export function manualMarkdown({ fileURL }: PluginFactoryContext): HastPluginDef
           const [image, ...rest] = node.children.filter((child) => child.type !== 'text' || child.value.trim() !== '');
           if (rest.length > 0 || image?.type !== 'element' || image.tagName !== 'img') return;
           const { src, alt } = image.properties;
-          if (typeof src !== 'string' || !src.startsWith(FIGURE)) return;
-          const caption = typeset(typeof alt === 'string' ? alt : '', locale);
+          if (typeof src !== 'string' || typeof alt !== 'string' || !src.startsWith(FIGURE)) return;
+          const caption = typeset(alt, locale);
           context.replaceNode(node, { type: 'raw', value: figureMarkup(src.slice(FIGURE.length), caption, locale) });
         },
       },
