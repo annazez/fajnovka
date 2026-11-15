@@ -17,9 +17,12 @@ This is a proposal by a student team. It is not an official product of the City 
 | Full screen            | `F`, or the button at the bottom right                 |
 | Pause the animations   | `P`, or the button at the bottom right                 |
 | Speaker text and timer | `N` (`R` resets the timer)                             |
+| Live data of DPO       | `L` on the first slide                                 |
 | Language               | The switch on the first slide (`/` English, `/cs/` Czech) |
 
 On a touch screen, swipe left or right. The address keeps the slide number (`/#4`).
+
+The trams on the first slide are about as full as the real vehicles of DPO at this minute. `L` shows the numbers. Without a connection, the slide uses a stored reading from Friday 13 November 2026.
 
 The page needs the network only for the first load. Open it before the pitch starts.
 
@@ -31,7 +34,8 @@ npm run dev        # http://localhost:4321
 npm run check      # types
 npm run build      # static site in dist/
 npm run test:unit  # tests of the pure code, the texts and the PDF files
-npm run test:e2e   # browser tests (Chromium, Firefox, WebKit); build first
+npm run build:test # the same site for the browser tests: it asks for live data, and each test gives the answer
+npm run test:e2e   # browser tests (Chromium, Firefox, WebKit); run build:test first
 npm run manual:pdf # print the manual to public/manual/*.pdf
 ```
 
@@ -53,6 +57,7 @@ src/
   lib/                     pure functions (formats, typography, scene model, charts, Markdown rules)
   scripts/                 deck engine and the scenes of the slides
   styles/                  design tokens, reset, deck styles, manual styles
+api/occupancy.ts           server function: how full the vehicles of DPO are now
 scripts/manual-pdf.ts      prints the manual to PDF
 public/manual/             the PDF files of the manual
 tests/unit/                Vitest tests
@@ -82,4 +87,4 @@ The rules that keep the deck simple are in [`AGENTS.md`](AGENTS.md).
 
 ## Deploy
 
-Vercel builds each push to `main` and serves it at the address above. The site is static. It has no analytics, and search engines are told not to index it.
+Vercel builds each push to `main` and serves it at the address above. The site is static, with one server function in Frankfurt (`fra1`) that reads the public vehicle feed of DPO. The site has no analytics and no cookies, and search engines are told not to index it.

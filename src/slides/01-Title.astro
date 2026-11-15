@@ -42,6 +42,9 @@ const hasManual = hasPublicFile(manual);
     }
   </nav>
 
+  {/* The key L shows how full the real vehicles are. The script writes the text. */}
+  <p class="title__live" role="status" data-live-text data-now={t.title.live} data-snapshot={t.title.snapshot}></p>
+
   <h1 class="title__mark" id="title-title" data-in="0">
     <span class="sr-only">Fajnovka</span>
     <Wordmark />
@@ -133,6 +136,24 @@ const hasManual = hasPublicFile(manual);
   .title__languages a[aria-current] {
     background: var(--accent);
     color: var(--fg);
+  }
+
+  /* Live data of the network: a pill like the language switch, on the other side. */
+  .title__live {
+    position: absolute;
+    top: 4.5rem;
+    left: var(--pad-x);
+    z-index: 1;
+  }
+
+  .title__live :global(span) {
+    display: flex;
+    align-items: center;
+    min-height: max(5.4rem, 34px);
+    padding: 1rem 2.8rem;
+    border-radius: 10rem;
+    background: var(--fg);
+    color: var(--accent);
   }
 
   /* The tram scene: two lines, stops, trams and passengers. The script adds trams and passengers. */
@@ -236,6 +257,11 @@ const hasManual = hasPublicFile(manual);
     .title__languages {
       position: static;
       align-self: flex-end;
+    }
+
+    .title__live {
+      position: static;
+      order: 1;
     }
 
     .title__slogan {

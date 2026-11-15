@@ -7,6 +7,7 @@ export interface Actions {
   fullscreen(): void;
   notes(): void;
   resetTimer(): void;
+  live(): void;
 }
 
 const IDLE_AFTER = 2500;
@@ -42,6 +43,7 @@ export function bindInput(root: HTMLElement, deck: Deck, actions: Actions): void
     Home: () => deck.go(0),
     End: () => deck.go(deck.total - 1),
     f: actions.fullscreen,
+    l: actions.live,
     n: actions.notes,
     p: actions.motion,
     r: actions.resetTimer,

@@ -29,6 +29,8 @@ export const en = {
   title: {
     slogan: 'Ride well. Live Ostrava.',
     manual: 'Read the full manual',
+    live: 'Ostrava now · vehicles on the road: %vehicles · places taken: %share · DPO',
+    snapshot: '%when · vehicles on the road: %vehicles · places taken: %share · DPO',
     notes:
       'Good afternoon. We are the Fajnovka team. Fajnovka is a loyalty programme for public transport in Ostrava.',
   },

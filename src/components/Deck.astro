@@ -18,10 +18,11 @@ import Economics from '../slides/08-Economics.astro';
 import Ask from '../slides/09-Ask.astro';
 
 const slides = [Title, Paradox, Leak, Product, Journey, Evidence, Spread, Economics, Ask];
+// PUBLIC_LIVE_DATA is the path of the server function with the live data of DPO. It is set only where the function exists (see vercel.json).
 const { ui } = useDictionary(toLocale(Astro.currentLocale));
 ---
 
-<main class="deck" data-deck data-theme="cyan" data-motion="running" aria-label={ui.deck}>
+<main class="deck" data-deck data-theme="cyan" data-motion="running" data-live={import.meta.env.PUBLIC_LIVE_DATA} aria-label={ui.deck}>
   <div class="stage">
     {slides.map((Slide, index) => <Slide active={index === 0} />)}
 

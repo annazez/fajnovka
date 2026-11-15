@@ -26,6 +26,8 @@ export const cs: Dictionary = {
   title: {
     slogan: 'Jezdi fajně. Žij Ostravou.',
     manual: 'Zobrazit kompletní manuál',
+    live: 'Ostrava teď · vozů na trati: %vehicles · obsazeno míst: %share · DPO',
+    snapshot: '%when · vozů na trati: %vehicles · obsazeno míst: %share · DPO',
     notes: 'Dobrý den. Jsme tým Fajnovka. Fajnovka je věrnostní program pro MHD v Ostravě.',
   },
   paradox: {

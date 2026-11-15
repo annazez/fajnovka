@@ -4,6 +4,7 @@ dist/
 .vercel/
 .env
 .env.*
+!.env.test
 .DS_Store
 
 # tests

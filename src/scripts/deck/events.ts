@@ -1,7 +1,7 @@
 /**
  * Events of the deck. Slides and scenes listen to them; they never call the deck.
  *
- * On a slide:  `slide:enter`, `slide:leave`
+ * On a slide:  `slide:enter`, `slide:leave`, `slide:live` (the key L: show or hide the live data of the slide)
  * On the deck: `deck:change` (detail: index), `deck:motion` (detail: running)
  */
 
@@ -15,6 +15,7 @@ declare global {
   interface HTMLElementEventMap {
     'slide:enter': CustomEvent<undefined>;
     'slide:leave': CustomEvent<undefined>;
+    'slide:live': CustomEvent<undefined>;
     'deck:change': CustomEvent<DeckChange>;
     'deck:motion': CustomEvent<{ running: boolean }>;
   }

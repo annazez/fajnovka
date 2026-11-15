@@ -44,6 +44,6 @@ Do not add other pages, routing, a CMS, analytics or a UI framework.
 
 - `npm run check`, `npm run build` and `npm run test:unit` are successful.
 - Each slide is correct at 1920 × 1080. Look at a screenshot, not only at the code.
-- `npm run test:e2e` is successful in all three browser engines.
+- `npm run build:test` and then `npm run test:e2e` are successful in all three browser engines.
 - The browser console shows no errors.
 - Commit messages follow Conventional Commits.

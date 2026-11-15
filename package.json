@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build --force",
+    "build:test": "astro build --force --mode test",
     "preview": "astro preview",
     "check": "astro check",
     "manual:pdf": "node scripts/manual-pdf.ts",

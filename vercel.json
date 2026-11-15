@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["fra1"],
+  "build": {
+    "env": {
+      "PUBLIC_LIVE_DATA": "/api/occupancy"
+    }
+  }
+}

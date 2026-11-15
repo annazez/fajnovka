@@ -26,7 +26,12 @@ import {
   type TramSpec,
   type Waypoint,
 } from '../../lib/scene.ts';
-import { isFlowLayout } from '../deck/dom.ts';
+import { snapshot } from '../../data/occupancy.ts';
+import { toLocale } from '../../i18n/locales.ts';
+import { demandOf } from '../../lib/occupancy.ts';
+import { describeOccupancy } from '../../lib/readout.ts';
+import { isFlowLayout, pageLanguage } from '../deck/dom.ts';
+import { readOccupancy } from '../deck/live.ts';
 import { scene } from '../deck/scene.ts';
 
 /** Length of a carriage and the gap to the next one, in tenths of a rem. */
@@ -135,8 +140,11 @@ function waypoints(line: SceneLine, path: SVGPathElement, layout: SceneLayout, b
   return [{ distance: entry }, ...stops, { distance: exit, seconds: EXIT_SECONDS }];
 }
 
-/** Builds the scene inside one layout container and returns its animations. */
-function build(root: HTMLElement, layout: SceneLayout, demand: number): Animation[] {
+/**
+ * Builds the scene inside one layout container and returns its animations.
+ * `origin` is the moment at which the loop started. A new picture with the same origin continues without a jump.
+ */
+function build(root: HTMLElement, layout: SceneLayout, demand: number, origin: CSSNumberish | null): Animation[] {
   root.querySelectorAll('[data-built]').forEach((node) => node.remove());
   const band = sideBand(root, layout);
 
@@ -194,16 +202,24 @@ function build(root: HTMLElement, layout: SceneLayout, demand: number): Animatio
     }
   }
 
-  const start = document.timeline.currentTime;
+  const start = origin ?? document.timeline.currentTime;
   for (const animation of animations) animation.startTime = start;
   root.classList.add('is-built');
+  // For tests and for the curious: how busy this picture is.
+  root.dataset.demand = demand.toFixed(2);
   return animations;
 }
 
 scene('title', (context) => {
+  const deck = context.slide.closest<HTMLElement>('[data-deck]');
+  const readout = context.slide.querySelector<HTMLElement>('[data-live-text]');
+  const locale = toLocale(pageLanguage());
   let animations: Animation[] = [];
   let built: string | null = null;
-  let demand = 1;
+  let origin: CSSNumberish | null = null;
+  // The trams are as full as the real vehicles: the reading sets how busy the scene is.
+  let reading = snapshot;
+  let asked = false;
 
   const apply = (): void => {
     for (const animation of animations) {
@@ -220,26 +236,55 @@ scene('title', (context) => {
     const name = isFlowLayout() ? 'flow' : 'stage';
     const root = context.slide.querySelector<HTMLElement>(`[data-scene="${name}"]`);
     if (!root || (built === name && !force)) return;
+    const start = built === name ? origin : null;
     for (const animation of animations) animation.cancel();
-    animations = build(root, layouts[name], demand);
+    animations = build(root, layouts[name], demandOf(reading, snapshot), start);
+    origin = animations[0]?.startTime ?? null;
     built = name;
     apply();
+  };
+
+  /** Writes the reading into the pill, if the pill is on the slide. */
+  const write = (): void => {
+    const pill = readout?.firstElementChild;
+    if (!readout || !pill) return;
+    pill.textContent = describeOccupancy(reading, locale, { live: readout.dataset.now ?? '', snapshot: readout.dataset.snapshot ?? '' });
+  };
+
+  /** Asks for the live reading one time. The stored snapshot stays if no answer comes. */
+  const ask = (): void => {
+    if (asked) return;
+    asked = true;
+    void readOccupancy(deck?.dataset.live).then((answer) => {
+      if (answer === reading) return;
+      reading = answer;
+      refresh(true);
+      write();
+    });
   };
 
   addEventListener('resize', () => {
     if (context.active) refresh();
   });
 
-  // Live data can make the scene busier or calmer: 1 is a normal day.
-  context.slide.addEventListener('scene:demand', (event) => {
-    demand = (event as CustomEvent<number>).detail;
-    refresh(true);
+  // The key L shows and hides the reading.
+  context.slide.addEventListener('slide:live', () => {
+    if (!readout) return;
+    if (readout.firstElementChild) {
+      readout.replaceChildren();
+      return;
+    }
+    const pill = document.createElement('span');
+    pill.className = 't-small';
+    readout.append(pill);
+    write();
   });
 
   return {
     enter() {
       refresh();
       apply();
+      ask();
     },
     leave: apply,
     motion: apply,

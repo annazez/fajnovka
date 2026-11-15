@@ -4,7 +4,8 @@ const PORT = 4321;
 const stage = { width: 1920, height: 1080 };
 
 /**
- * End-to-end tests run against the built site (`npm run build` first).
+ * End-to-end tests run against the test build of the site (`npm run build:test` first).
+ * The test build asks for the live data of DPO as the production site does, and each test gives the answer itself.
  * Three engines cover Chrome, Firefox and Safari, on a projector-size screen and on a phone.
  */
 export default defineConfig({
