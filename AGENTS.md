@@ -20,7 +20,7 @@ The site also gives its content to programs: `llms.txt`, the manual as Markdown,
 3. Use the type classes from `global.css` only: `t-title`, `t-hero`, `t-body`, `t-small`. A slide can make its hero smaller. Text inside a mock-up (the card) can have its own size.
 4. Use the colour roles `--bg`, `--fg`, `--accent` and `--soft` only. Do not add colours. White text on cyan is for large shapes only.
 5. Give all sizes in `rem`. The stage is 192 × 108 rem. A figure that scales as one piece can use `em` inside.
-6. There is one graphic device: the line with stops. Use it for progress, journeys and timelines. A shape that moves on a line has a ring in the colour `--bg`, so the shape and a line of the same colour stay apart.
+6. There is one graphic device: the line with stops. Use it for progress, journeys and timelines. A shape that moves on a line has a ring in the colour `--bg`. The ring keeps the shape apart from a line of the same colour.
 7. Motion shows order or change. When the viewer must see how many things move, move them one at a time. Start each animation from `.is-active` or the `slide:enter` event. An animation must not need a click.
 8. Interactive parts are optional. The arrow keys must always go to the next slide. Remove focus from a button after a mouse click, or `Space` will press it again.
 9. Decorative layers must have `pointer-events: none`.
