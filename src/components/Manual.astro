@@ -1,0 +1,126 @@
+---
+/**
+ * The manual on one page: cover, contents and chapters.
+ * A chapter is a Markdown file in `src/content/manual/<language>/`. `src/lib/markdown.ts` holds the rules for its text.
+ * The PDF is a print of this page (`npm run manual:pdf`).
+ */
+import { getCollection, render } from 'astro:content';
+
+import '../styles/manual.css';
+import SceneLines from './SceneLines.astro';
+import UiIcon from './UiIcon.astro';
+import Wordmark from './Wordmark.astro';
+import { manual, manualPdf } from '../data/manual.ts';
+import { useDictionary } from '../i18n/index.ts';
+import { languageName, languageTag, localePath, locales, toLocale } from '../i18n/locales.ts';
+import { hasPublicFile } from '../lib/site.ts';
+import { typeset } from '../lib/typeset.ts';
+
+const locale = toLocale(Astro.currentLocale);
+const { manual: t, ui } = useDictionary(locale);
+
+const entries = await getCollection('manual', ({ id }) => id.startsWith(`${locale}/`));
+const chapters = await Promise.all(
+  entries
+    .sort((a, b) => a.data.order - b.data.order)
+    .map(async (entry) => ({
+      // `en/02-problem` gives the anchor `problem`, the same in each language.
+      slug: entry.id.replace(/^[a-z]+\/\d+-/, ''),
+      number: String(entry.data.order),
+      title: typeset(entry.data.title, locale),
+      Content: (await render(entry)).Content,
+    })),
+);
+
+const pdf = manualPdf(locale);
+const published = new Intl.DateTimeFormat(languageTag[locale], { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+  new Date(`${manual.published}-01T00:00:00Z`),
+);
+---
+
+<div class="manual" data-theme="white">
+  <header class="bar">
+    <a class="bar__link" href={localePath(locale)}>
+      <UiIcon name="previous" />
+      {t.pitch}
+    </a>
+    <nav class="bar__languages" aria-label={ui.language}>
+      {
+        locales.map((code) => (
+          <a
+            href={localePath(code, '/manual/')}
+            hreflang={code}
+            lang={code}
+            aria-label={`${code.toUpperCase()} · ${languageName[code]}`}
+            aria-current={code === locale ? 'true' : undefined}
+          >
+            {code.toUpperCase()}
+          </a>
+        ))
+      }
+    </nav>
+    {
+      hasPublicFile(pdf) && (
+        <a class="bar__link bar__link--strong" href={pdf}>
+          <UiIcon name="book" />
+          {t.download}
+        </a>
+      )
+    }
+  </header>
+
+  <main>
+    <header class="cover" data-theme="navy">
+      <p class="cover__team">{manual.team} · {published}</p>
+      <h1 class="cover__title">
+        <span class="cover__mark" role="img" aria-label="Fajnovka"><Wordmark /></span>
+        {t.title}
+      </h1>
+      <p class="cover__lead">{t.lead}</p>
+      <p class="cover__authors">{manual.authors.join(' · ')}</p>
+      <div class="cover__scene" aria-hidden="true">
+        <SceneLines layout="flow" />
+      </div>
+    </header>
+
+    <nav class="contents" aria-labelledby="contents-title">
+      <h2 class="contents__title" id="contents-title">{t.contents}</h2>
+      {/* The list and the headings give the numbers to a screen reader, so the printed numbers are for the eye only. */}
+      <ol class="contents__list">
+        {
+          chapters.map(({ slug, number, title }) => (
+            <li>
+              <a href={`#${slug}`}>
+                <span class="contents__number" aria-hidden="true">
+                  {number}
+                </span>
+                <span class="contents__name">{title}</span>
+                <span class="contents__page" data-page-of={slug} />
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    {
+      chapters.map(({ slug, number, title, Content }) => (
+        <section class="chapter" id={slug}>
+          <h2 class="chapter__title">
+            <span class="chapter__number" aria-hidden="true">
+              {number}
+            </span>
+            <span>{title}</span>
+          </h2>
+          <div class="prose">
+            <Content />
+          </div>
+        </section>
+      ))
+    }
+  </main>
+</div>
+
+<script>
+  import '../scripts/manual.ts';
+</script>

@@ -1,8 +1,9 @@
-# Fajnovka pitch deck
+# Fajnovka: pitch deck and manual
 
-Web presentation for the pitch of Fajnovka, a proposed public transport loyalty programme for Ostrava (MSIC LabZero 2026).
+Web presentation for the pitch of Fajnovka, a proposed public transport loyalty programme for Ostrava (MSIC LabZero 2026), and the full manual of the proposal.
 
-Live: <https://fajnovka.zezulka.me>
+- Deck: <https://fajnovka.zezulka.me> (English), <https://fajnovka.zezulka.me/cs/> (Czech)
+- Manual: <https://fajnovka.zezulka.me/manual/> (English), <https://fajnovka.zezulka.me/cs/manual/> (Czech), each with a PDF
 
 This is a proposal by a student team. It is not an official product of the City of Ostrava, DPO or KODIS.
 
@@ -29,7 +30,9 @@ npm install
 npm run dev        # http://localhost:4321
 npm run check      # types
 npm run build      # static site in dist/
+npm run test:unit  # tests of the pure code, the texts and the PDF files
 npm run test:e2e   # browser tests (Chromium, Firefox, WebKit); build first
+npm run manual:pdf # print the manual to public/manual/*.pdf
 ```
 
 Node 22.23.4 or later is necessary (Astro 7).
@@ -38,16 +41,22 @@ Node 22.23.4 or later is necessary (Astro 7).
 
 ```text
 src/
-  pages/                 one page for each language
-  components/Deck.astro  the list of slides sets the order of the pitch
-  slides/NN-Name.astro   one file for each slide: layout, and its script if it has one
-  i18n/en.ts, cs.ts      all texts and speaker notes
-  data/numbers.ts        every number in the deck, with its source
-  data/scene.ts          the tram scene of the title slide
-  lib/                   pure functions (formats, typography, scene model)
-  scripts/               deck engine and the scenes of the slides
-  styles/                design tokens, type, deck controls
-tests/e2e/               Playwright tests
+  pages/                   the deck and the manual, one page for each language
+  components/Deck.astro    the list of slides sets the order of the pitch
+  components/Manual.astro  cover, contents and chapters of the manual
+  slides/NN-Name.astro     one file for each slide: layout, and its script if it has one
+  content/manual/          the chapters of the manual, one Markdown file for each language
+  i18n/en.ts, cs.ts        all texts of the deck, speaker notes, labels of the manual
+  data/numbers.ts          every number in the deck, with its source
+  data/model.ts            data behind the charts of the manual
+  data/scene.ts            the tram scene of the title slide
+  lib/                     pure functions (formats, typography, scene model, charts, Markdown rules)
+  scripts/                 deck engine and the scenes of the slides
+  styles/                  design tokens, reset, deck styles, manual styles
+scripts/manual-pdf.ts      prints the manual to PDF
+public/manual/             the PDF files of the manual
+tests/unit/                Vitest tests
+tests/e2e/                 Playwright tests
 ```
 
 ## Change the content
@@ -55,6 +64,12 @@ tests/e2e/               Playwright tests
 - **Text:** edit `src/i18n/en.ts` and `src/i18n/cs.ts`. `notes` is the text that the speaker says.
 - **Numbers:** edit `src/data/numbers.ts` only. A text refers to a number as `{key}` or `{key:format}`.
 - **Order:** change the `slides` list in `src/components/Deck.astro`.
+
+## Change the manual
+
+- **Text:** edit the chapter in `src/content/manual/en/` and the same chapter in `src/content/manual/cs/`. Keep the same headings, tables, lists and links in the two languages.
+- **Chart:** write `![Caption.](figure:<name>)` on its own line. The charts are in `src/lib/figures.ts`.
+- **PDF:** run `npm run manual:pdf`, then commit the two PDF files and `src/data/manual-pdf.json`.
 
 ## Design
 

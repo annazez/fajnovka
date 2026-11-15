@@ -1,11 +1,10 @@
 ---
 /**
- * Page shell: metadata, fonts and the design system.
+ * Page shell: metadata and fonts. The content of the page brings its own styles.
  * path: the path of the page without the language prefix, for example `/` or `/manual/`.
  */
 import { Font } from 'astro:assets';
 
-import '../styles/global.css';
 import { defaultLocale, localePath, locales, type Locale } from '../i18n/locales.ts';
 
 interface Props {

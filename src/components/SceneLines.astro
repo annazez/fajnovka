@@ -1,0 +1,39 @@
+---
+/**
+ * The two tram lines and their stops as a still picture.
+ * The light line takes the accent colour and the dark line takes the text colour of the theme around it.
+ */
+import { scene } from '../data/scene.ts';
+
+interface Props {
+  layout: keyof typeof scene;
+}
+
+const { width, height, lines, stops } = scene[Astro.props.layout];
+---
+
+<svg viewBox={`0 0 ${width} ${height}`}>
+  {lines.map((line) => <path data-line={line.id} data-tone={line.tone} d={line.d} />)}
+  {stops.map((stop) => <circle cx={stop.x} cy={stop.y} r={stop.hub ? 25 : 19} />)}
+</svg>
+
+<style>
+  path {
+    fill: none;
+    stroke-width: 14;
+  }
+
+  path[data-tone='light'] {
+    stroke: var(--accent);
+  }
+
+  path[data-tone='dark'] {
+    stroke: var(--fg);
+  }
+
+  circle {
+    fill: var(--accent);
+    stroke: var(--fg);
+    stroke-width: 7;
+  }
+</style>

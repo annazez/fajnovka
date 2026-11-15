@@ -54,3 +54,12 @@ export function fill(text: string, locale: Locale): string {
     return format(numbers[key].value, kind, locale);
   });
 }
+
+/** Replaces each `%name` in a text with the value of that name. */
+export function insert(text: string, values: Readonly<Record<string, string>>): string {
+  return text.replace(/%(\w+)/g, (token, name: string) => {
+    const value = values[name];
+    if (value === undefined) throw new Error(`No value for "${token}" in text: ${text}`);
+    return value;
+  });
+}

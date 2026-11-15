@@ -1,6 +1,8 @@
+import { satteri } from '@astrojs/markdown-satteri';
 import { defineConfig, fontProviders } from 'astro/config';
 
 import { defaultLocale, locales } from './src/i18n/locales.ts';
+import { manualMarkdown } from './src/lib/markdown.ts';
 
 type UnicodeRange = [string, ...string[]];
 
@@ -23,6 +25,7 @@ export default defineConfig({
   devToolbar: { enabled: false },
   i18n: { locales: [...locales], defaultLocale },
   build: { inlineStylesheets: 'always' },
+  markdown: { processor: satteri({ hastPlugins: [manualMarkdown] }) },
   fonts: [
     montserrat('latin', 'Montserrat', '--font-montserrat', [
       'U+0000-00FF',

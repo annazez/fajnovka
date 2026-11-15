@@ -1,6 +1,7 @@
-/* Design system of the site. The order matters: media modes, tokens, reset, type, deck. */
+/* Styles of the deck. The order matters: media modes, tokens, reset, stage, type, deck. */
 @import './media.css';
 @import './tokens.css';
-@import './base.css';
+@import './reset.css';
+@import './stage.css';
 @import './type.css';
 @import './deck.css';

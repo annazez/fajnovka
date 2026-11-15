@@ -138,4 +138,39 @@ export const cs: Dictionary = {
     notes:
       'Žádáme dvě věci: data z ODIS a jeden městský obvod. Pilot trvá šest měsíců v Porubě, pro srovnání slouží Jih, a stojí {pilotCost:mczk}. Potom rozhodnou čísla: rozšířit, upravit, nebo ukončit. Malé kroky, velké změny. Děkujeme.',
   },
+  manual: {
+    title: 'Kompletní manuál',
+    lead: 'Věrnostní program MHD pro Ostravu: zákazníci, odměny, důkazy, financování, pilot a zdroje.',
+    description:
+      'Kompletní manuál Fajnovky, návrhu věrnostního programu MHD pro Ostravu: zákazníci, odměny, důkazy, byznys model, pilot a zdroje.',
+    contents: 'Obsah',
+    download: 'Stáhnout jako PDF',
+    pitch: 'Zpět na pitch',
+    table: 'Tabulka: %title. Všechny sloupce zobrazíte posunem do strany.',
+    figure: 'Graf: %title. Celý graf zobrazíte posunem do strany.',
+    chart: {
+      kinds: { line: 'Čárový graf', bars: 'Sloupcový graf', ranges: 'Graf rozpětí' },
+      line: '%name: z hodnoty %from v roce %start na %to v roce %end',
+      bar: '%name: %value',
+      range: '%name: %mid, v rozpětí od %low do %high',
+      year: 'Rok',
+      total: 'Celkem',
+      pandemic: 'pandemie',
+      units: {
+        passengers: 'mil. cestujících',
+        people: 'lidí ročně',
+        extra: 'cestující navíc',
+        mczk: 'mil. Kč',
+      },
+      scenarios: { worse: 'Pesimistický', base: 'Základní', better: 'Optimistický' },
+      revenue: { with: 'S Fajnovkou', without: 'Bez Fajnovky' },
+      budget: { shared: 'Společné náklady' },
+      region: {
+        city: 'DPO a město',
+        kodis: 'KODIS',
+        partners: 'Partneři',
+        cars: 'Ušetřené externí náklady aut',
+      },
+    },
+  },
 };

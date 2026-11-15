@@ -4,8 +4,12 @@ Read `README.md` first. Then obey these rules.
 
 ## Purpose
 
-The deck has one job: a nine-slide, three-minute pitch on a projector in fullscreen.
-Do not add pages, routing, a CMS, analytics or a UI framework.
+The site has two parts. Each part has one job.
+
+- The deck: a nine-slide, three-minute pitch on a projector in fullscreen.
+- The manual: the full proposal, as one page and one PDF for each language.
+
+Do not add other pages, routing, a CMS, analytics or a UI framework.
 
 ## Design rules
 
@@ -27,9 +31,18 @@ Do not add pages, routing, a CMS, analytics or a UI framework.
 4. The deck must stay clear as a static picture, without motion.
 5. Do not type non-breaking spaces. The `typeset` function adds them.
 
+## Manual rules
+
+1. A chapter is one Markdown file for each language: `src/content/manual/<language>/<order>-<name>.md`. The two languages have the same blocks and the same links. A test compares them.
+2. The last chapter (Sources) lists each link of the other chapters.
+3. A chart is an image with the address `figure:<name>`: `![Caption.](figure:payback)`. The charts are in `src/lib/figures.ts`, and their data is in `src/data/model.ts` and `src/data/numbers.ts`.
+4. A chart uses one ink colour and direct labels. It has no legend box. The accent colour fills a stop or a wash only.
+5. Do not type arrows, subscripts or comparison signs. The font does not have them. Write the words.
+6. After each change of the manual, run `npm run manual:pdf`. Commit the two PDF files and `src/data/manual-pdf.json` with your change. A test fails if the PDF is older than the page.
+
 ## Checks before you finish
 
-- `npm run check` and `npm run build` are successful.
+- `npm run check`, `npm run build` and `npm run test:unit` are successful.
 - Each slide is correct at 1920 × 1080. Look at a screenshot, not only at the code.
 - `npm run test:e2e` is successful in all three browser engines.
 - The browser console shows no errors.

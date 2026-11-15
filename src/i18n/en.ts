@@ -142,4 +142,39 @@ export const en = {
     notes:
       'We ask for two things: data from ODIS and one city district. The pilot takes six months in Poruba, with Jih for comparison, and costs {pilotCost:mczk}. Then the numbers decide: expand, adjust, or end. Small steps, big changes. Thank you.',
   },
+  manual: {
+    title: 'The full manual',
+    lead: 'A loyalty programme for public transport in Ostrava: customers, rewards, evidence, financing, the pilot and sources.',
+    description:
+      'The full manual of Fajnovka, a proposal for a loyalty programme for public transport in Ostrava: customers, rewards, evidence, business model, pilot and sources.',
+    contents: 'Contents',
+    download: 'Download as PDF',
+    pitch: 'Back to the pitch',
+    table: 'Table: %title. Scroll sideways to see all columns.',
+    figure: 'Figure: %title. Scroll sideways to see the full chart.',
+    chart: {
+      kinds: { line: 'Line chart', bars: 'Bar chart', ranges: 'Range chart' },
+      line: '%name: from %from in %start to %to in %end',
+      bar: '%name: %value',
+      range: '%name: %mid, in a range from %low to %high',
+      year: 'Year',
+      total: 'Total',
+      pandemic: 'pandemic',
+      units: {
+        passengers: 'million passengers',
+        people: 'people a year',
+        extra: 'extra passengers',
+        mczk: 'CZK million',
+      },
+      scenarios: { worse: 'Pessimistic', base: 'Base', better: 'Optimistic' },
+      revenue: { with: 'With Fajnovka', without: 'Without Fajnovka' },
+      budget: { shared: 'Shared costs' },
+      region: {
+        city: 'DPO and the city',
+        kodis: 'KODIS',
+        partners: 'Partners',
+        cars: 'Saved external costs of cars',
+      },
+    },
+  },
 } as const;

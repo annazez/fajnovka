@@ -1,0 +1,11 @@
+---
+import Manual from '../../components/Manual.astro';
+import { useDictionary } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+
+const { manual } = useDictionary('en');
+---
+
+<Base locale="en" title={`Fajnovka · ${manual.title}`} description={manual.description} path="/manual/">
+  <Manual />
+</Base>

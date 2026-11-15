@@ -1,10 +1,4 @@
-/* Reset and the stage unit. */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* The stage of the deck: the unit of length, the page behind the slides and the focus ring. */
 
 /*
  * Stage unit: 1rem is 1/192 of the stage width, so the stage is always 192 × 108 rem.
@@ -13,7 +7,6 @@
 html {
   font-size: min(calc(100vw / 192), calc(100vh / 108));
   font-size: min(calc(100vw / 192), calc(100dvh / 108));
-  text-size-adjust: 100%;
 }
 
 /*
@@ -34,72 +27,11 @@ html {
 }
 
 body {
-  margin: 0;
   overflow: hidden;
   background: var(--cyan);
-  font-family: var(--font);
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1,
-h2,
-h3,
-p,
-ul,
-ol,
-dl,
-dd,
-figure {
-  margin: 0;
-  padding: 0;
-}
-
-ul,
-ol {
-  list-style: none;
-}
-
-a {
-  color: inherit;
-}
-
-button {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-svg {
-  display: block;
-  overflow: visible;
 }
 
 :focus-visible {
   outline: var(--line) solid var(--fg);
   outline-offset: 0.6rem;
-}
-
-/* Text for screen readers only. */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-delay: 0s !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0s !important;
-  }
 }
