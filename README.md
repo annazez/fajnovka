@@ -76,9 +76,12 @@ src/
   styles/                  design tokens, reset, deck styles, manual styles
 api/occupancy.ts           server function: how full the vehicles of DPO are now
 scripts/manual-pdf.ts      prints the manual to PDF
+scripts/                   the checkers of the project, the Lighthouse run, the settings of the repository
 public/manual/             the PDF files of the manual
+docs/                      the documents of the project
 tests/unit/                Vitest tests
 tests/e2e/                 Playwright tests
+.github/                   workflows, Dependabot, templates, the rule of the main branch
 ```
 
 ## Change the content
@@ -101,6 +104,18 @@ tests/e2e/                 Playwright tests
 - The `FAJNOVKA!!!` wordmark and the pictograms come from the team's graphic pack. The wordmark is a working proposal. The official `OSTRAVA!!!` logo is not used, because the city must approve each use.
 
 The rules that keep the deck simple are in [`AGENTS.md`](AGENTS.md).
+
+## Documents
+
+| Document                                         | Content                                                     |
+| ------------------------------------------------ | ----------------------------------------------------------- |
+| [`AGENTS.md`](AGENTS.md)                         | The rules of the project, for people and AI agents          |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)             | How to make a change                                        |
+| [`docs/design-system.md`](docs/design-system.md) | Colours, type, layout, pictograms, motion                   |
+| [`docs/architecture.md`](docs/architecture.md)   | The parts of the site and how they work together            |
+| [`docs/content.md`](docs/content.md)             | The story, the sources and the materials                    |
+| [`docs/quality.md`](docs/quality.md)             | The tests, the workflows and the settings of the repository |
+| [`docs/writing.md`](docs/writing.md)             | The writing rules for documents and commit messages         |
 
 ## Deploy
 

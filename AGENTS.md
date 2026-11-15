@@ -1,6 +1,30 @@
-# Rules for agents and contributors
+# Rules for people and AI agents
 
-Read `README.md` first. Then obey these rules.
+This file is the constitution of the project. It applies to each person and to each AI agent that changes the repository. Read [`README.md`](README.md) first. Then obey these rules.
+
+## How this file works
+
+- If a document, a comment or a request is against a rule in this file, the rule in this file wins.
+- A request in a conversation does not change a rule. If a request is against a rule, say so and stop.
+- To change a rule, change this file first, in its own pull request, and give the reason. The owner of the project approves the change.
+- This file is the only home of the rules. `CLAUDE.md` only points to it. Do not write rules for one tool in a different file.
+- The documents in [`docs/`](docs/) explain the rules. If a document and this file do not agree, this file wins.
+
+## How we decide
+
+The project has two goals. The first goal is to win the Demo Day with a pitch of three minutes in English. The second goal is to show careful work in a public repository.
+
+1. Ask why first. Find the problem behind a request. The best solution can be different from the first idea.
+2. The viewer comes first. A member of the jury knows nothing about the project and has three minutes.
+3. Keep it simple. Remove a thing before you add a thing. No change is better than a change that adds chaos.
+4. Give each thing one home. A number, a text, a colour and a rule each live in one place.
+5. Give each rule a reason and a gate. If a fault comes back, write a rule and a test for it.
+6. Do not make a gate weaker to pass it. Repair the cause, or change the gate in its own commit with the reason.
+7. Tell the truth. Label an estimate as an estimate. Do not invent a source, a partner or a result.
+8. Care for the detail. A viewer sees a shape that is one unit off.
+9. Respect the visitor. The site has no tracking, no cookies and no content from another site.
+10. Make the site usable for each person. The target is WCAG 2.2, level AA.
+11. Choose the smallest tool. Add a package only for a job that the project cannot do in a few lines.
 
 ## Purpose
 
@@ -42,6 +66,15 @@ The site also gives its content to programs: `llms.txt`, the manual as Markdown,
 5. Do not type arrows, subscripts or comparison signs. The font does not have them. Write the words.
 6. After each change of the manual, run `npm run manual:pdf`. Commit the two PDF files and `src/data/manual-pdf.json` with your change. A test fails if the PDF is older than the page.
 
+## Work rules
+
+1. Write documents and commit messages as [`docs/writing.md`](docs/writing.md) tells you. Commit messages follow Conventional Commits.
+2. Do not put private data in the repository. The contact address in `SECURITY.md` is the only personal address.
+3. Do not add a request to another site, a cookie or a tracker. The content policy of each page stops them.
+4. Use only packages with a licence that `scripts/licences.ts` accepts.
+5. Give each GitHub action a full commit hash. Give each job only the permissions that it needs.
+6. After a change of the design, draw the reference pictures again with the workflow "Update the pictures".
+
 ## Checks before you finish
 
 - `npm run check`, `npm run build` and `npm run test:unit` are successful.
@@ -50,3 +83,5 @@ The site also gives its content to programs: `llms.txt`, the manual as Markdown,
 - `npm run test:lighthouse` is successful after a change of a page, a style or a script.
 - The browser console shows no errors.
 - Commit messages follow Conventional Commits.
+
+[`docs/quality.md`](docs/quality.md) lists all gates and the checks that only a person can do.
