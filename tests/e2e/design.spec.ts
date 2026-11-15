@@ -86,7 +86,7 @@ test.describe('design rules', () => {
       }, info) => {
         await openDeck(page, { locale, slide: index + 1, motion: false });
         const layout = await page.locator('.slide.is-active').evaluate((slide) => {
-          const label = (node: Element): string => `"${(node.textContent ?? '').trim().slice(0, 24)}"`;
+          const label = (node: Element): string => `"${node.textContent.trim().slice(0, 24)}"`;
           // The text that a person reads: each element with words of its own.
           const texts = Array.from(slide.querySelectorAll<HTMLElement>('*')).filter((node) => {
             if (node.closest('[aria-hidden="true"], .sr-only, svg')) return false;
