@@ -17,6 +17,13 @@ updates:
         update-types: [minor, patch]
       npm-major:
         update-types: [major]
+    ignore:
+      # The types of Node follow the version of Node that the project uses (see .nvmrc).
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # A new major version of TypeScript needs new versions of its tools at the same time. A person makes that change.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
     commit-message:
       prefix: chore(deps)
     open-pull-requests-limit: 5

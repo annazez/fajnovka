@@ -28,10 +28,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PULL_REQUEST: ${{ github.event.pull_request.node_id }}
-        run: |
-          gh api graphql -f id="$PULL_REQUEST" -f query='
+          QUERY: |
             mutation ($id: ID!) {
               enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) {
                 clientMutationId
               }
-            }'
+            }
+        run: gh api graphql -f id="$PULL_REQUEST" -f query="$QUERY"
